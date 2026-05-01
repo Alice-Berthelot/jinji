@@ -22,7 +22,18 @@ export default async function middleware(request: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, SECRET);
+    const roles = (payload.roles ?? []) as string[];
+    if (pathname.startsWith("/hr") && !roles.includes("HR")) {
+      const redirectUrl = new URL("/", request.url);
+      redirectUrl.searchParams.set("error", "HR_REQUIRED");
+      return NextResponse.redirect(redirectUrl);
+    }
+    if (pathname.startsWith("/manager") && !roles.includes("MANAGER")) {
+      const redirectUrl = new URL("/", request.url);
+      redirectUrl.searchParams.set("error", "MANAGER_REQUIRED");
+      return NextResponse.redirect(redirectUrl);
+    }
     return NextResponse.next();
   } catch {
     return NextResponse.redirect(new URL("/login", request.url));
