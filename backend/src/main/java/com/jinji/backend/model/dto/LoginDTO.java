@@ -1,7 +1,6 @@
 package com.jinji.backend.model.dto;
 
-public class UserDTO {
-
+public class LoginDTO {
     private String username;
     private String password;
 

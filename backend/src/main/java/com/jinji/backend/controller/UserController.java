@@ -1,6 +1,6 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.UserDTO;
+import com.jinji.backend.model.dto.RegisterUserDTO;
 import com.jinji.backend.model.entity.User;
 import com.jinji.backend.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,13 +16,5 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
-    }
-
-    @PostMapping("/register")
-    public User create(@RequestBody UserDTO request) {
-        return userService.createUser(
-                request.getUsername(),
-                request.getPassword()
-        );
     }
 }
