@@ -3,6 +3,7 @@ import { Inclusive_Sans, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import AuthToastHandler from "@/components/ui/AuthAlertHandler";
 import { ToastContainer } from "react-toastify";
+import Header from "@/components/layout/Header";
 
 const inclusiveSans = Inclusive_Sans({
   variable: "--font-inclusive-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${inclusiveSans.variable} ${nunitoSans.variable} antialiased`}
       >
+        <Header />
         <main>
           <AuthToastHandler />
           <ToastContainer />
