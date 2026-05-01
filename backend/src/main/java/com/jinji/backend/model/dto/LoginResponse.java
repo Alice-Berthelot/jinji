@@ -1,5 +1,7 @@
 package com.jinji.backend.model.dto;
 
+import java.util.List;
+
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
@@ -16,4 +18,5 @@ public class LoginResponse {
     public String getRefreshToken() {
         return refreshToken;
     }
+
 }

@@ -12,6 +12,8 @@ import java.security.Key;
 import java.util.Date;
 
 import io.jsonwebtoken.*;
+
+import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -20,16 +22,22 @@ public class JwtService {
     @Value("${secret_jwt}")
     private String secretJwt;
 
-    private String SECRET;
-
-    @PostConstruct
-    public void init() {
-        SECRET = secretJwt;
-    }
+//    private String SECRET;
+//
+//    @PostConstruct
+//    public void init() {
+//        SECRET = secretJwt;
+//    }
 
     public String generateAccessToken(UserDetails userDetails) {
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(a -> a.getAuthority().replace("ROLE_", ""))
+                .toList();
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -46,7 +54,7 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secretJwt.getBytes());
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
