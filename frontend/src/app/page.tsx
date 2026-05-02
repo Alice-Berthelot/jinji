@@ -1,5 +1,7 @@
-import Image from "next/image";
-
 export default function Home() {
-  return <div>Currently under development</div>;
+  return (
+    <div>
+      <p>Currently under development</p>
+    </div>
+  );
 }

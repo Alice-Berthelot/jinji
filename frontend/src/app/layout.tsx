@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import {
-  Inclusive_Sans,
-  Nunito_Sans,
-} from "next/font/google";
+import { Inclusive_Sans, Nunito_Sans } from "next/font/google";
 import "./globals.css";
+import AuthToastHandler from "@/components/ui/AuthAlertHandler";
+import { ToastContainer } from "react-toastify";
+import Header from "@/components/layout/Header";
 
 const inclusiveSans = Inclusive_Sans({
   variable: "--font-inclusive-sans",
@@ -17,7 +17,8 @@ const nunitoSans = Nunito_Sans({
 
 export const metadata: Metadata = {
   title: "jinji",
-  description: "multi-company HRIS application specializing in paid leave management",
+  description:
+    "multi-company HRIS application specializing in paid leave management",
 };
 
 export default function RootLayout({
@@ -30,7 +31,12 @@ export default function RootLayout({
       <body
         className={`${inclusiveSans.variable} ${nunitoSans.variable} antialiased`}
       >
-          <main>{children}</main>
+        <Header />
+        <main>
+          <AuthToastHandler />
+          <ToastContainer />
+          {children}
+        </main>
       </body>
     </html>
   );
