@@ -1,4 +1,5 @@
 INSERT INTO business.role (code, label)
-VALUES('HR', 'Human Resources'),
+VALUES('EMPLOYEE', 'Employee'),
       ('MANAGER', 'Manager'),
-      ('EMPLOYEE', 'Employee');
+      ('HR', 'Human Resources')
+      ;

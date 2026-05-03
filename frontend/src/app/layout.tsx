@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthToastHandler from "@/components/ui/AuthAlertHandler";
 import { ToastContainer } from "react-toastify";
 import Header from "@/components/layout/Header";
+import Sidebar from "@/components/layout/Sidebar";
 
 const inclusiveSans = Inclusive_Sans({
   variable: "--font-inclusive-sans",
@@ -32,11 +33,14 @@ export default function RootLayout({
         className={`${inclusiveSans.variable} ${nunitoSans.variable} antialiased`}
       >
         <Header />
-        <main>
-          <AuthToastHandler />
-          <ToastContainer />
-          {children}
-        </main>
+        <div className="lg:flex">
+          <Sidebar />
+          <main className="flex-1">
+            <AuthToastHandler />
+            <ToastContainer />
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
