@@ -1,0 +1,1 @@
+type Period = "AM" | "PM";
