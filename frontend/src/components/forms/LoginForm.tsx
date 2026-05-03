@@ -3,7 +3,7 @@
 import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { loginAction, LoginState } from "@/app/actions/login";
-import ButtonPurple from "../ui/ButtonPurple";
+import ButtonPurple from "../ui/Button";
 import { InputField } from "../ui/InputField";
 
 export default function LoginForm() {

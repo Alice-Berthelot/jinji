@@ -1,8 +1,5 @@
 import MainTitle from "@/components/ui/MainTitle";
-import Link from "next/link";
-import jinjiLogo from "../../public/logos/jinji_logo.svg";
-import Image from "next/image";
-import LinkPurple from "@/components/ui/LinkPurple";
+import LinkPurple from "@/components/ui/LinkCustom";
 
 export default function NotFound() {
   return (

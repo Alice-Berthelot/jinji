@@ -1,4 +1,4 @@
-import LinkPurple from "@/components/ui/LinkPurple";
+import LinkPurple from "@/components/ui/LinkCustom";
 
 export default function HrHome() {
   return (
