@@ -2,7 +2,7 @@
 
 import { useActionState, useRef, useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import ButtonPurple from "../ui/ButtonPurple";
+import ButtonPurple from "../ui/Button";
 import { InputField } from "../ui/InputField";
 import {
   createEmployeeAction,

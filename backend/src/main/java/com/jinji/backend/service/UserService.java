@@ -6,6 +6,7 @@ import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.RoleRepository;
 import com.jinji.backend.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +52,14 @@ public class UserService {
         user.setRoles(userRoles);
 
         return userRepository.save(user);
+    }
+
+    public User getCurrentUser() {
+        String username = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
