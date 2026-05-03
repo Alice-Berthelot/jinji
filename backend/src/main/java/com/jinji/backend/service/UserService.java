@@ -1,6 +1,7 @@
 package com.jinji.backend.service;
 
 import com.jinji.backend.exception.ResourceAlreadyExistsException;
+import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.Role;
 import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
@@ -26,7 +27,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User createUser(String username, String password, Set<RoleEnum> roles) {
+    public User createUser(String username, String password, Set<RoleEnum> roles, Employee employee) {
 
         User user = new User();
 
@@ -51,7 +52,15 @@ public class UserService {
 
         user.setRoles(userRoles);
 
+        if (employee != null) {
+            user.setEmployee(employee);
+        }
+
         return userRepository.save(user);
+    }
+    
+    public User createUser(String username, String password, Set<RoleEnum> roles) {
+        return createUser(username, password, roles, null);
     }
 
     public User getCurrentUser() {

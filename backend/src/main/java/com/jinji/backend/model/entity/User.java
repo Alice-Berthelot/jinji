@@ -27,7 +27,7 @@ public class User {
     )
     private Set<Role> roles;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
