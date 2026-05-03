@@ -1,11 +1,14 @@
 package com.jinji.backend.service;
 
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
+import com.jinji.backend.model.dto.EmployeeDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
+import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.DepartmentRepository;
 import com.jinji.backend.repository.EmployeeRepository;
+import com.jinji.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -16,13 +19,47 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
 
     public EmployeeService(EmployeeRepository employeeRepository,
-                           DepartmentRepository departmentRepository, UserService userService) {
+                           DepartmentRepository departmentRepository,
+                           UserRepository userRepository,
+                           UserService userService) {
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
+    }
+
+    public EmployeeDTO getCurrentEmployee(String username) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Employee employee = user.getEmployee();
+
+        if (employee == null) {
+            throw new RuntimeException("No employee linked to this user");
+        }
+
+        return mapToDto(employee);
+    }
+
+    private EmployeeDTO mapToDto(Employee e) {
+        EmployeeDTO dto = new EmployeeDTO();
+
+        dto.setEmployeeNumber(e.getEmployeeNumber());
+        dto.setSurname(e.getSurname());
+        dto.setFirstName(e.getFirstName());
+        dto.setEmail(e.getEmail());
+        dto.setPhoneNumber(e.getPhoneNumber());
+        dto.setSeniorityDate(e.getSeniorityDate());
+        dto.setDepartmentCode(
+                e.getDepartment() != null ? e.getDepartment().getCode() : null
+        );
+
+        return dto;
     }
 
     public String createEmployee(EmployeeCreateRequest request) {
