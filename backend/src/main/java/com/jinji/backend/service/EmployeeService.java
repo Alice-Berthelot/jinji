@@ -54,7 +54,8 @@ public class EmployeeService {
             userService.createUser(
                     savedEmployee.getEmail(), // username = email
                     request.getPassword(),
-                    roles
+                    roles,
+                    savedEmployee
             );
         }
 
