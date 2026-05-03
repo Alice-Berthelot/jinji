@@ -1,5 +1,6 @@
 package com.jinji.backend.repository;
 
+import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
