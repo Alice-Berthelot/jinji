@@ -14,7 +14,7 @@ import { SelectField } from "../ui/SelectField";
 import Subtitle from "../ui/Subtitle";
 import { toast } from "react-toastify";
 import LinkCustom from "../ui/LinkCustom";
-import { LeaveType } from "@/types/leaveTypes";
+import { LeaveType } from "@/types/leave/leaveTypes";
 import { RadioField } from "../ui/RadioField";
 
 export default function LeaveRequestForm() {

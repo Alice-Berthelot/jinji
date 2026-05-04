@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 
 export default function Profile() {
   const [profile, setProfile] = useState<EmployeeProfile | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
