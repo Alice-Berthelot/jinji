@@ -32,8 +32,7 @@ public class EmployeeService {
         this.userService = userService;
     }
 
-    public EmployeeDTO getCurrentEmployee(String username) {
-
+    public Employee getCurrentEmployee(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -43,7 +42,14 @@ public class EmployeeService {
             throw new RuntimeException("No employee linked to this user");
         }
 
-        return mapToDto(employee);
+        return employee;
+    }
+
+    public EmployeeDTO getEmployeeMe(String username) {
+
+        Employee currentEmployee = getCurrentEmployee(username);
+
+        return mapToDto(currentEmployee);
     }
 
     private EmployeeDTO mapToDto(Employee e) {

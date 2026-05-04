@@ -31,6 +31,6 @@ public class EmployeeController {
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public EmployeeDTO getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        return employeeService.getCurrentEmployee(userDetails.getUsername());
+        return employeeService.getEmployeeMe(userDetails.getUsername());
     }
 }
