@@ -2,14 +2,13 @@ package com.jinji.backend.service;
 
 import com.jinji.backend.model.dto.LeaveRequestCreateRequest;
 import com.jinji.backend.model.dto.LeaveRequestDTO;
+import com.jinji.backend.model.dto.LeaveRequestReviewDTO;
 import com.jinji.backend.model.dto.LeaveRequestSummaryDTO;
-import com.jinji.backend.model.entity.Employee;
-import com.jinji.backend.model.entity.LeaveRequest;
-import com.jinji.backend.model.entity.LeaveType;
-import com.jinji.backend.model.entity.User;
+import com.jinji.backend.model.entity.*;
 import com.jinji.backend.model.enums.LeaveRequestStatus;
 import com.jinji.backend.model.enums.PeriodType;
 import com.jinji.backend.repository.LeaveRequestRepository;
+import com.jinji.backend.repository.LeaveRequestReviewRepository;
 import com.jinji.backend.repository.LeaveTypeRepository;
 import com.jinji.backend.repository.projection.LeaveRequestSummaryRaw;
 import org.springframework.stereotype.Service;
@@ -22,13 +21,15 @@ public class LeaveRequestService {
 
     private final LeaveRequestRepository leaveRequestRepository;
     private final LeaveTypeRepository leaveTypeRepository;
+    private final LeaveRequestReviewRepository leaveRequestReviewRepository;
     private final UserService userService;
     private final EmployeeService employeeService;
 
     public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
-                               LeaveTypeRepository leaveTypeRepository, UserService userService, EmployeeService employeeService) {
+                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveTypeRepository = leaveTypeRepository;
+        this.leaveRequestReviewRepository = leaveRequestReviewRepository;
         this.userService = userService;
         this.employeeService = employeeService;
     }
@@ -67,11 +68,42 @@ public class LeaveRequestService {
         return "Leave request submitted successfully";
     }
 
+//    public List<LeaveRequestDTO> getMyLeaveRequests(String username) {
+//
+//        Employee employee = employeeService.getCurrentEmployee(username);
+//
+//        return leaveRequestRepository.findByEmployee_Id(employee.getId()).stream()
+//                .map(this::mapToDto)
+//                .toList();
+//    }
+//
+//    private LeaveRequestDTO mapToDto(LeaveRequest lr) {
+//        LeaveRequestDTO dto = new LeaveRequestDTO();
+//
+//        dto.setId(lr.getId());
+//        dto.setCreatedAt(lr.getCreatedAt());
+//        dto.setStartDate(lr.getStartDate());
+//        dto.setEndDate(lr.getEndDate());
+//        dto.setStartPeriod(lr.getStartPeriod());
+//        dto.setEndPeriod(lr.getEndPeriod());
+//        dto.setStatus(lr.getStatus());
+//        dto.setEmployeeComment(lr.getEmployeeComment());
+//        dto.setLeaveTypeLabel(
+//                lr.getLeaveType() != null ? lr.getLeaveType().getLabel() : null
+//        );
+//
+//        return dto;
+//    }
+
+
     public List<LeaveRequestDTO> getMyLeaveRequests(String username) {
 
         Employee employee = employeeService.getCurrentEmployee(username);
 
-        return leaveRequestRepository.findByEmployee_Id(employee.getId()).stream()
+        List<LeaveRequest> leaveRequests =
+                leaveRequestRepository.findByEmployee_Id(employee.getId());
+
+        return leaveRequests.stream()
                 .map(this::mapToDto)
                 .toList();
     }
@@ -87,9 +119,38 @@ public class LeaveRequestService {
         dto.setEndPeriod(lr.getEndPeriod());
         dto.setStatus(lr.getStatus());
         dto.setEmployeeComment(lr.getEmployeeComment());
+
         dto.setLeaveTypeLabel(
                 lr.getLeaveType() != null ? lr.getLeaveType().getLabel() : null
         );
+
+        List<LeaveRequestReview> reviews =
+                leaveRequestReviewRepository.findByLeaveRequest_Id(lr.getId());
+
+        dto.setReviews(
+                reviews.stream()
+                        .map(this::mapReviewToDto)
+                        .toList()
+        );
+
+        return dto;
+    }
+
+    private LeaveRequestReviewDTO mapReviewToDto(LeaveRequestReview r) {
+
+        LeaveRequestReviewDTO dto = new LeaveRequestReviewDTO();
+
+        dto.setId(r.getId());
+        dto.setReviewerRole(r.getReviewerRole());
+        dto.setDecision(r.getDecision());
+        dto.setComment(r.getComment());
+        dto.setReviewedAt(r.getReviewedAt());
+
+        if (r.getReviewedBy() != null) {
+            dto.setReviewerId(r.getReviewedBy().getId());
+            dto.setReviewerFirstName(r.getReviewedBy().getFirstName());
+            dto.setReviewerLastName(r.getReviewedBy().getSurname());
+        }
 
         return dto;
     }

@@ -5,6 +5,7 @@ import com.jinji.backend.model.enums.PeriodType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class LeaveRequestDTO {
 
@@ -17,6 +18,7 @@ public class LeaveRequestDTO {
     private LeaveRequestStatus status;
     private String employeeComment;
     private String leaveTypeLabel;
+    private List<LeaveRequestReviewDTO> reviews;
 
     public Long getId() {
         return id;
@@ -88,5 +90,13 @@ public class LeaveRequestDTO {
 
     public void setLeaveTypeLabel(String leaveTypeLabel) {
         this.leaveTypeLabel = leaveTypeLabel;
+    }
+
+    public List<LeaveRequestReviewDTO> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<LeaveRequestReviewDTO> reviews) {
+        this.reviews = reviews;
     }
 }
