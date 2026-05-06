@@ -1,18 +1,20 @@
-import { LeaveType } from "./leaveTypes";
+export type LeaveRequestStatus = "APPROVED" | "REJECTED" | "PENDING" | "CANCELLED";
+export type LeaveRequestReviewDecision = "APPROVED" | "REJECTED";
+export type ReviewerRole = "HR" | "MANAGER";
 
-export interface MyLeaveRequests {
-  id: number;
-  start_date: string;
-  start_period: Period;
-  end_date: string;
-  end_period: Period;
-  status_label: string;
-  employee_comment: string;
-  created_at: string;
-  leave_type_label: string;
-  number_of_days: number;
-  comment?: string;
-}
+// export interface MyLeaveRequests {
+//   id: number;
+//   start_date: string;
+//   start_period: Period;
+//   end_date: string;
+//   end_period: Period;
+//   status_label: string;
+//   employee_comment: string;
+//   created_at: string;
+//   leave_type_label: string;
+//   number_of_days: number;
+//   comment?: string;
+// }
 
 export interface MyLeaveRequestsSummary {
   id: number;
@@ -23,7 +25,30 @@ export interface MyLeaveRequestsSummary {
   createdAt: string;
 }
 
-export type LeaveRequestStatus = "ACCEPTED" | "REJECTED" | "PENDING" | "CANCELLED";
+export interface MyLeaveRequestDetail {
+  id: number;
+  leaveTypeLabel: string;
+  createdAt: string;
+  startDate: string;
+  endDate: string;
+  startPeriod: Period;
+  endPeriod: Period;
+  status: LeaveRequestStatus;
+  employeeComment: string;
+  //     number_of_days: number;
+  reviews: LeaveRequestReview[];
+}
+
+export interface LeaveRequestReview {
+  id: number;
+  reviewerRole: ReviewerRole;
+  decision: LeaveRequestReviewDecision;
+  comment: string;
+  reviewedAt: string;
+  reviewerId: number;
+  reviewerFirstName: string;
+  reviewerLastName: string;
+}
 
 // export interface LeaveRequestTable {
 //     leave_request_id: string;
@@ -35,26 +60,6 @@ export type LeaveRequestStatus = "ACCEPTED" | "REJECTED" | "PENDING" | "CANCELLE
 //     end_date: string;
 //     end_period: Period;
 //     status_label: string;
-//     employee_comment: string;
-//     created_at: string;
-//     number_of_days: number;
-//     reviews: LeaveRequestReview[];
-//     comment?: string;
-//   }
-
-//   export interface LeaveRequestDetail {
-//     id: string;
-//     employee: Employee;
-//     employee_full_name: string;
-//     leave_type: LeaveType;
-//     start_date: Period;
-//     start_period: Period;
-//     end_date: string;
-//     end_period: string;
-//     status: string;
-//     status_label: string;
-//     source: string;
-//     paper_document?: string | null;
 //     employee_comment: string;
 //     created_at: string;
 //     number_of_days: number;

@@ -27,7 +27,7 @@ export default function LeaveRequestSmallTable({
           header: "N° de la demande",
           accessor: (row) => (
             <Link
-              href={`/leaves/${row.id}`}
+              href={`/leaves/leave-requests/${row.id}`}
               className="text-[var(--color-dark-purple)] underline underline-offset-2"
             >
               <div className="flex gap-2 items-center">
@@ -52,7 +52,7 @@ export default function LeaveRequestSmallTable({
           accessor: (row) => {
             const colors: Record<string, string> = {
               PENDING: "bg-yellow-100 text-yellow-700",
-              ACCEPTED: "bg-green-100 text-green-700",
+              APPROVED: "bg-green-100 text-green-700",
               REJECTED: "bg-red-100 text-red-700",
               CANCELLED: "bg-gray-200 text-gray-600",
             };

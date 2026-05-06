@@ -96,6 +96,13 @@ public class LeaveRequestService {
 //    }
 
 
+    public LeaveRequestDTO getLeaveRequestById(Long leaveRequestId) {
+        LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
+                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+
+        return mapToDto(leaveRequest);
+    }
+
     public List<LeaveRequestDTO> getMyLeaveRequests(String username) {
 
         Employee employee = employeeService.getCurrentEmployee(username);

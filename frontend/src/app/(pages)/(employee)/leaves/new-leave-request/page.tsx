@@ -2,7 +2,7 @@ import LeaveRequestForm from "@/components/forms/LeaveRequestForm";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
 
-export default function LeaveRequest() {
+export default function NewLeaveRequestPage() {
   return (
     <>
       <BackArrow />
