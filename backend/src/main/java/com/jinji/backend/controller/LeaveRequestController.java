@@ -40,7 +40,7 @@ public class LeaveRequestController {
         return leaveRequestService.getMyLeaveRequests(userDetails.getUsername());
     }
 
-    @GetMapping("/me/{leaveRequestId}")
+    @GetMapping("/{leaveRequestId}")
     @PreAuthorize("isAuthenticated()")
     public LeaveRequestDTO getMyLeaveRequestDetail(@PathVariable Long leaveRequestId) {
         return leaveRequestService.getLeaveRequestById(leaveRequestId);

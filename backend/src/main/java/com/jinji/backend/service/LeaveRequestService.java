@@ -68,39 +68,32 @@ public class LeaveRequestService {
         return "Leave request submitted successfully";
     }
 
-//    public List<LeaveRequestDTO> getMyLeaveRequests(String username) {
-//
-//        Employee employee = employeeService.getCurrentEmployee(username);
-//
-//        return leaveRequestRepository.findByEmployee_Id(employee.getId()).stream()
-//                .map(this::mapToDto)
-//                .toList();
-//    }
-//
-//    private LeaveRequestDTO mapToDto(LeaveRequest lr) {
-//        LeaveRequestDTO dto = new LeaveRequestDTO();
-//
-//        dto.setId(lr.getId());
-//        dto.setCreatedAt(lr.getCreatedAt());
-//        dto.setStartDate(lr.getStartDate());
-//        dto.setEndDate(lr.getEndDate());
-//        dto.setStartPeriod(lr.getStartPeriod());
-//        dto.setEndPeriod(lr.getEndPeriod());
-//        dto.setStatus(lr.getStatus());
-//        dto.setEmployeeComment(lr.getEmployeeComment());
-//        dto.setLeaveTypeLabel(
-//                lr.getLeaveType() != null ? lr.getLeaveType().getLabel() : null
-//        );
-//
-//        return dto;
-//    }
-
-
-    public LeaveRequestDTO getLeaveRequestById(Long leaveRequestId) {
+    public LeaveRequestDTO getLeaveRequestById(Long leaveRequestId) throws RuntimeException {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
                 .orElseThrow(() -> new RuntimeException("Leave request not found"));
 
+        User currentUser = userService.getCurrentUser();
+        Employee employeeAuth = currentUser.getEmployee();
+
+        boolean isOwner = employeeAuth.getId().equals(leaveRequest.getEmployee().getId());
+        boolean hasHrRole = currentUser.getRoles().stream()
+                .anyMatch(role -> role.getLabel().equalsIgnoreCase("HR"));
+        boolean hasTeamManagerRole = currentUser.getRoles().stream()
+                .anyMatch(role -> role.getLabel().equalsIgnoreCase("MANAGER")) && isManagerOf(employeeAuth, leaveRequest.getEmployee());
+
+        if (!isOwner && !hasHrRole && !hasTeamManagerRole) {
+            throw new RuntimeException("User is not authorized to read the leave request");
+        }
+
+
         return mapToDto(leaveRequest);
+    }
+
+    private boolean isManagerOf(Employee manager, Employee employee) {
+        System.out.println(manager.getId());
+        return employee.getTeams().stream()
+                .anyMatch(team -> team.getManager() != null
+                        && team.getManager().getId().equals(manager.getId()));
     }
 
     public List<LeaveRequestDTO> getMyLeaveRequests(String username) {

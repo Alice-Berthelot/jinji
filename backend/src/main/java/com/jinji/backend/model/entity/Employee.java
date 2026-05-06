@@ -3,6 +3,7 @@ package com.jinji.backend.model.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "employee", schema = "business")
@@ -27,6 +28,9 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
+
+    @ManyToMany(mappedBy = "employees")
+    private Set<Team> teams;
 
     public Long getId() {
         return id;
@@ -90,5 +94,13 @@ public class Employee {
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    public Set<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(Set<Team> teams) {
+        this.teams = teams;
     }
 }

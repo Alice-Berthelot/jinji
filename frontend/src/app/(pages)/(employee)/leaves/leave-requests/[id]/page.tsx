@@ -1,6 +1,6 @@
 "use client";
 
-import { getMyLeaveRequestDetail } from "@/app/api/leave-requests/me/route";
+import { getLeaveRequestDetail } from "@/app/api/leave-requests/me/route";
 import LeaveRequestDetail from "@/components/LeaveRequestDetail";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
@@ -20,7 +20,7 @@ const leaveRequestId = params.id as string;
     async function load() {
       try {
         setLoading(true);
-        const data = await getMyLeaveRequestDetail(leaveRequestId);
+        const data = await getLeaveRequestDetail(leaveRequestId);
         setLeaveRequest(data);
         setLoading(false);
       } catch (err) {
