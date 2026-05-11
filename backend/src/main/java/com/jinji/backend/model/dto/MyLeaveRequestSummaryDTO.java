@@ -5,7 +5,7 @@ import com.jinji.backend.model.enums.LeaveRequestStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class LeaveRequestSummaryDTO {
+public class MyLeaveRequestSummaryDTO {
 
     private Long id;
     private String leaveTypeLabel;
@@ -13,10 +13,6 @@ public class LeaveRequestSummaryDTO {
     private LocalDate endDate;
     private LeaveRequestStatus status;
     private LocalDateTime createdAt;
-    private String employeeFirstName;
-    private String employeeSurname;
-    private Boolean hasHrReview;
-    private Boolean hasManagerReview;
 
     public Long getId() {
         return id;
@@ -64,37 +60,5 @@ public class LeaveRequestSummaryDTO {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public String getEmployeeFirstName() {
-        return employeeFirstName;
-    }
-
-    public void setEmployeeFirstName(String employeeFirstName) {
-        this.employeeFirstName = employeeFirstName;
-    }
-
-    public String getEmployeeSurname() {
-        return employeeSurname;
-    }
-
-    public void setEmployeeSurname(String employeeSurname) {
-        this.employeeSurname = employeeSurname;
-    }
-
-    public Boolean getHasHrReview() {
-        return hasHrReview;
-    }
-
-    public void setHasHrReview(Boolean hasHrReview) {
-        this.hasHrReview = hasHrReview;
-    }
-
-    public Boolean getHasManagerReview() {
-        return hasManagerReview;
-    }
-
-    public void setHasManagerReview(Boolean hasManagerReview) {
-        this.hasManagerReview = hasManagerReview;
     }
 }

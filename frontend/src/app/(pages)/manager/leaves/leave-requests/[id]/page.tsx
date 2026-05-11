@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { getLeaveRequestDetail } from "@/app/api/leave-requests/me/route";
 import LeaveRequestDetail from "@/components/LeaveRequestDetail";
@@ -8,27 +8,27 @@ import { LeaveRequest } from "@/types/leave/leaveRequest";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
-export default function LeaveRequestDetailPage() {
-  const params = useParams();
-const leaveRequestId = params.id as string;
-  const [leaveRequest, setLeaveRequest] = useState<
-    LeaveRequest | null
-  >(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        const data = await getLeaveRequestDetail(leaveRequestId);
-        setLeaveRequest(data);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    load();
-  }, []);
+export default function ManagerLeaveRequestDetail() {
+    const params = useParams();
+    const leaveRequestId = params.id as string;
+      const [leaveRequest, setLeaveRequest] = useState<
+        LeaveRequest | null
+      >(null);
+      const [loading, setLoading] = useState(true);
+    
+      useEffect(() => {
+        async function load() {
+          try {
+            setLoading(true);
+            const data = await getLeaveRequestDetail(leaveRequestId);
+            setLeaveRequest(data);
+            setLoading(false);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        load();
+      }, []);
   return (
     <>
       <BackArrow />

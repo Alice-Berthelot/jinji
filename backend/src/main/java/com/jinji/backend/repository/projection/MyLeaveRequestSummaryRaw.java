@@ -5,15 +5,11 @@ import com.jinji.backend.model.enums.LeaveRequestStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public interface LeaveRequestSummaryRaw {
+public interface MyLeaveRequestSummaryRaw {
     Long getId();
     String getLeaveTypeLabel();
     LocalDate getStartDate();
     LocalDate getEndDate();
     LeaveRequestStatus getStatus();
     LocalDateTime getCreatedAt();
-    String getEmployeeFirstName();
-    String getEmployeeSurname();
-    Boolean getHasHrReview();
-    Boolean getHasManagerReview();
 }
