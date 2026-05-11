@@ -23,9 +23,11 @@ export interface MyLeaveRequestsSummary {
   endDate: string;
   status: LeaveRequestStatus;
   createdAt: string;
+  reviewedByManager: boolean;
+  reviewedByHr: boolean;
 }
 
-export interface MyLeaveRequestDetail {
+export interface LeaveRequest {
   id: number;
   leaveTypeLabel: string;
   createdAt: string;
@@ -37,6 +39,20 @@ export interface MyLeaveRequestDetail {
   employeeComment: string;
   //     number_of_days: number;
   reviews: LeaveRequestReview[];
+}
+
+export interface LeaveRequestsSummary {
+  id: number;
+  employeeSurname: string;
+  employeeFirstName: string;
+  leaveTypeLabel: string;
+  startDate: string;
+  endDate: string;
+  status: LeaveRequestStatus;
+  createdAt: string;
+  hasManagerReview: boolean;
+  hasHrReview: boolean;
+    //     number_of_days: number;
 }
 
 export interface LeaveRequestReview {

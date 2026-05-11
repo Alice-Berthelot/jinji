@@ -1,16 +1,15 @@
 package com.jinji.backend.service;
 
-import com.jinji.backend.model.dto.LeaveRequestCreateRequest;
-import com.jinji.backend.model.dto.LeaveRequestDTO;
-import com.jinji.backend.model.dto.LeaveRequestReviewDTO;
-import com.jinji.backend.model.dto.LeaveRequestSummaryDTO;
+import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.entity.*;
 import com.jinji.backend.model.enums.LeaveRequestStatus;
 import com.jinji.backend.model.enums.PeriodType;
+import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.LeaveRequestRepository;
 import com.jinji.backend.repository.LeaveRequestReviewRepository;
 import com.jinji.backend.repository.LeaveTypeRepository;
 import com.jinji.backend.repository.projection.LeaveRequestSummaryRaw;
+import com.jinji.backend.repository.projection.MyLeaveRequestSummaryRaw;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -90,7 +89,6 @@ public class LeaveRequestService {
     }
 
     private boolean isManagerOf(Employee manager, Employee employee) {
-        System.out.println(manager.getId());
         return employee.getTeams().stream()
                 .anyMatch(team -> team.getManager() != null
                         && team.getManager().getId().equals(manager.getId()));
@@ -155,14 +153,61 @@ public class LeaveRequestService {
         return dto;
     }
 
-    public List<LeaveRequestSummaryDTO> getMyLeaveRequestsSummary(String username) {
+    public List<LeaveRequestSummaryDTO> getLeaveRequestsSummary(String username) {
+        User currentUser = userService.getCurrentUser();
+        Employee employeeAuth = currentUser.getEmployee();
+
+        currentUser.getRoles()
+                .forEach(role -> System.out.println(role.getLabel()));
+
+        boolean hasHrRole = currentUser.getRoles().stream()
+                .anyMatch(role -> role.getCode() == RoleEnum.HR);
+
+        boolean hasManagerRole = currentUser.getRoles().stream()
+                .anyMatch(role -> role.getCode() == RoleEnum.MANAGER);
+
+        List<LeaveRequestSummaryRaw> leaveRequests;
+
+        if (hasHrRole) {
+            leaveRequests = leaveRequestRepository.findAllLeaveRequestsSummary();
+        }
+        else if (hasManagerRole) {
+            leaveRequests = leaveRequestRepository
+                    .findLeaveRequestSummaryByManagerId(employeeAuth.getId());
+        }
+        else {
+            throw new RuntimeException(
+                    "User is not authorized to read leave requests"
+            );
+        }
+
+        return leaveRequests.stream()
+                .map(this::mapToSummaryDto)
+                .toList();
+    }
+
+    public List<MyLeaveRequestSummaryDTO> getMyLeaveRequestsSummary(String username) {
 
         Employee employee = employeeService.getCurrentEmployee(username);
 
         return leaveRequestRepository.findLeaveRequestSummaryByEmployee_Id(employee.getId())
                 .stream()
-                .map(this::mapToSummaryDto)
+                .map(this::mapToMySummaryDto)
                 .toList();
+    }
+
+    private MyLeaveRequestSummaryDTO mapToMySummaryDto(MyLeaveRequestSummaryRaw r) {
+
+        MyLeaveRequestSummaryDTO dto = new MyLeaveRequestSummaryDTO();
+
+        dto.setId(r.getId());
+        dto.setLeaveTypeLabel(r.getLeaveTypeLabel());
+        dto.setStartDate(r.getStartDate());
+        dto.setEndDate(r.getEndDate());
+        dto.setStatus(r.getStatus());
+        dto.setCreatedAt(r.getCreatedAt());
+
+        return dto;
     }
 
     private LeaveRequestSummaryDTO mapToSummaryDto(LeaveRequestSummaryRaw r) {
@@ -175,6 +220,12 @@ public class LeaveRequestService {
         dto.setEndDate(r.getEndDate());
         dto.setStatus(r.getStatus());
         dto.setCreatedAt(r.getCreatedAt());
+
+        dto.setEmployeeFirstName(r.getEmployeeFirstName());
+        dto.setEmployeeSurname(r.getEmployeeSurname());
+
+        dto.setHasHrReview(r.getHasHrReview());
+        dto.setHasManagerReview(r.getHasManagerReview());
 
         return dto;
     }

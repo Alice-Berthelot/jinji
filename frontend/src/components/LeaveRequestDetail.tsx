@@ -1,7 +1,7 @@
-import { MyLeaveRequestDetail } from "@/types/leave/leaveRequest";
+import { LeaveRequest } from "@/types/leave/leaveRequest";
 
 type LeaveRequestDetailProps = {
-    leaveRequest: MyLeaveRequestDetail | null;
+    leaveRequest: LeaveRequest | null;
     loading: boolean;
   };
   

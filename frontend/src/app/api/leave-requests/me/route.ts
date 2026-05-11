@@ -1,6 +1,6 @@
 "use server"
 
-import { MyLeaveRequestDetail, MyLeaveRequestsSummary } from "@/types/leave/leaveRequest";
+import { LeaveRequest, LeaveRequestsSummary, MyLeaveRequestsSummary } from "@/types/leave/leaveRequest";
 import { cookies } from "next/headers";
 
   
@@ -27,7 +27,30 @@ import { cookies } from "next/headers";
     return res.json();
   }
 
-  export async function getLeaveRequestDetail(leaveRequestId: string): Promise<MyLeaveRequestDetail> {
+  export async function getLeaveRequestsSummary(): Promise<LeaveRequestsSummary[]> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
+  
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/leave-requests/summary`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      }
+    );
+  
+    if (!res.ok) {
+      throw new Error("Error occuring while loading leave request data");
+    }
+
+    return res.json();
+  }
+
+  export async function getLeaveRequestDetail(leaveRequestId: string): Promise<LeaveRequest> {
     const cookieStore = await cookies();
     const token = cookieStore.get("access_token")?.value;
   

@@ -1,10 +1,9 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.EmployeeDTO;
 import com.jinji.backend.model.dto.LeaveRequestCreateRequest;
 import com.jinji.backend.model.dto.LeaveRequestDTO;
 import com.jinji.backend.model.dto.LeaveRequestSummaryDTO;
-import com.jinji.backend.service.EmployeeService;
+import com.jinji.backend.model.dto.MyLeaveRequestSummaryDTO;
 import com.jinji.backend.service.LeaveRequestService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -40,16 +39,22 @@ public class LeaveRequestController {
         return leaveRequestService.getMyLeaveRequests(userDetails.getUsername());
     }
 
+    @GetMapping("/me/summary")
+    @PreAuthorize("isAuthenticated()")
+    public List<MyLeaveRequestSummaryDTO> getMyLeaveRequestsSummary(@AuthenticationPrincipal UserDetails userDetails) {
+        return leaveRequestService.getMyLeaveRequestsSummary(userDetails.getUsername());
+    }
+
     @GetMapping("/{leaveRequestId}")
     @PreAuthorize("isAuthenticated()")
-    public LeaveRequestDTO getMyLeaveRequestDetail(@PathVariable Long leaveRequestId) {
+    public LeaveRequestDTO getLeaveRequestDetail(@PathVariable Long leaveRequestId) {
         return leaveRequestService.getLeaveRequestById(leaveRequestId);
     }
 
-    @GetMapping("/me/summary")
-    @PreAuthorize("isAuthenticated()")
-    public List<LeaveRequestSummaryDTO> getMyLeaveRequestsSummary(@AuthenticationPrincipal UserDetails userDetails) {
-        return leaveRequestService.getMyLeaveRequestsSummary(userDetails.getUsername());
+    @GetMapping("/summary")
+    @PreAuthorize("hasRole('HR') or hasRole('MANAGER')")
+    public List<LeaveRequestSummaryDTO> getLeaveRequestsSummary(@AuthenticationPrincipal UserDetails userDetails) {
+        return leaveRequestService.getLeaveRequestsSummary(userDetails.getUsername());
     }
 
 }
