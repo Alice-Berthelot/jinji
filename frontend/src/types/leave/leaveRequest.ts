@@ -49,6 +49,7 @@ export interface LeaveRequestsSummary {
   startDate: string;
   endDate: string;
   status: LeaveRequestStatus;
+  statusLabel: string;
   createdAt: string;
   hasManagerReview: boolean;
   hasHrReview: boolean;

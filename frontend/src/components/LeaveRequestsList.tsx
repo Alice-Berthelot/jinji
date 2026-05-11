@@ -67,38 +67,53 @@ export default function LeaveRequestsList({
     <>
       <Filters options={filterOptions} value={filter} onChange={setFilter} />
 
-      {visibleLeaveRequests.map((leaveRequest) => (
-        <article
-          key={leaveRequest.id}
-          className={`${
-            leaveRequest.isProcessed
-              ? "bg-[var(--color-light-purple)]"
-              : "bg-[var(--color-block-white)]"
-          } p-4 shadow-sm rounded-sm w-[95%] lg:w-[45%] flex flex-col gap-2`}
-        >
-          <h3 className="font-semibold">
-            Demande de {leaveRequest.employeeFirstName}{" "}
-            {leaveRequest.employeeSurname}{" "}
-            ({leaveRequest.leaveTypeLabel})
-          </h3>
+      {visibleLeaveRequests.map((leaveRequest) => {
+  const waitingForHr =
+    leaveRequest.hasManagerReview &&
+    !leaveRequest.hasHrReview &&
+    leaveRequest.status !== "CANCELLED";
 
-          <p className="text-sm">
-            Du {formatDate(leaveRequest.startDate)} au{" "}
-            {formatDate(leaveRequest.endDate)}
-            {/* ( {leaveRequest.number_of_days} jours) */}
-          </p>
+  const waitingForManager =
+    !leaveRequest.hasManagerReview &&
+    leaveRequest.status !== "CANCELLED";
 
-          <p className="text-sm italic text-[var(--color-dark-purple)]">
-            {leaveRequest.status}
-          </p>
+  const highlightForCurrentRole =
+    (role === "MANAGER" && waitingForHr) ||
+    (role === "HR" && waitingForManager);
 
-          <LinkCustom
-            title="Voir"
-            href={`${detailBasePath}/${leaveRequest.id}`}
-            className="self-end"
-          />
-        </article>
-      ))}
+  return (
+    <article
+      key={leaveRequest.id}
+      className={`${
+        highlightForCurrentRole
+          ? "bg-[var(--color-block-purple)]"
+          : leaveRequest.isProcessed
+          ? "bg-[var(--color-light-purple)]"
+          : "bg-[var(--color-block-white)]"
+      } p-4 shadow-sm rounded-sm w-[95%] lg:w-[45%] flex flex-col gap-2`}
+    >
+      <h3 className="font-semibold">
+        Demande de {leaveRequest.employeeFirstName}{" "}
+        {leaveRequest.employeeSurname} ({leaveRequest.leaveTypeLabel})
+      </h3>
+
+      <p className="text-sm">
+        Du {formatDate(leaveRequest.startDate)} au{" "}
+        {formatDate(leaveRequest.endDate)}
+      </p>
+
+      <p className="text-sm italic text-[var(--color-dark-purple)]">
+        {leaveRequest.statusLabel}
+      </p>
+
+      <LinkCustom
+        title="Voir"
+        href={`${detailBasePath}/${leaveRequest.id}`}
+        className="self-end"
+      />
+    </article>
+  );
+})}
     </>
   );
 }
