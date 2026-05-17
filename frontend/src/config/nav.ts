@@ -5,15 +5,15 @@ export const employeeLinks = [
   },
   {
     name: "Mes congés et absences",
-    link: "/mes-conges-et-absences",
+    link: "/leaves",
   },
   {
     name: "Mes informations",
-    link: "/mes-informations",
+    link: "/profile",
   },
   {
     name: "Mes préférences",
-    link: "/mes-preferences",
+    link: "/settings",
   },
 ];
 

@@ -7,7 +7,7 @@ export default async function HrHome() {
   return (
     <>
       <p>HR test</p>
-      <LinkPurple href="/hr/new-employee" title="Ajouter un collaborateur" />
+      <LinkPurple href="/hr/employees/new-employee" title="Ajouter un collaborateur" />
     </>
   );
 }
