@@ -6,12 +6,16 @@ import { getLeaveRequestsSummary } from "@/app/api/leave-requests/me/route";
 import LeaveRequestsList from "@/components/LeaveRequestsList";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
+import { LeaveValidation } from "@/types/leave/hrPolicy";
+import { getLeaveValidation } from "@/app/api/hr-policy/route";
+import { hasRole } from "@/lib/auth";
 
 export default function HrLeaveRequestsPage() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequestsSummary[]>(
     []
   );
   const [loading, setLoading] = useState(true);
+  const [hrPolicy, setHrPolicy] = useState<LeaveValidation>("MANAGER_THEN_HR");
 
   useEffect(() => {
     async function load() {
@@ -21,6 +25,19 @@ export default function HrLeaveRequestsPage() {
         console.log(data);
         setLeaveRequests(data);
         setLoading(false);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    load();
+  }, []);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getLeaveValidation();
+        console.log(data);
+        setHrPolicy(data);
       } catch (err) {
         console.error(err);
       }
@@ -42,6 +59,7 @@ export default function HrLeaveRequestsPage() {
             leaveRequests={leaveRequests}
             role="HR"
             detailBasePath="/hr/leaves/leave-requests"
+            hrPolicy={hrPolicy}
           />
         </div>
       </section>

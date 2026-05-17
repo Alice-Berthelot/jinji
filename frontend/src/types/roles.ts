@@ -1,1 +1,1 @@
-type Role = "MANAGER" | "HR";
+type Role = "MANAGER" | "HR" | "EMPLOYEE";

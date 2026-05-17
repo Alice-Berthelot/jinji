@@ -11,12 +11,14 @@ type Props = {
   leaveRequests: LeaveRequestsSummary[];
   role: Role;
   detailBasePath: string;
+  hrPolicy: string;
 };
 
 export default function LeaveRequestsList({
   leaveRequests,
   role,
   detailBasePath,
+  hrPolicy,
 }: Props) {
   const [filter, setFilter] = useState<"all" | "processed" | "unprocessed">(
     "all"
@@ -36,10 +38,15 @@ export default function LeaveRequestsList({
 
         const isCancelled = request.status === "CANCELLED";
 
-        const isProcessed =
-          role === "HR"
-            ? isHrReviewed || isCancelled
-            : isManagerReviewed || isCancelled;
+        let isProcessed = false;
+
+        if (role === "HR") {
+          if (hrPolicy === "MANAGER_THEN_HR") {
+            isProcessed = isHrReviewed || isCancelled;
+          } else {
+            isProcessed = true;
+          }
+        }
 
         return {
           ...request,
@@ -47,73 +54,98 @@ export default function LeaveRequestsList({
         };
       })
       .filter((request) => {
+        if (role === "HR" && hrPolicy === "MANAGER_ONLY") {
+          return true;
+        }
+        if (role === "HR" && hrPolicy === "MANAGER_THEN_HR") {
+          const waitingForHr =
+            request.hasManagerReview &&
+            !request.hasHrReview &&
+            request.status !== "CANCELLED";
+      
+          const hrProcessed =
+            request.hasHrReview ||
+            request.status === "CANCELLED";
+      
+          if (filter === "all") return true;
+          if (filter === "processed") return hrProcessed;
+          if (filter === "unprocessed") return waitingForHr;
+      
+          return true;
+        }
+      
         if (filter === "all") return true;
-        if (filter === "processed") return request.isProcessed;
-        if (filter === "unprocessed") return !request.isProcessed;
-
+      
+        if (filter === "processed") {
+          return (
+            request.hasManagerReview ||
+            request.status === "CANCELLED"
+          );
+        }
+      
+        if (filter === "unprocessed") {
+          return (
+            !request.hasManagerReview &&
+            request.status !== "CANCELLED"
+          );
+        }
+      
         return true;
       })
-      .sort((a, b) => {
-        if (a.isProcessed && !b.isProcessed) return 1;
-        if (!a.isProcessed && b.isProcessed) return -1;
-
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      });
-  }, [leaveRequests, filter, role]);
+  }, [leaveRequests, filter, role, hrPolicy]);
 
   return (
     <>
-      <Filters options={filterOptions} value={filter} onChange={setFilter} />
+      {!(role === "HR" && hrPolicy === "MANAGER_ONLY") && (
+        <Filters options={filterOptions} value={filter} onChange={setFilter} />
+      )}
 
       {visibleLeaveRequests.map((leaveRequest) => {
-  const waitingForHr =
-    leaveRequest.hasManagerReview &&
-    !leaveRequest.hasHrReview &&
-    leaveRequest.status !== "CANCELLED";
+        const waitingForHr =
+          leaveRequest.hasManagerReview &&
+          !leaveRequest.hasHrReview &&
+          leaveRequest.status !== "CANCELLED";
 
-  const waitingForManager =
-    !leaveRequest.hasManagerReview &&
-    leaveRequest.status !== "CANCELLED";
+        const waitingForManager =
+          !leaveRequest.hasManagerReview && leaveRequest.status !== "CANCELLED";
 
-  const highlightForCurrentRole =
-    (role === "MANAGER" && waitingForHr) ||
-    (role === "HR" && waitingForManager);
+        const highlightForCurrentRole =
+          (role === "MANAGER" && waitingForHr) ||
+          (role === "HR" && waitingForManager);
 
-  return (
-    <article
-      key={leaveRequest.id}
-      className={`${
-        highlightForCurrentRole
-          ? "bg-[var(--color-block-purple)]"
-          : leaveRequest.isProcessed
-          ? "bg-[var(--color-light-purple)]"
-          : "bg-[var(--color-block-white)]"
-      } p-4 shadow-sm rounded-sm w-[95%] lg:w-[45%] flex flex-col gap-2`}
-    >
-      <h3 className="font-semibold">
-        Demande de {leaveRequest.employeeFirstName}{" "}
-        {leaveRequest.employeeSurname} ({leaveRequest.leaveTypeLabel})
-      </h3>
+        return (
+          <article
+            key={leaveRequest.id}
+            className={`${
+              highlightForCurrentRole
+                ? "bg-[var(--color-block-purple)]"
+                : leaveRequest.isProcessed
+                ? "bg-[var(--color-light-purple)]"
+                : "bg-[var(--color-block-white)]"
+            } p-4 shadow-sm rounded-sm w-[95%] lg:w-[45%] flex flex-col gap-2`}
+          >
+            <h3 className="font-semibold">
+              Demande de {leaveRequest.employeeFirstName}{" "}
+              {leaveRequest.employeeSurname} ({leaveRequest.leaveTypeLabel})
+            </h3>
 
-      <p className="text-sm">
-        Du {formatDate(leaveRequest.startDate)} au{" "}
-        {formatDate(leaveRequest.endDate)}
-      </p>
+            <p className="text-sm">
+              Du {formatDate(leaveRequest.startDate)} au{" "}
+              {formatDate(leaveRequest.endDate)}
+            </p>
 
-      <p className="text-sm italic text-[var(--color-dark-purple)]">
-        {leaveRequest.statusLabel}
-      </p>
+            <p className="text-sm italic text-[var(--color-dark-purple)]">
+              {leaveRequest.statusLabel}
+            </p>
 
-      <LinkCustom
-        title="Voir"
-        href={`${detailBasePath}/${leaveRequest.id}`}
-        className="self-end"
-      />
-    </article>
-  );
-})}
+            <LinkCustom
+              title="Voir"
+              href={`${detailBasePath}/${leaveRequest.id}`}
+              className="self-end"
+            />
+          </article>
+        );
+      })}
     </>
   );
 }
