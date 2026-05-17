@@ -24,33 +24,33 @@ export const managerLinks = [
   },
   {
     name: "Demandes d'absence",
-    link: "/manager/demandes-absences-equipe",
+    link: "/manager/leaves/leave-requests",
   },
   {
     name: "Liste des collaborateurs",
-    link: "/manager/collaborateurs",
+    link: "/manager/employees",
   },
-  {
-    name: "Planning de l'équipe",
-    link: "/manager/planning-equipe",
-  },
+  // {
+  //   name: "Planning de l'équipe",
+  //   link: "/manager/planning-equipe",
+  // },
 ];
 
 export const hrLinks = [
   {
     name: "Dashboard RH",
-    link: "/rh",
+    link: "/hr",
   },
   {
     name: "Demandes d'absence",
-    link: "/rh/demandes-absences",
+    link: "/hr/leaves/leave-requests",
   },
   {
     name: "Gestion des collaborateurs",
-    link: "/rh/collaborateurs",
+    link: "/hr/employees",
   },
   {
     name: "Paramétrage des règles de congés",
-    link: "/rh/parametrage-regles-conges",
+    link: "/hr/policies",
   },
 ];
