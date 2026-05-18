@@ -3,6 +3,7 @@ package com.jinji.backend.model.dto;
 import com.jinji.backend.model.enums.LeaveRequestStatus;
 import com.jinji.backend.model.enums.PeriodType;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +20,7 @@ public class LeaveRequestDTO {
     private String employeeComment;
     private String leaveTypeLabel;
     private List<LeaveRequestReviewDTO> reviews;
+    private BigDecimal numberOfDays;
 
     public Long getId() {
         return id;
@@ -98,5 +100,13 @@ public class LeaveRequestDTO {
 
     public void setReviews(List<LeaveRequestReviewDTO> reviews) {
         this.reviews = reviews;
+    }
+
+    public BigDecimal getNumberOfDays() {
+        return numberOfDays;
+    }
+
+    public void setNumberOfDays(BigDecimal numberOfDays) {
+        this.numberOfDays = numberOfDays;
     }
 }

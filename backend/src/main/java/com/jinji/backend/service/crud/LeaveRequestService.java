@@ -143,6 +143,7 @@ public class LeaveRequestService {
         dto.setEndPeriod(lr.getEndPeriod());
         dto.setStatus(lr.getStatus());
         dto.setEmployeeComment(lr.getEmployeeComment());
+        dto.setNumberOfDays(lr.getNumberOfDays());
 
         dto.setLeaveTypeLabel(
                 lr.getLeaveType() != null ? lr.getLeaveType().getLabel() : null

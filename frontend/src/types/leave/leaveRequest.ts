@@ -37,7 +37,7 @@ export interface LeaveRequest {
   endPeriod: Period;
   status: LeaveRequestStatus;
   employeeComment: string;
-  //     number_of_days: number;
+  numberOfDays: number;
   reviews: LeaveRequestReview[];
 }
 
