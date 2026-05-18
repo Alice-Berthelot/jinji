@@ -1,0 +1,1 @@
+export type LeaveValidation = "MANAGER_ONLY" | "MANAGER_THEN_HR";

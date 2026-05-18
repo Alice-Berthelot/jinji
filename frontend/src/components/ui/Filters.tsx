@@ -20,7 +20,7 @@ export default function Filters<T extends string>({
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
-          className={`${value === option.value ? "font-bold bg-[var(--color-dark-purple)] text-[var(--color-block-white)] px-4 rounded-full" : "font-normal text-[var(--color-dark-purple)] border border-solid border-[var(--color-dark-purple)] px-4 rounded-full"}`} 
+          className={`cursor-pointer ${value === option.value ? "font-bold bg-[var(--color-dark-purple)] text-[var(--color-block-white)] px-4 rounded-full" : "font-normal text-[var(--color-dark-purple)] border border-solid border-[var(--color-dark-purple)] px-4 rounded-full"}`} 
         >
           {option.label}
         </button>

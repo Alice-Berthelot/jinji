@@ -1,6 +1,6 @@
 "use server"
 
-import { EmployeeProfile } from "@/types/employee/employee";
+import { EmployeeFullName, EmployeeProfile } from "@/types/employee/employee";
 import { cookies } from "next/headers";
 
   
@@ -22,6 +22,31 @@ import { cookies } from "next/headers";
   
     if (!res.ok) {
       throw new Error("Error occuring while loading employee data");
+    }
+
+    console.log(res.json);
+  
+    return res.json();
+  }
+
+  export async function getMyFullName(): Promise<EmployeeFullName> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
+  
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/employees/me/fullname`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      }
+    );
+  
+    if (!res.ok) {
+      throw new Error("Error occuring while loading employee full name");
     }
 
     console.log(res.json);

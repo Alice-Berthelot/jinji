@@ -5,6 +5,7 @@ import AuthToastHandler from "@/components/ui/AuthAlertHandler";
 import { ToastContainer } from "react-toastify";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
+import { getUserRoles } from "@/lib/auth";
 
 const inclusiveSans = Inclusive_Sans({
   variable: "--font-inclusive-sans",
@@ -22,11 +23,12 @@ export const metadata: Metadata = {
     "multi-company HRIS application specializing in paid leave management",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const roles = await getUserRoles();
   return (
     <html lang="en">
       <body
@@ -34,7 +36,7 @@ export default function RootLayout({
       >
         <Header />
         <div className="lg:flex">
-          <Sidebar />
+          <Sidebar roles={roles} />
           <main className="flex-1">
             <AuthToastHandler />
             <ToastContainer />

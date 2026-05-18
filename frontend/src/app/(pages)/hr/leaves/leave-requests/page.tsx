@@ -6,10 +6,11 @@ import { getLeaveRequestsSummary } from "@/app/api/leave-requests/me/route";
 import LeaveRequestsList from "@/components/LeaveRequestsList";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
-import { getLeaveValidation } from "@/app/api/hr-policy/route";
 import { LeaveValidation } from "@/types/leave/hrPolicy";
+import { getLeaveValidation } from "@/app/api/hr-policy/route";
+import { hasRole } from "@/lib/auth";
 
-export default function ManagerLeaveRequestsPage() {
+export default function HrLeaveRequestsPage() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequestsSummary[]>(
     []
   );
@@ -51,13 +52,13 @@ export default function ManagerLeaveRequestsPage() {
   return (
     <>
       <BackArrow />
-      <MainTitle title="Demandes d'absence de l'équipe" />
+      <MainTitle title="Demandes d'absence des équipes" />
       <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] lg:min-h-screen">
         <div className="flex flex-col justify-center items-center gap-4 lg:gap-8 mb-6">
           <LeaveRequestsList
             leaveRequests={leaveRequests}
-            role="MANAGER"
-            detailBasePath="/manager/leaves/leave-requests"
+            role="HR"
+            detailBasePath="/hr/leaves/leave-requests"
             hrPolicy={hrPolicy}
           />
         </div>

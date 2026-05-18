@@ -3,6 +3,7 @@ package com.jinji.backend.service;
 import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.entity.*;
 import com.jinji.backend.model.enums.LeaveRequestStatus;
+import com.jinji.backend.model.enums.LeaveValidationProcess;
 import com.jinji.backend.model.enums.PeriodType;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.LeaveRequestRepository;
@@ -23,14 +24,16 @@ public class LeaveRequestService {
     private final LeaveRequestReviewRepository leaveRequestReviewRepository;
     private final UserService userService;
     private final EmployeeService employeeService;
+    private final HrPolicyService hrPolicyService;
 
     public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
-                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService) {
+                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.leaveRequestReviewRepository = leaveRequestReviewRepository;
         this.userService = userService;
         this.employeeService = employeeService;
+        this.hrPolicyService = hrPolicyService;
     }
 
     public String createLeaveRequest(LeaveRequestCreateRequest request) {
@@ -227,7 +230,38 @@ public class LeaveRequestService {
         dto.setHasHrReview(r.getHasHrReview());
         dto.setHasManagerReview(r.getHasManagerReview());
 
+        dto.setStatusLabel(buildLeaveRequestStatusLabel(r));
+
         return dto;
     }
 
+    private String buildLeaveRequestStatusLabel(LeaveRequestSummaryRaw r) {
+
+        if (r.getStatus() != LeaveRequestStatus.PENDING) {
+            return r.getStatus().name();
+        }
+
+        LeaveValidationProcess validationProcess =
+                hrPolicyService.getLeaveValidation();
+
+        if (Boolean.FALSE.equals(r.getHasManagerReview())) {
+            return "En attente de validation Manager";
+        }
+
+        if (
+                validationProcess == LeaveValidationProcess.MANAGER_THEN_HR
+                        && Boolean.FALSE.equals(r.getHasHrReview())
+        ) {
+            return "En attente de validation RH";
+        }
+
+        if (
+                validationProcess == LeaveValidationProcess.MANAGER_ONLY
+                        && Boolean.FALSE.equals(r.getHasHrReview())
+        ) {
+            return "Traitée par Manager";
+        }
+
+        return "En attente";
+    }
 }

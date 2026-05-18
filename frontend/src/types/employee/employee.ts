@@ -7,3 +7,8 @@ export type EmployeeProfile = {
     seniorityDate: string;
     departmentCode: string;
   };
+
+export type EmployeeFullName = {
+  surname: string;
+  firstName: string;
+}
