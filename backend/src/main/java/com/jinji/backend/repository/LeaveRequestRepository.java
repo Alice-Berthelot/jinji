@@ -36,6 +36,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
         lr.endDate AS endDate,
         lr.status AS status,
         lr.createdAt AS createdAt,
+        lr.numberOfDays AS numberOfDays,
 
         e.firstName AS employeeFirstName,
         e.surname AS employeeSurname,
@@ -70,6 +71,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
         lr.endDate AS endDate,
         lr.status AS status,
         lr.createdAt AS createdAt,
+        lr.numberOfDays AS numberOfDays,
 
         e.firstName AS employeeFirstName,
         e.surname AS employeeSurname,

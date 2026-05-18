@@ -246,6 +246,7 @@ public class LeaveRequestService {
         dto.setEndDate(r.getEndDate());
         dto.setStatus(r.getStatus());
         dto.setCreatedAt(r.getCreatedAt());
+        dto.setNumberOfDays(r.getNumberOfDays());
 
         dto.setEmployeeFirstName(r.getEmployeeFirstName());
         dto.setEmployeeSurname(r.getEmployeeSurname());

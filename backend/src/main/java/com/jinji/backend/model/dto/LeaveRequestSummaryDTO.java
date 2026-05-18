@@ -1,7 +1,10 @@
 package com.jinji.backend.model.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.jinji.backend.model.enums.LeaveRequestStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,6 +21,7 @@ public class LeaveRequestSummaryDTO {
     private String employeeSurname;
     private Boolean hasHrReview;
     private Boolean hasManagerReview;
+    private BigDecimal numberOfDays;
 
     public Long getId() {
         return id;
@@ -105,5 +109,13 @@ public class LeaveRequestSummaryDTO {
 
     public void setHasManagerReview(Boolean hasManagerReview) {
         this.hasManagerReview = hasManagerReview;
+    }
+
+    public BigDecimal getNumberOfDays() {
+        return numberOfDays;
+    }
+
+    public void setNumberOfDays(BigDecimal numberOfDays) {
+        this.numberOfDays = numberOfDays;
     }
 }

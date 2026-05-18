@@ -131,7 +131,7 @@ export default function LeaveRequestsList({
 
             <p className="text-sm">
               Du {formatDate(leaveRequest.startDate)} au{" "}
-              {formatDate(leaveRequest.endDate)}
+              {formatDate(leaveRequest.endDate)} - {leaveRequest.numberOfDays} jour(s)
             </p>
 
             <p className="text-sm italic text-[var(--color-dark-purple)]">

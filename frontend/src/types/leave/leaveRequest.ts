@@ -53,7 +53,7 @@ export interface LeaveRequestsSummary {
   createdAt: string;
   hasManagerReview: boolean;
   hasHrReview: boolean;
-    //     number_of_days: number;
+  numberOfDays: number;
 }
 
 export interface LeaveRequestReview {
