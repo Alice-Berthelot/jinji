@@ -3,7 +3,7 @@ package com.jinji.backend.controller;
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
 import com.jinji.backend.model.dto.EmployeeDTO;
 import com.jinji.backend.model.dto.EmployeeNameDTO;
-import com.jinji.backend.service.EmployeeService;
+import com.jinji.backend.service.crud.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

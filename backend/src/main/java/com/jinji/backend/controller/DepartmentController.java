@@ -1,7 +1,7 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.DepartmentResponse;
-import com.jinji.backend.service.DepartmentService;
+import com.jinji.backend.service.crud.DepartmentService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

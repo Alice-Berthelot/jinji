@@ -1,4 +1,4 @@
-package com.jinji.backend.service;
+package com.jinji.backend.service.crud;
 
 import com.jinji.backend.exception.ResourceAlreadyExistsException;
 import com.jinji.backend.model.entity.Employee;

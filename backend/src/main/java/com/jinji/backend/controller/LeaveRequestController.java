@@ -4,7 +4,7 @@ import com.jinji.backend.model.dto.LeaveRequestCreateRequest;
 import com.jinji.backend.model.dto.LeaveRequestDTO;
 import com.jinji.backend.model.dto.LeaveRequestSummaryDTO;
 import com.jinji.backend.model.dto.MyLeaveRequestSummaryDTO;
-import com.jinji.backend.service.LeaveRequestService;
+import com.jinji.backend.service.crud.LeaveRequestService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

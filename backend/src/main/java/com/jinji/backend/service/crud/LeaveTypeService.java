@@ -1,4 +1,4 @@
-package com.jinji.backend.service;
+package com.jinji.backend.service.crud;
 
 import com.jinji.backend.model.dto.LeaveTypeDTO;
 import com.jinji.backend.repository.LeaveTypeRepository;

@@ -1,10 +1,6 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.RegisterUserDTO;
-import com.jinji.backend.model.entity.User;
-import com.jinji.backend.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.jinji.backend.service.crud.UserService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

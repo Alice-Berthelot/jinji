@@ -4,6 +4,7 @@ import com.jinji.backend.model.enums.LeaveRequestStatus;
 import com.jinji.backend.model.enums.PeriodType;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -38,6 +39,9 @@ public class LeaveRequest {
 
     @Column(name = "employee_comment")
     private String employeeComment;
+
+    @Column(name = "number_of_days")
+    private BigDecimal numberOfDays;
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
@@ -109,6 +113,14 @@ public class LeaveRequest {
 
     public void setEmployeeComment(String employeeComment) {
         this.employeeComment = employeeComment;
+    }
+
+    public BigDecimal getNumberOfDays() {
+        return numberOfDays;
+    }
+
+    public void setNumberOfDays(BigDecimal numberOfDays) {
+        this.numberOfDays = numberOfDays;
     }
 
     public Employee getEmployee() {
