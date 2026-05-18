@@ -15,10 +15,6 @@ export default function Header() {
   const pathname = usePathname();
   const [myFullName, setMyFullName] = useState<EmployeeFullName | null>(null);
 
-  if (pathname === "/login") {
-    return null;
-  }
-
   useEffect(() => {
     async function load() {
       try {
@@ -30,6 +26,10 @@ export default function Header() {
     }
     load();
   }, []);
+  
+  if (pathname === "/login") {
+    return null;
+  }
 
   return (
     <header className="fixed z-100 w-full bg-[var(--color-block-white)] shadow-xl flex items-center p-3 top-0 justify-between">
