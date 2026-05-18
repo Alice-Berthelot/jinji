@@ -2,6 +2,7 @@ package com.jinji.backend.service;
 
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
 import com.jinji.backend.model.dto.EmployeeDTO;
+import com.jinji.backend.model.dto.EmployeeNameDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.User;
@@ -103,6 +104,12 @@ public class EmployeeService {
         }
 
         return "Successful registration for Employee " + savedEmployee.getFirstName() + " " + savedEmployee.getSurname();
+    }
+
+    public EmployeeNameDTO getEmployeeFullName(String username) {
+
+        return employeeRepository.findEmployeeNameByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 
     private String normalizeName(String value) {

@@ -2,6 +2,7 @@ package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
 import com.jinji.backend.model.dto.EmployeeDTO;
+import com.jinji.backend.model.dto.EmployeeNameDTO;
 import com.jinji.backend.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -32,5 +33,12 @@ public class EmployeeController {
     @PreAuthorize("isAuthenticated()")
     public EmployeeDTO getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
         return employeeService.getEmployeeMe(userDetails.getUsername());
+    }
+
+    @GetMapping("/me/fullname")
+    @PreAuthorize("isAuthenticated()")
+    public EmployeeNameDTO getMyFullName(@AuthenticationPrincipal UserDetails userDetails) {
+
+        return employeeService.getEmployeeFullName(userDetails.getUsername());
     }
 }
