@@ -1,4 +1,4 @@
-package com.jinji.backend.service;
+package com.jinji.backend.service.crud;
 
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
 import com.jinji.backend.model.dto.EmployeeDTO;

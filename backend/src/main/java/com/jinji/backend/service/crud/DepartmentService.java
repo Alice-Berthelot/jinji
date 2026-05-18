@@ -1,4 +1,4 @@
-package com.jinji.backend.service;
+package com.jinji.backend.service.crud;
 
 import com.jinji.backend.model.dto.DepartmentResponse;
 import com.jinji.backend.model.entity.Department;

@@ -2,7 +2,7 @@ package com.jinji.backend.controller;
 
 import com.jinji.backend.model.entity.HrPolicy;
 import com.jinji.backend.model.enums.LeaveValidationProcess;
-import com.jinji.backend.service.HrPolicyService;
+import com.jinji.backend.service.crud.HrPolicyService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,7 +1,7 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.LeaveTypeDTO;
-import com.jinji.backend.service.LeaveTypeService;
+import com.jinji.backend.service.crud.LeaveTypeService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

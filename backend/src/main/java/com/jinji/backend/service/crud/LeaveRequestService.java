@@ -1,18 +1,18 @@
-package com.jinji.backend.service;
+package com.jinji.backend.service.crud;
 
 import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.entity.*;
-import com.jinji.backend.model.enums.LeaveRequestStatus;
-import com.jinji.backend.model.enums.LeaveValidationProcess;
-import com.jinji.backend.model.enums.PeriodType;
-import com.jinji.backend.model.enums.RoleEnum;
+import com.jinji.backend.model.enums.*;
 import com.jinji.backend.repository.LeaveRequestRepository;
 import com.jinji.backend.repository.LeaveRequestReviewRepository;
 import com.jinji.backend.repository.LeaveTypeRepository;
 import com.jinji.backend.repository.projection.LeaveRequestSummaryRaw;
 import com.jinji.backend.repository.projection.MyLeaveRequestSummaryRaw;
+import com.jinji.backend.service.business.LeaveCalculationService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,15 +25,17 @@ public class LeaveRequestService {
     private final UserService userService;
     private final EmployeeService employeeService;
     private final HrPolicyService hrPolicyService;
+    private final LeaveCalculationService leaveCalculationService;
 
     public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
-                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService) {
+                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.leaveRequestReviewRepository = leaveRequestReviewRepository;
         this.userService = userService;
         this.employeeService = employeeService;
         this.hrPolicyService = hrPolicyService;
+        this.leaveCalculationService = leaveCalculationService;
     }
 
     public String createLeaveRequest(LeaveRequestCreateRequest request) {
@@ -51,6 +53,26 @@ public class LeaveRequestService {
                         "Leave type not found with code: " + request.getLeaveTypeCode()
                 ));
 
+        PeriodType startPeriod = request.getStartPeriod() != null
+                ? request.getStartPeriod()
+                : PeriodType.AM;
+
+        PeriodType endPeriod = request.getEndPeriod() != null
+                ? request.getEndPeriod()
+                : PeriodType.PM;
+
+        AnnualLeaveDayType annualLeaveDayType = hrPolicyService.getAnnualLeaveDayType();
+        LocalDate solidarityDay = hrPolicyService.getEffectiveSolidarityDay();
+
+        BigDecimal numberOfDays = leaveCalculationService.calculateLeaveDays(
+                request.getStartDate(),
+                request.getEndDate(),
+                startPeriod,
+                endPeriod,
+                annualLeaveDayType,
+                solidarityDay
+        );
+
         LeaveRequest leave = new LeaveRequest();
         leave.setEmployee(employee);
         leave.setLeaveType(leaveType);
@@ -63,6 +85,7 @@ public class LeaveRequestService {
                 request.getEndPeriod() != null ? request.getEndPeriod() : PeriodType.PM
         );
         leave.setEmployeeComment(request.getEmployeeComment());
+        leave.setNumberOfDays(numberOfDays);
         leave.setCreatedAt(LocalDateTime.now());
         leave.setStatus(LeaveRequestStatus.PENDING);
         leaveRequestRepository.save(leave);
