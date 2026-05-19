@@ -1,1 +1,1 @@
-type Color = "purple" | "red";
+type Color = "purple" | "red" | "lightPurple";
