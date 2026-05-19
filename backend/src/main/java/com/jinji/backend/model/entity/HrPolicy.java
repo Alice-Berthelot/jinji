@@ -1,5 +1,6 @@
 package com.jinji.backend.model.entity;
 
+import com.jinji.backend.model.enums.AnnualLeaveAccrualPeriod;
 import com.jinji.backend.model.enums.AnnualLeaveDayType;
 import com.jinji.backend.model.enums.LeaveValidationProcess;
 import jakarta.persistence.*;
@@ -26,6 +27,9 @@ public class HrPolicy {
 
     @Column(name = "solidarity_day")
     private LocalDate solidarityDay;
+
+    @Column(name = "annual_leave_accrual_period")
+    private AnnualLeaveAccrualPeriod annualLeaveAccrualPeriod;
 
     public Long getId() {
         return id;
@@ -65,5 +69,13 @@ public class HrPolicy {
 
     public void setSolidarityDay(LocalDate solidarityDay) {
         this.solidarityDay = solidarityDay;
+    }
+
+    public AnnualLeaveAccrualPeriod getAnnualLeaveAccrualPeriod() {
+        return annualLeaveAccrualPeriod;
+    }
+
+    public void setAnnualLeaveAccrualPeriod(AnnualLeaveAccrualPeriod annualLeaveAccrualPeriod) {
+        this.annualLeaveAccrualPeriod = annualLeaveAccrualPeriod;
     }
 }

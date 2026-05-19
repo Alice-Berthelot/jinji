@@ -1,11 +1,14 @@
 "use client";
 
+import { getMyLeaveBalance } from "@/app/api/leave-balances/route";
 import { getMyLeaveRequestsSummary } from "@/app/api/leave-requests/me/route";
+import LeaveBalanceTable from "@/components/tables/LeaveBalanceTable";
 import LeaveRequestSmallTable from "@/components/tables/LeaveRequestSmallTable";
 import BackArrow from "@/components/ui/BackArrow";
 import LinkCustom from "@/components/ui/LinkCustom";
 import MainTitle from "@/components/ui/MainTitle";
 import Subtitle from "@/components/ui/Subtitle";
+import { LeaveBalance } from "@/types/leave/leaveBalance";
 import { MyLeaveRequestsSummary } from "@/types/leave/leaveRequest";
 import { useEffect, useState } from "react";
 
@@ -13,7 +16,9 @@ export default function LeavePage() {
   const [leaveRequests, setLeaveRequests] = useState<
     MyLeaveRequestsSummary[] | []
   >([]);
+  const [leaveBalance, setLeaveBalance] = useState<LeaveBalance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingBalance, setLoadingBalance] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -27,6 +32,21 @@ export default function LeavePage() {
       }
     }
     load();
+  }, []);
+
+  useEffect(() => {
+  
+    const loadBalance = async () => {
+      try {
+        setLoadingBalance(true);  
+        const data = await getMyLeaveBalance();
+        setLeaveBalance(data);
+      } finally {
+        setLoadingBalance(false);
+      }
+    };
+  
+    loadBalance();
   }, []);
 
   return (
@@ -43,7 +63,7 @@ export default function LeavePage() {
       <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-4 lg:gap-8 lg:h-96">
         <section className="bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[45%] lg:h-full">
           <Subtitle subtitle="Mon solde de congés payés" />
-          {/* <PaidLeaveAccount /> */}
+          <LeaveBalanceTable leaveBalance={leaveBalance} loading={loadingBalance}/>
         </section>
         <section className="bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[45%] lg:h-full">
           <Subtitle subtitle="Mes demandes d'absence" />

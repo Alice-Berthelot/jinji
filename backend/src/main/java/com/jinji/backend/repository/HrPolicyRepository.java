@@ -1,6 +1,7 @@
 package com.jinji.backend.repository;
 
 import com.jinji.backend.model.entity.HrPolicy;
+import com.jinji.backend.model.enums.AnnualLeaveAccrualPeriod;
 import com.jinji.backend.model.enums.AnnualLeaveDayType;
 import com.jinji.backend.model.enums.LeaveValidationProcess;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,4 +34,11 @@ public interface HrPolicyRepository extends JpaRepository<HrPolicy, Long> {
         FROM HrPolicy h
     """)
     LocalDate findSolidarityDay();
+
+    @Query("""
+        SELECT h.annualLeaveAccrualPeriod
+        FROM HrPolicy h
+    """)
+    AnnualLeaveAccrualPeriod findAnnualLeaveAccrualPeriod();
+
 }
