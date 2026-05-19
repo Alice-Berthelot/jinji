@@ -24,11 +24,11 @@ public class LeaveBalance {
     private LocalDate acquisitionEndDate;
 
     @Min(0)
-    @Column(name = "acquired_days", nullable = false)
+    @Column(name = "acquired_days")
     private BigDecimal acquiredDays;
 
     @Min(0)
-    @Column(name = "taken_days", nullable = false)
+    @Column(name = "taken_days")
     private BigDecimal takenDays;
 
     @ManyToOne

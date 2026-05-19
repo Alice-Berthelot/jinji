@@ -28,6 +28,7 @@ public class HrPolicy {
     @Column(name = "solidarity_day")
     private LocalDate solidarityDay;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "annual_leave_accrual_period")
     private AnnualLeaveAccrualPeriod annualLeaveAccrualPeriod;
 

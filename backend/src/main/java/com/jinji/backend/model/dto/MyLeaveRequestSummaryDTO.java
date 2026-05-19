@@ -12,6 +12,7 @@ public class MyLeaveRequestSummaryDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private LeaveRequestStatus status;
+    private String statusLabel;
     private LocalDateTime createdAt;
 
     public Long getId() {
@@ -52,6 +53,14 @@ public class MyLeaveRequestSummaryDTO {
 
     public void setStatus(LeaveRequestStatus status) {
         this.status = status;
+    }
+
+    public String getStatusLabel() {
+        return statusLabel;
+    }
+
+    public void setStatusLabel(String statusLabel) {
+        this.statusLabel = statusLabel;
     }
 
     public LocalDateTime getCreatedAt() {
