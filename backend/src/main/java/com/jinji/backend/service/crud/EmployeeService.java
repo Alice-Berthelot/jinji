@@ -9,8 +9,10 @@ import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.DepartmentRepository;
 import com.jinji.backend.repository.EmployeeRepository;
+//import com.jinji.backend.repository.LeaveBalanceRepository;
 import com.jinji.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,14 +24,18 @@ public class EmployeeService {
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final LeaveBalanceService leaveBalanceService;
 
     public EmployeeService(EmployeeRepository employeeRepository,
                            DepartmentRepository departmentRepository,
                            UserRepository userRepository,
-                           UserService userService) {
+                           UserService userService
+                           , LeaveBalanceService leaveBalanceService
+    ) {
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
+        this.leaveBalanceService = leaveBalanceService;
         this.userService = userService;
     }
 
@@ -69,6 +75,7 @@ public class EmployeeService {
         return dto;
     }
 
+    @Transactional
     public String createEmployee(EmployeeCreateRequest request) {
 
         Department department = departmentRepository.findByCode(request.getDepartmentCode())
@@ -102,6 +109,8 @@ public class EmployeeService {
                     savedEmployee
             );
         }
+
+        leaveBalanceService.createLeaveBalance(savedEmployee);
 
         return "Successful registration for Employee " + savedEmployee.getFirstName() + " " + savedEmployee.getSurname();
     }

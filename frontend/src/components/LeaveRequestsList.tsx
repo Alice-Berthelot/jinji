@@ -141,6 +141,13 @@ export default function LeaveRequestsList({
             <LinkCustom
               title="Voir"
               href={`${detailBasePath}/${leaveRequest.id}`}
+              color={
+                highlightForCurrentRole
+                  ? "lightPurple"
+                  : leaveRequest.isProcessed
+                  ? "lightPurple"
+                  : "purple"
+              }
               className="self-end"
             />
           </article>

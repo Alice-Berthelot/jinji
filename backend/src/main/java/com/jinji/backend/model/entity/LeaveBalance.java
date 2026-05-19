@@ -3,6 +3,7 @@ package com.jinji.backend.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -23,12 +24,12 @@ public class LeaveBalance {
     private LocalDate acquisitionEndDate;
 
     @Min(0)
-    @Column(name = "acquired_days", nullable = false)
-    private Integer acquiredDays;
+    @Column(name = "acquired_days")
+    private BigDecimal acquiredDays;
 
     @Min(0)
-    @Column(name = "taken_days", nullable = false)
-    private Integer takenDays;
+    @Column(name = "taken_days")
+    private BigDecimal takenDays;
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
@@ -70,19 +71,19 @@ public class LeaveBalance {
         this.acquisitionEndDate = acquisitionEndDate;
     }
 
-    public Integer getAcquiredDays() {
+    public @Min(0) BigDecimal getAcquiredDays() {
         return acquiredDays;
     }
 
-    public void setAcquiredDays(Integer acquiredDays) {
+    public void setAcquiredDays(@Min(0) BigDecimal acquiredDays) {
         this.acquiredDays = acquiredDays;
     }
 
-    public Integer getTakenDays() {
+    public @Min(0) BigDecimal getTakenDays() {
         return takenDays;
     }
 
-    public void setTakenDays(Integer takenDays) {
+    public void setTakenDays(@Min(0) BigDecimal takenDays) {
         this.takenDays = takenDays;
     }
 
