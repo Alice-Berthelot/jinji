@@ -33,6 +33,10 @@ public class HrPolicyService {
         return hrPolicyRepository.findAnnualLeaveDayType();
     }
 
+    public Boolean getAllowAnnualLeaveCarryover() {
+        return hrPolicyRepository.findAllowAnnualLeaveCarryover();
+    }
+
     public LocalDate getSolidarityDay() {
         return getHrPolicy().getSolidarityDay();
     }

@@ -10,6 +10,7 @@ import com.jinji.backend.repository.projection.LeaveRequestSummaryRaw;
 import com.jinji.backend.repository.projection.MyLeaveRequestSummaryRaw;
 import com.jinji.backend.service.business.LeaveCalculationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,9 +27,11 @@ public class LeaveRequestService {
     private final EmployeeService employeeService;
     private final HrPolicyService hrPolicyService;
     private final LeaveCalculationService leaveCalculationService;
+    private final LeaveRequestReviewService leaveRequestReviewService;
+    private final LeaveService leaveService;
 
     public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
-                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService) {
+                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService, LeaveRequestReviewService leaveRequestReviewService, LeaveService leaveService) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.leaveRequestReviewRepository = leaveRequestReviewRepository;
@@ -36,6 +39,8 @@ public class LeaveRequestService {
         this.employeeService = employeeService;
         this.hrPolicyService = hrPolicyService;
         this.leaveCalculationService = leaveCalculationService;
+        this.leaveRequestReviewService = leaveRequestReviewService;
+        this.leaveService = leaveService;
     }
 
     public String createLeaveRequest(LeaveRequestCreateRequest request) {
@@ -289,4 +294,185 @@ public class LeaveRequestService {
 
         return "En attente";
     }
+
+    @Transactional
+    public LeaveRequestDTO processLeaveRequest(Long leaveRequestId, LeaveRequestCreateReview reviewRaw) throws RuntimeException {
+        // If no leave request matches the provided ID, the request cannot be processed
+        LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
+                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+
+        // If the leave request is already APPROVED or CANCELLED, it cannot be processed further
+        LeaveRequestStatus leaveRequestStatus = leaveRequest.getStatus();
+        if (leaveRequestStatus == LeaveRequestStatus.APPROVED || leaveRequestStatus == LeaveRequestStatus.CANCELLED) {
+            throw new RuntimeException("Leave request with id " + leaveRequestId
+                    + " has already been reviewed, with status " + leaveRequestStatus);
+        }
+
+        User currentUser = userService.getCurrentUser();
+        Employee reviewer = currentUser.getEmployee();
+
+        // An employee cannot process their own leave requests
+        boolean isOwner = reviewer.getId().equals(leaveRequest.getEmployee().getId());
+        if (isOwner) {
+            throw new RuntimeException("User is not authorized to validate their own leave request");
+        }
+
+        // Check whether reviews already exist
+        List<LeaveRequestReview> reviews = leaveRequestReviewRepository.findByLeaveRequest_Id(leaveRequestId);
+        boolean hasManagerReview = reviews.stream()
+                .anyMatch(r ->
+                        r.getReviewerRole() == LeaveRequestReviewerRole.MANAGER
+                );
+        boolean hasHrReview = reviews.stream()
+                .anyMatch(r ->
+                        r.getReviewerRole() == LeaveRequestReviewerRole.HR
+                );
+        if (hasManagerReview && hasHrReview) {
+            throw new RuntimeException("Leave request with id " + leaveRequest.getId()
+                    + " has already been reviewed by Manager AND HR");
+        }
+
+        boolean isHr = currentUser.isHr();
+        boolean isTeamManager =
+                currentUser.isManager()
+                        && isManagerOf(reviewer, leaveRequest.getEmployee());
+
+
+        // Determine which validation process to apply
+        LeaveValidationProcess process = hrPolicyService.getLeaveValidation();
+
+        // MANAGER_THEN_HR
+        if (process == LeaveValidationProcess.MANAGER_THEN_HR) {
+            processManagerThenHr(
+                    leaveRequest,
+                    reviewRaw,
+                    reviewer,
+                    isTeamManager,
+                    isHr,
+                    hasManagerReview
+            );
+
+        } else if (isTeamManager) { // MANAGER_ONLY (DEFAULT)
+            processManagerOnly(
+                    leaveRequest,
+                    reviewRaw,
+                    reviewer,
+                    isTeamManager
+            );
+        }
+
+
+        return mapToDto(leaveRequest);
+    }
+
+    private void processManagerOnly(
+            LeaveRequest leaveRequest,
+            LeaveRequestCreateReview reviewRaw,
+            Employee reviewer,
+            boolean isManager
+    ) {
+
+        if (!isManager) {
+            throw new RuntimeException(
+                    "User is not authorized to review this leave request"
+            );
+        }
+
+        LeaveRequestDecision decision = reviewRaw.getDecision();
+
+//  1. Create leave review
+        leaveRequestReviewService.createLeaveRequestReview(
+                leaveRequest,
+                reviewer,
+                LeaveRequestReviewerRole.MANAGER,
+                reviewRaw
+        );
+
+// 2. Update leave request status
+        switch (decision) {
+            case APPROVED -> {
+                leaveRequest.setStatus(LeaveRequestStatus.APPROVED);
+                // 3. Create leave
+                leaveService.createLeaveFromRequest(leaveRequest);
+                // 4. TODO: send notifications (HR & Employee)
+            }
+            case REJECTED -> {
+                leaveRequest.setStatus(LeaveRequestStatus.REJECTED);
+                // 3.TODO: send notifications (HR & Employee)
+            }
+        }
+
+        leaveRequestRepository.save(leaveRequest);
+    }
+
+    private void processManagerThenHr(
+            LeaveRequest leaveRequest,
+            LeaveRequestCreateReview reviewRaw,
+            Employee reviewer,
+            boolean isManager,
+            boolean isHr,
+            boolean hasManagerReview
+    ) {
+
+        LeaveRequestDecision decision = reviewRaw.getDecision();
+
+        // MANAGER REVIEW
+        if (!hasManagerReview) {
+            if (!isManager) {
+                throw new RuntimeException(
+                        "Manager review is required first"
+                );
+            }
+
+            //  1. Create leave review
+            leaveRequestReviewService.createLeaveRequestReview(
+                    leaveRequest,
+                    reviewer,
+                    LeaveRequestReviewerRole.MANAGER,
+                    reviewRaw
+            );
+
+            // 2. TODO: send notifications (HR & employee)
+
+            leaveRequestRepository.save(leaveRequest);
+
+            return;
+        }
+
+        // HR REVIEW
+        if (!isHr) {
+            throw new RuntimeException(
+                    "Reviewer must be HR"
+            );
+        }
+
+        //  1. Create leave review
+        leaveRequestReviewService.createLeaveRequestReview(
+                leaveRequest,
+                reviewer,
+                LeaveRequestReviewerRole.HR,
+                reviewRaw
+        );
+
+        // 2. Update leave request status
+        switch (decision) {
+            case APPROVED -> {
+                leaveRequest.setStatus(LeaveRequestStatus.APPROVED);
+                leaveRequestRepository.save(leaveRequest);
+                // 3. Create leave
+                leaveService.createLeaveFromRequest(leaveRequest);
+                // 4. TODO: send notifications (Manager & Employee)
+            }
+            case REJECTED -> {
+                leaveRequest.setStatus(LeaveRequestStatus.REJECTED);
+                leaveRequestRepository.save(leaveRequest);
+                // 3.TODO: send notifications (Manager & Employee)
+            }
+        }
+
+
+
+    }
+
+
 }

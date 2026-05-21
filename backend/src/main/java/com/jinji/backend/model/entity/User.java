@@ -1,5 +1,6 @@
 package com.jinji.backend.model.entity;
 
+import com.jinji.backend.model.enums.RoleEnum;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -78,5 +79,19 @@ public class User {
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }
+
+    public boolean hasRole(RoleEnum role) {
+        return roles != null &&
+                roles.stream()
+                        .anyMatch(r -> r.getCode() == role);
+    }
+
+    public boolean isHr() {
+        return hasRole(RoleEnum.HR);
+    }
+
+    public boolean isManager() {
+        return hasRole(RoleEnum.MANAGER);
     }
 }

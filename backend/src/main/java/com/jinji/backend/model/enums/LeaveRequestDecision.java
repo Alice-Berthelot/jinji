@@ -1,6 +1,6 @@
 package com.jinji.backend.model.enums;
 
-public enum LeaveReviewDecision {
+public enum LeaveRequestDecision {
     APPROVED,
     REJECTED
 }

@@ -39,6 +39,10 @@ public class LeaveBalance {
     @JoinColumn(name = "leave_type_id", nullable = false)
     private LeaveType leaveType;
 
+    public BigDecimal getRemainingDays() {
+        return acquiredDays.subtract(takenDays);
+    }
+
     public Long getId() {
         return id;
     }

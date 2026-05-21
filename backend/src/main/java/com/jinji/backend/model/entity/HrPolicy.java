@@ -32,6 +32,9 @@ public class HrPolicy {
     @Column(name = "annual_leave_accrual_period")
     private AnnualLeaveAccrualPeriod annualLeaveAccrualPeriod;
 
+    @Column(name = "allow_annual_leave_carryover", nullable = false)
+    private Boolean allowAnnualLeaveCarryover;
+
     public Long getId() {
         return id;
     }
@@ -78,5 +81,13 @@ public class HrPolicy {
 
     public void setAnnualLeaveAccrualPeriod(AnnualLeaveAccrualPeriod annualLeaveAccrualPeriod) {
         this.annualLeaveAccrualPeriod = annualLeaveAccrualPeriod;
+    }
+
+    public Boolean getAllowAnnualLeaveCarryover() {
+        return allowAnnualLeaveCarryover;
+    }
+
+    public void setAllowAnnualLeaveCarryover(Boolean allowAnnualLeaveCarryover) {
+        this.allowAnnualLeaveCarryover = allowAnnualLeaveCarryover;
     }
 }
