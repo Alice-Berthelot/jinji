@@ -2,7 +2,7 @@ package com.jinji.backend.model.dto;
 
 import java.time.LocalDate;
 
-public class EmployeeDTO {
+public class EmployeeMeDTO {
 
     private String employeeNumber;
     private String surname;

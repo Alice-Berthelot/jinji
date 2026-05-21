@@ -66,16 +66,11 @@ public class LeaveRequestService {
                 ? request.getEndPeriod()
                 : PeriodType.PM;
 
-        AnnualLeaveDayType annualLeaveDayType = hrPolicyService.getAnnualLeaveDayType();
-        LocalDate solidarityDay = hrPolicyService.getEffectiveSolidarityDay();
-
         BigDecimal numberOfDays = leaveCalculationService.calculateLeaveDays(
                 request.getStartDate(),
                 request.getEndDate(),
                 startPeriod,
-                endPeriod,
-                annualLeaveDayType,
-                solidarityDay
+                endPeriod
         );
 
         LeaveRequest leave = new LeaveRequest();

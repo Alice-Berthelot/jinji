@@ -9,6 +9,7 @@ import com.jinji.backend.repository.EmployeeRepository;
 import com.jinji.backend.repository.LeaveRepository;
 import com.jinji.backend.repository.LeaveTypeRepository;
 import com.jinji.backend.repository.projection.LeaveRaw;
+import com.jinji.backend.service.business.LeaveCalculationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,16 +23,18 @@ public class LeaveService {
     private final LeaveTypeRepository leaveTypeRepository;
     private final EmployeeRepository employeeRepository;
     private final LeaveBalanceService leaveBalanceService;
+    private final LeaveCalculationService leaveCalculationService;
     private final UserService userService;
     private final LeaveMapper leaveMapper;
 
     public LeaveService(
-            LeaveRepository leaveRepository, LeaveTypeRepository leaveTypeRepository, EmployeeRepository employeeRepository, LeaveBalanceService leaveBalanceService, UserService userService, LeaveMapper leaveMapper
+            LeaveRepository leaveRepository, LeaveTypeRepository leaveTypeRepository, EmployeeRepository employeeRepository, LeaveBalanceService leaveBalanceService, LeaveCalculationService leaveCalculationService, UserService userService, LeaveMapper leaveMapper
     ) {
         this.leaveRepository = leaveRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.employeeRepository = employeeRepository;
         this.leaveBalanceService = leaveBalanceService;
+        this.leaveCalculationService = leaveCalculationService;
         this.userService = userService;
         this.leaveMapper = leaveMapper;
     }
@@ -73,10 +76,14 @@ public class LeaveService {
         leaveRaw.setLeaveType(leaveType);
 
         if (leaveRaw.getLeaveType().isBalanceManaged()) {
-// TODO: add numberOfDays
-//         leaveRaw.setNumberOfDays(request.getNumberOfDays());
-            System.out.println("numberOfDays to be implemented");
-            leaveRaw.setNumberOfDays(BigDecimal.valueOf(1));
+            BigDecimal numberOfDays = leaveCalculationService.calculateLeaveDays(
+                    request.getStartDate(),
+                    request.getEndDate(),
+                    startPeriod,
+                    endPeriod
+            );
+
+            leaveRaw.setNumberOfDays(numberOfDays);
         }
 
 

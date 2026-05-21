@@ -1,7 +1,7 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
-import com.jinji.backend.model.dto.EmployeeDTO;
+import com.jinji.backend.model.dto.EmployeeMeDTO;
 import com.jinji.backend.model.dto.EmployeeNameDTO;
 import com.jinji.backend.service.crud.EmployeeService;
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ public class EmployeeController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public EmployeeDTO getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public EmployeeMeDTO getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
         return employeeService.getEmployeeMe(userDetails.getUsername());
     }
 

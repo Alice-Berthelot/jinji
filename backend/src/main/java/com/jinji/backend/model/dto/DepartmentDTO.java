@@ -1,6 +1,6 @@
 package com.jinji.backend.model.dto;
 
-public class DepartmentResponse {
+public class DepartmentDTO {
 
     private Long id;
     private String code;

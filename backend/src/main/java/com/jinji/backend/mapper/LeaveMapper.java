@@ -10,12 +10,10 @@ public interface LeaveMapper {
 
     @Mapping(source = "employee.id", target = "employeeId")
     @Mapping(source = "employee.fullName", target = "employeeFullName")
-
     @Mapping(source = "leaveType.label", target = "leaveTypeLabel")
-
     @Mapping(source = "leaveRequest.id", target = "leaveRequestId")
-
     @Mapping(source = "createdBy.id", target = "creatorId")
     @Mapping(source = "createdBy.fullName", target = "creatorFullName")
+
     LeaveDTO toDto(Leave leave);
 }

@@ -1,7 +1,8 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
-import com.jinji.backend.model.dto.EmployeeDTO;
+import com.jinji.backend.model.dto.EmployeeMeDTO;
 import com.jinji.backend.model.dto.EmployeeNameDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
@@ -24,18 +25,20 @@ public class EmployeeService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final LeaveBalanceService leaveBalanceService;
+    private final EmployeeMapper employeeMapper;
 
     public EmployeeService(EmployeeRepository employeeRepository,
                            DepartmentRepository departmentRepository,
                            UserRepository userRepository,
                            UserService userService
-                           , LeaveBalanceService leaveBalanceService
+                           , LeaveBalanceService leaveBalanceService, EmployeeMapper employeeMapper
     ) {
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.leaveBalanceService = leaveBalanceService;
         this.userService = userService;
+        this.employeeMapper = employeeMapper;
     }
 
     public Employee getCurrentEmployee(String username) {
@@ -51,27 +54,11 @@ public class EmployeeService {
         return employee;
     }
 
-    public EmployeeDTO getEmployeeMe(String username) {
+    public EmployeeMeDTO getEmployeeMe(String username) {
 
         Employee currentEmployee = getCurrentEmployee(username);
 
-        return mapToDto(currentEmployee);
-    }
-
-    private EmployeeDTO mapToDto(Employee e) {
-        EmployeeDTO dto = new EmployeeDTO();
-
-        dto.setEmployeeNumber(e.getEmployeeNumber());
-        dto.setSurname(e.getSurname());
-        dto.setFirstName(e.getFirstName());
-        dto.setEmail(e.getEmail());
-        dto.setPhoneNumber(e.getPhoneNumber());
-        dto.setSeniorityDate(e.getSeniorityDate());
-        dto.setDepartmentCode(
-                e.getDepartment() != null ? e.getDepartment().getCode() : null
-        );
-
-        return dto;
+        return employeeMapper.toMeDto(currentEmployee);
     }
 
     @Transactional
