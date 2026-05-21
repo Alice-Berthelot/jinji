@@ -1,44 +1,89 @@
 package com.jinji.backend.service.crud;
 
-import com.jinji.backend.model.entity.Leave;
-import com.jinji.backend.model.entity.LeaveRequest;
+import com.jinji.backend.mapper.LeaveMapper;
+import com.jinji.backend.model.dto.LeaveCreateRequest;
+import com.jinji.backend.model.dto.LeaveDTO;
+import com.jinji.backend.model.entity.*;
+import com.jinji.backend.model.enums.PeriodType;
+import com.jinji.backend.repository.EmployeeRepository;
 import com.jinji.backend.repository.LeaveRepository;
+import com.jinji.backend.repository.LeaveTypeRepository;
 import com.jinji.backend.repository.projection.LeaveRaw;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
 public class LeaveService {
 
     private final LeaveRepository leaveRepository;
+    private final LeaveTypeRepository leaveTypeRepository;
+    private final EmployeeRepository employeeRepository;
     private final LeaveBalanceService leaveBalanceService;
+    private final UserService userService;
+    private final LeaveMapper leaveMapper;
 
     public LeaveService(
-            LeaveRepository leaveRepository, LeaveBalanceService leaveBalanceService
+            LeaveRepository leaveRepository, LeaveTypeRepository leaveTypeRepository, EmployeeRepository employeeRepository, LeaveBalanceService leaveBalanceService, UserService userService, LeaveMapper leaveMapper
     ) {
         this.leaveRepository = leaveRepository;
+        this.leaveTypeRepository = leaveTypeRepository;
+        this.employeeRepository = employeeRepository;
         this.leaveBalanceService = leaveBalanceService;
+        this.userService = userService;
+        this.leaveMapper = leaveMapper;
     }
 
-//    @Transactional
-//    public LeaveDTO createLeave(LeaveCreateRequest request) {
-//
-//        Employee employee = employeeRepository.findById(request.getEmployeeId())
-//                .orElseThrow(() -> new RuntimeException("Employee not found"));
-//
-//        Leave leave = buildLeave(
-//                employee,
-//                request.getStartDate(),
-//                request.getEndDate(),
-//                request.getComment()
-//        );
-//
-//        leaveRepository.save(leave);
-//
-//        return mapToDto(leave);
-//    }
+    @Transactional
+    public LeaveDTO createLeave(LeaveCreateRequest request) {
+        User currentUser = userService.getCurrentUser();
+        boolean isHr = currentUser.isHr();
+        Employee employeeAuth = currentUser.getEmployee();
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        if ((employeeAuth.getId().equals(employee.getId())) && !isHr) {
+            throw new RuntimeException("User is not authorized to create a leave for employee " + employee.getFullName());
+        }
+
+
+        LeaveType leaveType = leaveTypeRepository
+                .findByCode(request.getLeaveTypeCode())
+                .orElseThrow(() -> new RuntimeException(
+                        "Leave type not found with code: " + request.getLeaveTypeCode()
+                ));
+
+        LeaveRaw leaveRaw = new LeaveRaw();
+
+        leaveRaw.setEmployee(employee);
+        leaveRaw.setStartDate(request.getStartDate());
+        leaveRaw.setEndDate(request.getEndDate());
+        PeriodType startPeriod = request.getStartPeriod() != null
+                ? request.getStartPeriod()
+                : PeriodType.AM;
+        leaveRaw.setStartPeriod(startPeriod);
+        PeriodType endPeriod = request.getEndPeriod() != null
+                ? request.getEndPeriod()
+                : PeriodType.PM;
+        leaveRaw.setEndPeriod(endPeriod);
+        leaveRaw.setCreatedBy(employeeAuth);
+        leaveRaw.setCreatedAt(request.getCreatedAt());
+        leaveRaw.setLeaveType(leaveType);
+
+        if (leaveRaw.getLeaveType().isBalanceManaged()) {
+// TODO: add numberOfDays
+//         leaveRaw.setNumberOfDays(request.getNumberOfDays());
+            System.out.println("numberOfDays to be implemented");
+            leaveRaw.setNumberOfDays(BigDecimal.valueOf(1));
+        }
+
+
+        Leave leave = buildLeave(leaveRaw);
+
+        return leaveMapper.toDto(leave);
+    }
 
     @Transactional
     public void createLeaveFromRequest(LeaveRequest leaveRequest) {

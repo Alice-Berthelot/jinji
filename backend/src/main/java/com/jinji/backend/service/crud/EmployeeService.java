@@ -9,7 +9,6 @@ import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.DepartmentRepository;
 import com.jinji.backend.repository.EmployeeRepository;
-//import com.jinji.backend.repository.LeaveBalanceRepository;
 import com.jinji.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
