@@ -1,9 +1,6 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.LeaveRequestCreateRequest;
-import com.jinji.backend.model.dto.LeaveRequestDTO;
-import com.jinji.backend.model.dto.LeaveRequestSummaryDTO;
-import com.jinji.backend.model.dto.MyLeaveRequestSummaryDTO;
+import com.jinji.backend.model.dto.*;
 import com.jinji.backend.service.crud.LeaveRequestService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -57,4 +54,14 @@ public class LeaveRequestController {
         return leaveRequestService.getLeaveRequestsSummary(userDetails.getUsername());
     }
 
+    @PostMapping("/{leaveRequestId}/review")
+    @PreAuthorize("hasRole('HR') or hasRole('MANAGER')")
+    public ResponseEntity<LeaveRequestDTO> validateLeaveRequest(@PathVariable Long leaveRequestId,
+            @Valid @RequestBody LeaveRequestCreateReview leaveRequestCreateReview
+    ) {
+
+        LeaveRequestDTO response = leaveRequestService.processLeaveRequest(leaveRequestId, leaveRequestCreateReview);
+
+        return ResponseEntity.ok(response);
+    }
 }

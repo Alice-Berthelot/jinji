@@ -1,7 +1,7 @@
 package com.jinji.backend.model.entity;
 
 import com.jinji.backend.model.enums.LeaveRequestReviewerRole;
-import com.jinji.backend.model.enums.LeaveReviewDecision;
+import com.jinji.backend.model.enums.LeaveRequestDecision;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class LeaveRequestReview {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "decision", nullable = false)
-    private LeaveReviewDecision decision;
+    private LeaveRequestDecision decision;
 
     @Column(name = "comment")
     private String comment;
@@ -52,11 +52,11 @@ public class LeaveRequestReview {
         this.reviewerRole = reviewerRole;
     }
 
-    public LeaveReviewDecision getDecision() {
+    public LeaveRequestDecision getDecision() {
         return decision;
     }
 
-    public void setDecision(LeaveReviewDecision decision) {
+    public void setDecision(LeaveRequestDecision decision) {
         this.decision = decision;
     }
 

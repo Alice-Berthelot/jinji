@@ -13,6 +13,8 @@ public class LeaveType {
     private String code;
     @Column(name = "label", nullable = false)
     private String label;
+    @Column(name = "balance_managed")
+    private boolean balanceManaged;
 
     public Long getId() {
         return id;
@@ -36,5 +38,13 @@ public class LeaveType {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public boolean isBalanceManaged() {
+        return balanceManaged;
+    }
+
+    public void setBalanceManaged(boolean balanceManaged) {
+        this.balanceManaged = balanceManaged;
     }
 }

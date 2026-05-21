@@ -41,4 +41,10 @@ public interface HrPolicyRepository extends JpaRepository<HrPolicy, Long> {
     """)
     AnnualLeaveAccrualPeriod findAnnualLeaveAccrualPeriod();
 
+    @Query("""
+        SELECT h.allowAnnualLeaveCarryover
+        FROM HrPolicy h
+    """)
+    Boolean findAllowAnnualLeaveCarryover();
+
 }

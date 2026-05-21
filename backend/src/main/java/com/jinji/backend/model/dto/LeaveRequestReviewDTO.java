@@ -1,7 +1,7 @@
 package com.jinji.backend.model.dto;
 
+import com.jinji.backend.model.enums.LeaveRequestDecision;
 import com.jinji.backend.model.enums.LeaveRequestReviewerRole;
-import com.jinji.backend.model.enums.LeaveReviewDecision;
 
 import java.time.LocalDateTime;
 
@@ -9,7 +9,7 @@ public class LeaveRequestReviewDTO {
 
     private Long id;
     private LeaveRequestReviewerRole reviewerRole;
-    private LeaveReviewDecision decision;
+    private LeaveRequestDecision decision;
     private String comment;
     private LocalDateTime reviewedAt;
 
@@ -33,11 +33,11 @@ public class LeaveRequestReviewDTO {
         this.reviewerRole = reviewerRole;
     }
 
-    public LeaveReviewDecision getDecision() {
+    public LeaveRequestDecision getDecision() {
         return decision;
     }
 
-    public void setDecision(LeaveReviewDecision decision) {
+    public void setDecision(LeaveRequestDecision decision) {
         this.decision = decision;
     }
 

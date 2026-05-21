@@ -6,6 +6,7 @@ import com.jinji.backend.model.entity.LeaveBalance;
 import com.jinji.backend.model.entity.LeaveType;
 import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.AnnualLeaveAccrualPeriod;
+import com.jinji.backend.repository.HrPolicyRepository;
 import com.jinji.backend.repository.LeaveBalanceRepository;
 import com.jinji.backend.repository.LeaveTypeRepository;
 import com.jinji.backend.repository.UserRepository;
@@ -22,15 +23,17 @@ public class LeaveBalanceService {
     private final LeaveBalanceRepository leaveBalanceRepository;
     private final UserRepository userRepository;
     private final LeaveTypeRepository leaveTypeRepository;
+    private final HrPolicyRepository hrPolicyRepository;
     private final HrPolicyService hrPolicyService;
 
     public LeaveBalanceService(
             LeaveBalanceRepository leaveBalanceRepository,
-            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyService hrPolicyService
+            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyRepository hrPolicyRepository, HrPolicyService hrPolicyService
     ) {
         this.leaveBalanceRepository = leaveBalanceRepository;
         this.userRepository = userRepository;
         this.leaveTypeRepository = leaveTypeRepository;
+        this.hrPolicyRepository = hrPolicyRepository;
         this.hrPolicyService = hrPolicyService;
     }
 
@@ -230,5 +233,78 @@ public class LeaveBalanceService {
                 + acquisitionStartDate.getYear()
                 + "/"
                 + acquisitionEndDate.getYear();
+    }
+
+    public void deductLeaveBalance(Employee employee, LeaveType leaveType, BigDecimal days) {
+
+        boolean allowCarryover =
+                hrPolicyRepository.findAllowAnnualLeaveCarryover();
+
+        List<LeaveBalance> balances;
+
+        if (allowCarryover) {
+            System.out.println("allowCarryover");
+            // FIFO: oldest balances consumed first
+            balances =
+                    leaveBalanceRepository
+                            .findByEmployeeAndLeaveTypeOrderByAcquisitionStartDateAsc(
+                                    employee,
+                                    leaveType
+                            );
+
+        } else {
+            System.out.println("does not allow carryover");
+            // only current/latest balance
+            balances =
+                    leaveBalanceRepository
+                            .findTopByEmployeeAndLeaveTypeOrderByAcquisitionStartDateDesc(
+                                    employee,
+                                    leaveType
+                            )
+                            .stream()
+                            .toList();
+        }
+
+        if (balances.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "No LeaveBalance found for employee " + employee.getFirstName() + employee.getSurname() +
+                            " and leave type " + leaveType.getLabel()
+            );
+        }
+
+        BigDecimal remainingToDeduct = days;
+        for (LeaveBalance balance : balances) {
+            BigDecimal available = balance.getRemainingDays();
+
+            // available <= 0
+            if (available.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            // available >= remainingToDeduct
+            if (available.compareTo(remainingToDeduct) >= 0) {
+
+                balance.setTakenDays(
+                        balance.getTakenDays().add(remainingToDeduct)
+                );
+
+                leaveBalanceRepository.save(balance);
+                return;
+            }
+
+            // consume all available balance
+            balance.setTakenDays(
+                    balance.getTakenDays().add(available)
+            );
+
+            leaveBalanceRepository.save(balance);
+
+            remainingToDeduct =
+                    remainingToDeduct.subtract(available);
+        }
+
+        if (remainingToDeduct.compareTo(BigDecimal.ZERO) > 0) {
+            throw new IllegalArgumentException("Insufficient leave balance");
+        }
     }
 }
