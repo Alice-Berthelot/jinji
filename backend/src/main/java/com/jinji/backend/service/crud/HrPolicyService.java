@@ -6,7 +6,6 @@ import com.jinji.backend.model.enums.AnnualLeaveDayType;
 import com.jinji.backend.model.enums.LeaveValidationProcess;
 import com.jinji.backend.repository.HrPolicyRepository;
 import com.jinji.backend.repository.PublicHolidayVariableRepository;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,14 +30,6 @@ public class HrPolicyService {
 
     public AnnualLeaveDayType getAnnualLeaveDayType() {
         return hrPolicyRepository.findAnnualLeaveDayType();
-    }
-
-    public Boolean getAllowAnnualLeaveCarryover() {
-        return hrPolicyRepository.findAllowAnnualLeaveCarryover();
-    }
-
-    public LocalDate getSolidarityDay() {
-        return getHrPolicy().getSolidarityDay();
     }
 
     public LocalDate getEffectiveSolidarityDay() {

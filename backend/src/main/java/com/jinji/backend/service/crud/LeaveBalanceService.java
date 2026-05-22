@@ -1,5 +1,6 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.mapper.LeaveBalanceMapper;
 import com.jinji.backend.model.dto.LeaveBalanceDTO;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.LeaveBalance;
@@ -25,24 +26,25 @@ public class LeaveBalanceService {
     private final LeaveTypeRepository leaveTypeRepository;
     private final HrPolicyRepository hrPolicyRepository;
     private final HrPolicyService hrPolicyService;
+    private final LeaveBalanceMapper leaveBalanceMapper;
 
     public LeaveBalanceService(
             LeaveBalanceRepository leaveBalanceRepository,
-            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyRepository hrPolicyRepository, HrPolicyService hrPolicyService
+            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyRepository hrPolicyRepository, HrPolicyService hrPolicyService, LeaveBalanceMapper leaveBalanceMapper
     ) {
         this.leaveBalanceRepository = leaveBalanceRepository;
         this.userRepository = userRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.hrPolicyRepository = hrPolicyRepository;
         this.hrPolicyService = hrPolicyService;
+        this.leaveBalanceMapper = leaveBalanceMapper;
     }
 
     public List<LeaveBalanceDTO> getLeaveBalancesByEmployeeId(Long employeeId) {
 
-        return leaveBalanceRepository.findByEmployee_Id(employeeId)
-                .stream()
-                .map(this::mapToDto)
-                .toList();
+        return leaveBalanceMapper.toDtos(
+                leaveBalanceRepository.findByEmployee_Id(employeeId)
+        );
     }
 
     public List<LeaveBalanceDTO> getMyLeaveBalances(String username) {
@@ -54,32 +56,9 @@ public class LeaveBalanceService {
 
         Employee employee = user.getEmployee();
 
-        return leaveBalanceRepository.findByEmployee_Id(employee.getId())
-                .stream()
-                .map(this::mapToDto)
-                .toList();
-    }
-
-    private LeaveBalanceDTO mapToDto(LeaveBalance leaveBalance) {
-
-        LeaveBalanceDTO dto = new LeaveBalanceDTO();
-
-        dto.setLabel(leaveBalance.getLabel());
-        dto.setAcquisitionStartDate(leaveBalance.getAcquisitionStartDate());
-        dto.setAcquisitionEndDate(leaveBalance.getAcquisitionEndDate());
-        dto.setAcquiredDays(leaveBalance.getAcquiredDays());
-        dto.setTakenDays(leaveBalance.getTakenDays());
-
-        dto.setRemainingDays(
-                leaveBalance.getAcquiredDays()
-                        .subtract(leaveBalance.getTakenDays())
+        return leaveBalanceMapper.toDtos(
+                leaveBalanceRepository.findByEmployee_Id(employee.getId())
         );
-
-        dto.setLeaveType(
-                leaveBalance.getLeaveType().getLabel()
-        );
-
-        return dto;
     }
 
     public LeaveBalance createLeaveBalance(Employee employee) {

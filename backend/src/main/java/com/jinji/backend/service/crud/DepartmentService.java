@@ -1,7 +1,7 @@
 package com.jinji.backend.service.crud;
 
-import com.jinji.backend.model.dto.DepartmentResponse;
-import com.jinji.backend.model.entity.Department;
+import com.jinji.backend.mapper.DepartmentMapper;
+import com.jinji.backend.model.dto.DepartmentDTO;
 import com.jinji.backend.repository.DepartmentRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,24 +11,20 @@ import java.util.List;
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final DepartmentMapper departmentMapper;
 
-    public DepartmentService(DepartmentRepository departmentRepository) {
+    public DepartmentService(
+            DepartmentRepository departmentRepository,
+            DepartmentMapper departmentMapper
+    ) {
         this.departmentRepository = departmentRepository;
+        this.departmentMapper = departmentMapper;
     }
 
-    public List<DepartmentResponse> getAllDepartments() {
+    public List<DepartmentDTO> getAllDepartments() {
 
-        return departmentRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    private DepartmentResponse mapToResponse(Department department) {
-        DepartmentResponse departmentResponse = new DepartmentResponse();
-        departmentResponse.setId(department.getId());
-        departmentResponse.setCode(department.getCode());
-        departmentResponse.setName(department.getName());
-        return departmentResponse;
+        return departmentMapper.toDtos(
+                departmentRepository.findAll()
+        );
     }
 }

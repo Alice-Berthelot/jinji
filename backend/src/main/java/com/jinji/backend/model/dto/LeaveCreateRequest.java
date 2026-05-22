@@ -9,12 +9,20 @@ import java.time.LocalDateTime;
 
 public class LeaveCreateRequest {
 
+    private Long employeeId;
     private LocalDate startDate;
     private LocalDate endDate;
     private PeriodType startPeriod;
     private PeriodType endPeriod;
-    private LocalDateTime createdAt;
-    private String leaveType;
+    private String leaveTypeCode;
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
 
     public LocalDate getStartDate() {
         return startDate;
@@ -48,19 +56,11 @@ public class LeaveCreateRequest {
         this.endPeriod = endPeriod;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getLeaveTypeCode() {
+        return leaveTypeCode;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getLeaveType() {
-        return leaveType;
-    }
-
-    public void setLeaveType(String leaveType) {
-        this.leaveType = leaveType;
+    public void setLeaveTypeCode(String leaveTypeCode) {
+        this.leaveTypeCode = leaveTypeCode;
     }
 }

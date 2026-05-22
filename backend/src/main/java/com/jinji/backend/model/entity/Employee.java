@@ -32,6 +32,14 @@ public class Employee {
     @ManyToMany(mappedBy = "employees")
     private Set<Team> teams;
 
+    @Transient
+    public String getFullName() {
+        return String.format("%s %s",
+                        firstName != null ? firstName : "",
+                        surname != null ? surname : "")
+                .trim();
+    }
+
     public Long getId() {
         return id;
     }

@@ -50,7 +50,7 @@ export const hrLinks = [
     link: "/hr/employees",
   },
   {
-    name: "Paramétrage des règles de congés",
+    name: "Paramétrage des règles RH",
     link: "/hr/policies",
   },
 ];

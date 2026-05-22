@@ -1,15 +1,15 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
-import com.jinji.backend.model.dto.EmployeeDTO;
-import com.jinji.backend.model.dto.EmployeeNameDTO;
+import com.jinji.backend.model.dto.EmployeeMeDTO;
+import com.jinji.backend.model.dto.EmployeeFullNameDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.DepartmentRepository;
 import com.jinji.backend.repository.EmployeeRepository;
-//import com.jinji.backend.repository.LeaveBalanceRepository;
 import com.jinji.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,18 +25,20 @@ public class EmployeeService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final LeaveBalanceService leaveBalanceService;
+    private final EmployeeMapper employeeMapper;
 
     public EmployeeService(EmployeeRepository employeeRepository,
                            DepartmentRepository departmentRepository,
                            UserRepository userRepository,
                            UserService userService
-                           , LeaveBalanceService leaveBalanceService
+                           , LeaveBalanceService leaveBalanceService, EmployeeMapper employeeMapper
     ) {
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.leaveBalanceService = leaveBalanceService;
         this.userService = userService;
+        this.employeeMapper = employeeMapper;
     }
 
     public Employee getCurrentEmployee(String username) {
@@ -52,27 +54,21 @@ public class EmployeeService {
         return employee;
     }
 
-    public EmployeeDTO getEmployeeMe(String username) {
+    public EmployeeFullNameDTO getEmployeeFullNameById(Long employeeId) {
+        return employeeRepository.findEmployeeNameById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
+    public EmployeeFullNameDTO getMyFullName(String username) {
+        return employeeRepository.findEmployeeNameByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
+    public EmployeeMeDTO getEmployeeMe(String username) {
 
         Employee currentEmployee = getCurrentEmployee(username);
 
-        return mapToDto(currentEmployee);
-    }
-
-    private EmployeeDTO mapToDto(Employee e) {
-        EmployeeDTO dto = new EmployeeDTO();
-
-        dto.setEmployeeNumber(e.getEmployeeNumber());
-        dto.setSurname(e.getSurname());
-        dto.setFirstName(e.getFirstName());
-        dto.setEmail(e.getEmail());
-        dto.setPhoneNumber(e.getPhoneNumber());
-        dto.setSeniorityDate(e.getSeniorityDate());
-        dto.setDepartmentCode(
-                e.getDepartment() != null ? e.getDepartment().getCode() : null
-        );
-
-        return dto;
+        return employeeMapper.toMeDto(currentEmployee);
     }
 
     @Transactional
@@ -115,7 +111,7 @@ public class EmployeeService {
         return "Successful registration for Employee " + savedEmployee.getFirstName() + " " + savedEmployee.getSurname();
     }
 
-    public EmployeeNameDTO getEmployeeFullName(String username) {
+    public EmployeeFullNameDTO getEmployeeFullName(String username) {
 
         return employeeRepository.findEmployeeNameByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));

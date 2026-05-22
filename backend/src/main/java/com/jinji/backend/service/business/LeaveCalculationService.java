@@ -2,6 +2,7 @@ package com.jinji.backend.service.business;
 
 import com.jinji.backend.model.enums.AnnualLeaveDayType;
 import com.jinji.backend.model.enums.PeriodType;
+import com.jinji.backend.service.crud.HrPolicyService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -11,23 +12,26 @@ import java.time.LocalDate;
 public class LeaveCalculationService {
 
     private final CalendarService calendarService;
+    private final HrPolicyService hrPolicyService;
 
-    public LeaveCalculationService(CalendarService calendarService) {
+    public LeaveCalculationService(CalendarService calendarService, HrPolicyService hrPolicyService) {
         this.calendarService = calendarService;
+        this.hrPolicyService = hrPolicyService;
     }
 
     public BigDecimal calculateLeaveDays(
             LocalDate startDate,
             LocalDate endDate,
             PeriodType startPeriod,
-            PeriodType endPeriod,
-            AnnualLeaveDayType dayType,
-            LocalDate solidarityDay
+            PeriodType endPeriod
     ) {
 
         if (startDate == null || endDate == null) {
             return BigDecimal.ZERO;
         }
+
+        AnnualLeaveDayType dayType = hrPolicyService.getAnnualLeaveDayType();
+        LocalDate solidarityDay = hrPolicyService.getEffectiveSolidarityDay();
 
         BigDecimal total = BigDecimal.ZERO;
 

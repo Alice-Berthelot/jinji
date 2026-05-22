@@ -7,24 +7,25 @@ export type LeaveState = {
   success?: boolean;
 };
 
-export async function createLeaveRequestAction(
+export async function createLeaveAction(
   prevState: LeaveState,
   formData: FormData
 ): Promise<LeaveState> {
   const cookieStore = await cookies();
+
   const token = cookieStore.get("access_token")?.value;
 
   const payload = {
+    employeeId: Number(formData.get("employeeId")),
     startDate: formData.get("startDate"),
     endDate: formData.get("endDate"),
     startPeriod: formData.get("startPeriod"),
     endPeriod: formData.get("endPeriod"),
     leaveTypeCode: formData.get("leaveTypeCode"),
-    employeeComment: formData.get("employeeComment"),
   };
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/leave-requests`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/leaves`,
     {
       method: "POST",
       headers: {
@@ -36,8 +37,13 @@ export async function createLeaveRequestAction(
   );
 
   if (!res.ok) {
-    return { error: "Erreur lors de la création de la demande de congé" };
+    return {
+      error: "Erreur lors de la création de l'absence",
+    };
   }
 
-  return { error: null, success: true };
+  return {
+    error: null,
+    success: true,
+  };
 }

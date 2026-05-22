@@ -18,17 +18,6 @@ export async function createEmployeeAction(
 
   const createUser = formData.get("createUser") === "on";
 
-  // const payload : CreateEmployeePayload = {
-  //   employeeNumber: formData.get("employeeNumber"),
-  //   surname: formData.get("surname"),
-  //   firstName: formData.get("firstName"),
-  //   email: formData.get("email"),
-  //   phoneNumber: formData.get("phoneNumber"),
-  //   seniorityDate: formData.get("seniorityDate"),
-  //   departmentCode: formData.get("departmentCode"),
-  //   createUser,
-  // };
-
   const payload: CreateEmployeePayload = {
     employeeNumber: getString(formData, "employeeNumber"),
     surname: getString(formData, "surname"),
