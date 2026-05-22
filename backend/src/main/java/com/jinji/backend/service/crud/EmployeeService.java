@@ -3,7 +3,7 @@ package com.jinji.backend.service.crud;
 import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
 import com.jinji.backend.model.dto.EmployeeMeDTO;
-import com.jinji.backend.model.dto.EmployeeNameDTO;
+import com.jinji.backend.model.dto.EmployeeFullNameDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.User;
@@ -54,6 +54,16 @@ public class EmployeeService {
         return employee;
     }
 
+    public EmployeeFullNameDTO getEmployeeFullNameById(Long employeeId) {
+        return employeeRepository.findEmployeeNameById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
+    public EmployeeFullNameDTO getMyFullName(String username) {
+        return employeeRepository.findEmployeeNameByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
     public EmployeeMeDTO getEmployeeMe(String username) {
 
         Employee currentEmployee = getCurrentEmployee(username);
@@ -101,7 +111,7 @@ public class EmployeeService {
         return "Successful registration for Employee " + savedEmployee.getFirstName() + " " + savedEmployee.getSurname();
     }
 
-    public EmployeeNameDTO getEmployeeFullName(String username) {
+    public EmployeeFullNameDTO getEmployeeFullName(String username) {
 
         return employeeRepository.findEmployeeNameByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));

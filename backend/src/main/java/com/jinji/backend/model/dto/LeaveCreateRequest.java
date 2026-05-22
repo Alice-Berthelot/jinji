@@ -14,7 +14,6 @@ public class LeaveCreateRequest {
     private LocalDate endDate;
     private PeriodType startPeriod;
     private PeriodType endPeriod;
-    private LocalDateTime createdAt;
     private String leaveTypeCode;
 
     public Long getEmployeeId() {
@@ -55,14 +54,6 @@ public class LeaveCreateRequest {
 
     public void setEndPeriod(PeriodType endPeriod) {
         this.endPeriod = endPeriod;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public String getLeaveTypeCode() {

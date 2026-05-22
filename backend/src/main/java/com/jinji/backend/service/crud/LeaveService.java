@@ -72,7 +72,6 @@ public class LeaveService {
                 : PeriodType.PM;
         leaveRaw.setEndPeriod(endPeriod);
         leaveRaw.setCreatedBy(employeeAuth);
-        leaveRaw.setCreatedAt(request.getCreatedAt());
         leaveRaw.setLeaveType(leaveType);
 
         if (leaveRaw.getLeaveType().isBalanceManaged()) {

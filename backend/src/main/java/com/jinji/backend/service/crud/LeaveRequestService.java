@@ -262,6 +262,14 @@ public class LeaveRequestService {
 
     private String buildLeaveRequestStatusLabel(LeaveRequestSummaryRaw r) {
 
+        if (r.getStatus().equals(LeaveRequestStatus.APPROVED)) {
+            return "Validée";
+        }
+
+        if (r.getStatus().equals(LeaveRequestStatus.REJECTED)) {
+            return "Refusée";
+        }
+
         if (r.getStatus() != LeaveRequestStatus.PENDING) {
             return r.getStatus().name();
         }
@@ -280,14 +288,14 @@ public class LeaveRequestService {
             return "En attente de validation RH";
         }
 
-        if (
-                validationProcess == LeaveValidationProcess.MANAGER_ONLY
-                        && Boolean.FALSE.equals(r.getHasHrReview())
-        ) {
-            return "Traitée par Manager";
-        }
+//        if (
+//                validationProcess == LeaveValidationProcess.MANAGER_ONLY
+//                        && Boolean.FALSE.equals(r.getHasHrReview())
+//        ) {
+//            return "Traitée par Manager";
+//        }
 
-        return "En attente";
+        return r.getStatus().name();
     }
 
     @Transactional

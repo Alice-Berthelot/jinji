@@ -30,7 +30,8 @@ export default function NavBar({
   return (
     <>
       <div className="flex flex-col"></div>
-      <p className="mt-10 pl-2 text-md mb-4 font-semibold">{userSpaceTitle}</p>
+      <p className="mt-10 pl-2 text-sm">Vous êtes sur votre</p>
+      <p className="pl-2 text-md mb-4 font-semibold">{userSpaceTitle}</p>
       <div className="flex flex-col">
         {userSpaceSubtitles?.map((subtitle, i) => (
           <Link

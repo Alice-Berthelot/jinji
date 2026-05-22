@@ -3,59 +3,82 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
+
 import {
-  createLeaveRequestAction,
+  createLeaveAction,
   LeaveState,
-} from "@/app/actions/createLeaveRequest";
+} from "@/app/actions/createLeave";
+
 import { getLeaveTypes } from "@/app/api/leaveTypes";
+
 import ButtonPurple from "../ui/Button";
 import { InputField } from "../ui/InputField";
 import { SelectField } from "../ui/SelectField";
-import Subtitle from "../ui/Subtitle";
-import { toast } from "react-toastify";
-import LinkCustom from "../ui/LinkCustom";
-import { LeaveType } from "@/types/leave/leaveTypes";
 import { RadioField } from "../ui/RadioField";
+import Subtitle from "../ui/Subtitle";
+import LinkCustom from "../ui/LinkCustom";
 
-export default function LeaveRequestForm() {
+import { LeaveType } from "@/types/leave/leaveTypes";
+
+import { toast } from "react-toastify";
+
+type NewLeaveFormProps = {
+  employeeId: number,
+  subtitle: string;
+};
+
+export default function NewLeaveForm({
+  employeeId,
+  subtitle,
+}: NewLeaveFormProps) {
   const [state, formAction] = useActionState<LeaveState, FormData>(
-    createLeaveRequestAction,
+    createLeaveAction,
     { error: null }
   );
 
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const today = new Date().toISOString().split("T")[0];
-  const isStartDateValid = startDate >= today;
-  const isEndDateValid =
-  !startDate || !endDate ? true : endDate >= startDate;
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
 
-  const validateDates = (start: string, end: string) => {
-    if (start && start < today) return "start_invalid";
-    if (start && end && end < start) return "end_invalid";
-    return null;
-  };
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
-  const error = validateDates(startDate, endDate);
-
-  const { pending } = useFormStatus();
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+
   const [isValid, setIsValid] = useState(false);
 
-  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
+  const router = useRouter();
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const isStartDateValid = startDate >= today;
+
+  const isEndDateValid =
+    !startDate || !endDate
+      ? true
+      : endDate >= startDate;
 
   useEffect(() => {
     async function load() {
       try {
         const data = await getLeaveTypes();
         setLeaveTypes(data);
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
       }
     }
+
     load();
   }, []);
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success("Absence ajoutée avec succès");
+      router.push(`/employees/${employeeId}`);
+    }
+
+    if (state.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, employeeId]);
 
   const handleChange = () => {
     if (formRef.current) {
@@ -63,36 +86,23 @@ export default function LeaveRequestForm() {
     }
   };
 
-  useEffect(() => {
-    if (state.success) {
-      toast.success("Demande de congé créée avec succès");
-      router.push("/");
-    }
-
-    if (state.error) {
-      toast.error(state.error);
-    }
-  }, [state]);
-
-  const handleStartDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setStartDate(e.target.value);
-  };
-  
-  const handleEndDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setEndDate(e.target.value);
-  };
-
   return (
     <form
       ref={formRef}
-      onChange={handleChange}
       action={formAction}
+      onChange={handleChange}
       className="m-auto px-6 py-8 flex flex-col gap-6"
     >
       <Subtitle
-        subtitle="Créer une nouvelle demande d'absence"
+        subtitle={subtitle}
         paddingLeft="pl-0 lg:pl-2"
         className="self-start"
+      />
+
+      <input
+        type="hidden"
+        name="employeeId"
+        value={employeeId}
       />
 
       <div className="flex gap-4 items-center">
@@ -101,9 +111,9 @@ export default function LeaveRequestForm() {
           type="date"
           name="startDate"
           className="w-96"
-          onBlur={handleStartDateBlur}
-          min={today}
           required
+          min={today}
+          onChange={(e) => setStartDate(e.target.value)}
         />
 
         <RadioField
@@ -116,8 +126,8 @@ export default function LeaveRequestForm() {
         />
       </div>
 
-      {error === "start_invalid" && (
-        <p className="text-red-600">
+      {!isStartDateValid && (
+        <p className="text-red-600 text-sm">
           La date de début ne peut pas être antérieure à aujourd'hui.
         </p>
       )}
@@ -129,8 +139,8 @@ export default function LeaveRequestForm() {
           name="endDate"
           className="w-96"
           required
-          onBlur={handleEndDateBlur}
           min={startDate || today}
+          onChange={(e) => setEndDate(e.target.value)}
         />
 
         <RadioField
@@ -142,23 +152,22 @@ export default function LeaveRequestForm() {
           ]}
         />
       </div>
-      {!isEndDateValid && endDate && (
+
+      {!isEndDateValid && (
         <p className="text-red-600 text-sm">
-          La date de fin ne peut pas être antérieure à la date de début.
+          La date de fin ne peut pas être avant la date de début.
         </p>
       )}
 
       <SelectField
-        label="Type de congé"
+        label="Type d'absence"
         name="leaveTypeCode"
         required
-        options={leaveTypes.map((t) => ({
-          value: t.code,
-          label: t.label,
+        options={leaveTypes.map((type) => ({
+          value: type.code,
+          label: type.label,
         }))}
       />
-
-      <InputField label="Commentaire" type="text" name="employeeComment" />
 
       {state.error && (
         <p role="alert" className="text-red-600">
@@ -172,12 +181,21 @@ export default function LeaveRequestForm() {
 
       <div className="flex flex-col md:flex-row items-center md:self-end">
         <ButtonPurple
-          title="Envoyer"
+          title="Ajouter"
           type="submit"
-          isLoading={pending}
-          disabled={!isValid || !isStartDateValid || !isEndDateValid}
+          isLoading={false}
+          disabled={
+            !isValid ||
+            !isStartDateValid ||
+            !isEndDateValid
+          }
         />
-        <LinkCustom href="/leaves" title="Annuler" color="red" />
+
+        <LinkCustom
+          href={`/employees/${employeeId}`}
+          title="Annuler"
+          color="red"
+        />
       </div>
     </form>
   );
