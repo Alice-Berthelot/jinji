@@ -56,7 +56,7 @@ public class LeaveRequestController {
 
     @PostMapping("/{leaveRequestId}/review")
     @PreAuthorize("hasRole('HR') or hasRole('MANAGER')")
-    public ResponseEntity<LeaveRequestDTO> validateLeaveRequest(@PathVariable Long leaveRequestId,
+    public ResponseEntity<LeaveRequestDTO> processLeaveRequest(@PathVariable Long leaveRequestId,
             @Valid @RequestBody LeaveRequestCreateReview leaveRequestCreateReview
     ) {
 

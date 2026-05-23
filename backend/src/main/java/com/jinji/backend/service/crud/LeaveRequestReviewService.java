@@ -29,13 +29,7 @@ public class LeaveRequestReviewService {
         review.setLeaveRequest(leaveRequest);
         review.setReviewedBy(reviewer);
         review.setReviewerRole(reviewerRole);
-
-        review.setReviewedAt(
-                dto.getReviewedAt() != null
-                        ? dto.getReviewedAt()
-                        : LocalDateTime.now()
-        );
-
+        review.setReviewedAt(LocalDateTime.now());
         review.setDecision(dto.getDecision());
         review.setComment(dto.getComment());
 

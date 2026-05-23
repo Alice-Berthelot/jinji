@@ -118,7 +118,7 @@ export default function LeaveRequestsList({
             key={leaveRequest.id}
             className={`${
               highlightForCurrentRole
-                ? "bg-[var(--color-block-purple)]"
+                ? "bg-[var(--color-light-purple)]"
                 : leaveRequest.isProcessed
                 ? "bg-[var(--color-light-purple)]"
                 : "bg-[var(--color-block-white)]"
