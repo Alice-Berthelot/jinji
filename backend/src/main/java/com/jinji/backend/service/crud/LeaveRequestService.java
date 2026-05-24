@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -135,7 +134,10 @@ public class LeaveRequestService {
     private LeaveRequestDTO mapToDto(LeaveRequest lr) {
         LeaveRequestDTO dto = new LeaveRequestDTO();
 
-        dto.setId(lr.getId());
+        dto.setLeaveRequestId(lr.getId());
+        dto.setEmployeeId(lr.getEmployee().getId());
+        dto.setEmployeeFirstName(lr.getEmployee().getFirstName());
+        dto.setEmployeeSurname(lr.getEmployee().getSurname());
         dto.setCreatedAt(lr.getCreatedAt());
         dto.setStartDate(lr.getStartDate());
         dto.setEndDate(lr.getEndDate());
@@ -151,6 +153,29 @@ public class LeaveRequestService {
 
         List<LeaveRequestReview> reviews =
                 leaveRequestReviewRepository.findByLeaveRequest_Id(lr.getId());
+
+        boolean hasManagerReview = reviews.stream()
+                .anyMatch(r ->
+                        r.getReviewerRole() == LeaveRequestReviewerRole.MANAGER
+                );
+
+        boolean hasHrReview = reviews.stream()
+                .anyMatch(r ->
+                        r.getReviewerRole() == LeaveRequestReviewerRole.HR
+                );
+
+        LeaveRequestWorkflowStatus workflowStatus =
+                buildWorkflowStatus(
+                        lr.getStatus(),
+                        hasManagerReview,
+                        hasHrReview
+                );
+
+        dto.setWorkflowStatus(workflowStatus);
+
+        dto.setStatusLabel(
+                buildLeaveRequestStatusLabel(workflowStatus)
+        );
 
         dto.setReviews(
                 reviews.stream()
@@ -255,48 +280,105 @@ public class LeaveRequestService {
         dto.setHasHrReview(r.getHasHrReview());
         dto.setHasManagerReview(r.getHasManagerReview());
 
-        dto.setStatusLabel(buildLeaveRequestStatusLabel(r));
+        LeaveRequestWorkflowStatus workflowStatus =
+                buildWorkflowStatus(
+                        r.getStatus(),
+                        r.getHasManagerReview(),
+                        r.getHasHrReview()
+                );
+
+        dto.setWorkflowStatus(workflowStatus);
+
+        dto.setStatusLabel(
+                buildLeaveRequestStatusLabel(workflowStatus)
+        );
 
         return dto;
     }
 
-    private String buildLeaveRequestStatusLabel(LeaveRequestSummaryRaw r) {
+    private LeaveRequestWorkflowStatus buildWorkflowStatus(
+            LeaveRequestStatus status,
+            Boolean hasManagerReview,
+            Boolean hasHrReview
+    ) {
 
-        if (r.getStatus().equals(LeaveRequestStatus.APPROVED)) {
-            return "Validée";
+        if (status == LeaveRequestStatus.APPROVED) {
+            return LeaveRequestWorkflowStatus.APPROVED;
         }
 
-        if (r.getStatus().equals(LeaveRequestStatus.REJECTED)) {
-            return "Refusée";
+        if (status == LeaveRequestStatus.REJECTED) {
+            return LeaveRequestWorkflowStatus.REJECTED;
         }
 
-        if (r.getStatus() != LeaveRequestStatus.PENDING) {
-            return r.getStatus().name();
+        if (status == LeaveRequestStatus.CANCELLED) {
+            return LeaveRequestWorkflowStatus.CANCELLED;
         }
 
         LeaveValidationProcess validationProcess =
                 hrPolicyService.getLeaveValidation();
 
-        if (Boolean.FALSE.equals(r.getHasManagerReview())) {
-            return "En attente de validation Manager";
+        if (Boolean.FALSE.equals(hasManagerReview)) {
+            return LeaveRequestWorkflowStatus.PENDING_MANAGER;
         }
 
         if (
                 validationProcess == LeaveValidationProcess.MANAGER_THEN_HR
-                        && Boolean.FALSE.equals(r.getHasHrReview())
+                        && Boolean.TRUE.equals(hasManagerReview)
         ) {
-            return "En attente de validation RH";
+            return LeaveRequestWorkflowStatus.PENDING_HR;
         }
 
-//        if (
-//                validationProcess == LeaveValidationProcess.MANAGER_ONLY
-//                        && Boolean.FALSE.equals(r.getHasHrReview())
-//        ) {
-//            return "Traitée par Manager";
-//        }
-
-        return r.getStatus().name();
+        return LeaveRequestWorkflowStatus.PENDING;
     }
+
+    private String buildLeaveRequestStatusLabel(
+            LeaveRequestWorkflowStatus workflowStatus
+    ) {
+
+        return switch (workflowStatus) {
+            case APPROVED -> "Validée";
+            case REJECTED -> "Refusée";
+            case CANCELLED -> "Annulée";
+            case PENDING_MANAGER -> "En attente de validation Manager";
+            case PENDING_HR -> "En attente de validation RH";
+            case PENDING -> "En attente";
+        };
+    }
+//
+//    private String buildLeaveRequestStatusLabel(
+//            LeaveRequestStatus status,
+//            Boolean hasManagerReview,
+//            Boolean hasHrReview
+//    ) {
+//
+//        if (status == LeaveRequestStatus.APPROVED) {
+//            return "Validée";
+//        }
+//
+//        if (status == LeaveRequestStatus.REJECTED) {
+//            return "Refusée";
+//        }
+//
+//        if (status != LeaveRequestStatus.PENDING) {
+//            return status.name();
+//        }
+//
+//        LeaveValidationProcess validationProcess =
+//                hrPolicyService.getLeaveValidation();
+//
+//        if (Boolean.FALSE.equals(hasManagerReview)) {
+//            return "En attente de validation Manager";
+//        }
+//
+//        if (
+//                validationProcess == LeaveValidationProcess.MANAGER_THEN_HR
+//                        && Boolean.TRUE.equals(hasManagerReview)
+//        ) {
+//            return "Traitée par Manager. En attente de validation RH";
+//        }
+//
+//        return status.name();
+//    }
 
     @Transactional
     public LeaveRequestDTO processLeaveRequest(Long leaveRequestId, LeaveRequestCreateReview reviewRaw) throws RuntimeException {

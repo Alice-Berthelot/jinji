@@ -1,6 +1,6 @@
 "use server"
 
-import { LeaveRequest, LeaveRequestsSummary, MyLeaveRequestsSummary } from "@/types/leave/leaveRequest";
+import { CreateLeaveRequestReviewPayload, LeaveRequest, LeaveRequestsSummary, MyLeaveRequestsSummary } from "@/types/leave/leaveRequest";
 import { cookies } from "next/headers";
 
   
@@ -73,4 +73,27 @@ import { cookies } from "next/headers";
     return res.json();
   }
 
+  export async function createLeaveRequestReview(leaveRequestId: number,
+    payload: CreateLeaveRequestReviewPayload): Promise<LeaveRequest> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
+  
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/leave-requests/${leaveRequestId}/review`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+  
+    if (!res.ok) {
+      throw new Error("Error occuring while creating leave request review");
+    }
+
+    return res.json();
+  }
   

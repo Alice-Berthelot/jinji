@@ -1,6 +1,7 @@
 package com.jinji.backend.model.dto;
 
 import com.jinji.backend.model.enums.LeaveRequestStatus;
+import com.jinji.backend.model.enums.LeaveRequestWorkflowStatus;
 import com.jinji.backend.model.enums.PeriodType;
 
 import java.math.BigDecimal;
@@ -10,24 +11,53 @@ import java.util.List;
 
 public class LeaveRequestDTO {
 
-    private Long id;
+    private Long leaveRequestId;
+    private Long employeeId;
+    private String employeeFirstName;
+    private String employeeSurname;
     private LocalDateTime createdAt;
     private LocalDate startDate;
     private LocalDate endDate;
     private PeriodType startPeriod;
     private PeriodType endPeriod;
     private LeaveRequestStatus status;
+    private LeaveRequestWorkflowStatus workflowStatus;
+    private String statusLabel;
     private String employeeComment;
     private String leaveTypeLabel;
     private List<LeaveRequestReviewDTO> reviews;
     private BigDecimal numberOfDays;
 
-    public Long getId() {
-        return id;
+    public Long getLeaveRequestId() {
+        return leaveRequestId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLeaveRequestId(Long leaveRequestId) {
+        this.leaveRequestId = leaveRequestId;
+    }
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getEmployeeFirstName() {
+        return employeeFirstName;
+    }
+
+    public void setEmployeeFirstName(String employeeFirstName) {
+        this.employeeFirstName = employeeFirstName;
+    }
+
+    public String getEmployeeSurname() {
+        return employeeSurname;
+    }
+
+    public void setEmployeeSurname(String employeeSurname) {
+        this.employeeSurname = employeeSurname;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -76,6 +106,22 @@ public class LeaveRequestDTO {
 
     public void setStatus(LeaveRequestStatus status) {
         this.status = status;
+    }
+
+    public LeaveRequestWorkflowStatus getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(LeaveRequestWorkflowStatus workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    public String getStatusLabel() {
+        return statusLabel;
+    }
+
+    public void setStatusLabel(String statusLabel) {
+        this.statusLabel = statusLabel;
     }
 
     public String getEmployeeComment() {

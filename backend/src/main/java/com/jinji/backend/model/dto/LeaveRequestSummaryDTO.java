@@ -3,6 +3,7 @@ package com.jinji.backend.model.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.jinji.backend.model.enums.LeaveRequestStatus;
+import com.jinji.backend.model.enums.LeaveRequestWorkflowStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class LeaveRequestSummaryDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private LeaveRequestStatus status;
+    private LeaveRequestWorkflowStatus workflowStatus;
     private String statusLabel;
     private LocalDateTime createdAt;
     private String employeeFirstName;
@@ -61,6 +63,14 @@ public class LeaveRequestSummaryDTO {
 
     public void setStatus(LeaveRequestStatus status) {
         this.status = status;
+    }
+
+    public LeaveRequestWorkflowStatus getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(LeaveRequestWorkflowStatus workflowStatus) {
+        this.workflowStatus = workflowStatus;
     }
 
     public String getStatusLabel() {
