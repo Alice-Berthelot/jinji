@@ -1,5 +1,8 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.exception.BadRequestException;
+import com.jinji.backend.exception.ResourceAlreadyExistsException;
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveBalanceMapper;
 import com.jinji.backend.model.dto.LeaveBalanceDTO;
 import com.jinji.backend.model.entity.Employee;
@@ -50,7 +53,7 @@ public class LeaveBalanceService {
     public List<LeaveBalanceDTO> getMyLeaveBalances(String username) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "User not found: " + username
                 ));
 
@@ -84,7 +87,7 @@ public class LeaveBalanceService {
                 );
 
         if (alreadyExists) {
-            throw new IllegalStateException(
+            throw new ResourceAlreadyExistsException("leaveBalance",
                     "Leave balance already exists for employee "
                             + employee.getId()
                             + " and acquisition start date "
@@ -107,8 +110,8 @@ public class LeaveBalanceService {
         leaveBalance.setTakenDays(BigDecimal.ZERO);
         LeaveType leaveType = leaveTypeRepository
                 .findByCode("CP")
-                .orElseThrow(() -> new RuntimeException(
-                        "Leave type not found"
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Leave type CP not found"
                 ));
 
         leaveBalance.setLeaveType(leaveType);
@@ -132,7 +135,7 @@ public class LeaveBalanceService {
             );
 
             case CALENDAR_YEAR, CUSTOM ->
-                    throw new UnsupportedOperationException(
+                    throw new BadRequestException(
                             "Accrual period not implemented yet: " + accrualPeriod
                     );
         };
@@ -245,7 +248,7 @@ public class LeaveBalanceService {
         }
 
         if (balances.isEmpty()) {
-            throw new IllegalArgumentException(
+            throw new ResourceNotFoundException(
                     "No LeaveBalance found for employee " + employee.getFirstName() + employee.getSurname() +
                             " and leave type " + leaveType.getLabel()
             );
@@ -283,7 +286,7 @@ public class LeaveBalanceService {
         }
 
         if (remainingToDeduct.compareTo(BigDecimal.ZERO) > 0) {
-            throw new IllegalArgumentException("Insufficient leave balance");
+            throw new BadRequestException("Insufficient leave balance");
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.model.entity.HrPolicy;
 import com.jinji.backend.model.enums.AnnualLeaveAccrualPeriod;
 import com.jinji.backend.model.enums.AnnualLeaveDayType;
@@ -54,8 +55,8 @@ public class HrPolicyService {
                         end
                 )
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Pentecost Monday not configured"
+                        new ResourceNotFoundException(
+                                "Pentecost Monday not configured for year " + year
                         )
                 )
                 .getDate();

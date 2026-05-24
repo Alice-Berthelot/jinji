@@ -1,5 +1,6 @@
 package com.jinji.backend.service;
 
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
 import com.jinji.backend.model.entity.Department;
@@ -109,7 +110,7 @@ class EmployeeServiceTest {
             assertThatThrownBy(() ->
                     employeeService.createEmployee(request)
             )
-                    .isInstanceOf(RuntimeException.class)
+                    .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessage("Department not found with code: IT");
 
             verify(employeeRepository, never())
