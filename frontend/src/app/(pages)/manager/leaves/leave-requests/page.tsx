@@ -1,53 +1,14 @@
-"use client";
-
-import { LeaveRequestsSummary } from "@/types/leave/leaveRequest";
-import { useEffect, useState } from "react";
-import { getLeaveRequestsSummary } from "@/app/api/leave-requests/me/route";
 import LeaveRequestsList from "@/components/LeaveRequestsList";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
-import { getLeaveValidation } from "@/app/api/hr-policy/route";
-import { LeaveValidation } from "@/types/leave/hrPolicy";
+import { getLeaveRequestsSummary } from "@/services/leaveRequest.service";
+import { getLeaveValidation } from "@/services/hrPolicy.service";
 
-export default function ManagerLeaveRequestsPage() {
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequestsSummary[]>(
-    []
-  );
-  const [loading, setLoading] = useState(true);
-  const [hrPolicy, setHrPolicy] = useState<LeaveValidation>("MANAGER_THEN_HR");
-
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        const data = await getLeaveRequestsSummary();
-        console.log(data);
-        setLeaveRequests(data);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    load();
-  }, []);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getLeaveValidation();
-        console.log(data);
-        setHrPolicy(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    load();
-  }, []);
-
-  if (loading) {
-    return <p>Chargement...</p>;
-  }
-
+export default async function ManagerLeaveRequestsPage() {
+  const [leaveRequests, hrPolicy] = await Promise.all([
+    getLeaveRequestsSummary(),
+    getLeaveValidation(),
+  ]);
   return (
     <>
       <BackArrow />

@@ -1,27 +1,10 @@
-"use client";
-
-import { getMe } from "@/app/api/employee/me/route";
 import ProfileInfo from "@/components/ProfileInfo";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
-import { EmployeeProfile } from "@/types/employee/employee";
-import { useEffect, useState } from "react";
+import { getMe } from "@/services/employee.service";
 
-export default function Profile() {
-  const [profile, setProfile] = useState<EmployeeProfile | null>(null);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getMe();
-        setProfile(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    load();
-  }, []);
-
+export default async function ProfilePage() {
+  const profile = await getMe();
   return (
     <>
       <BackArrow />

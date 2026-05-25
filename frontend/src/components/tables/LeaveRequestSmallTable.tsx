@@ -10,12 +10,10 @@ import { useState } from "react";
 
 type LeaveRequestSmallTableProps = {
   leaveRequests: MyLeaveRequestsSummary[] | [];
-  loading: boolean;
 };
 
 export default function LeaveRequestSmallTable({
-  leaveRequests,
-  loading,
+  leaveRequests
 }: LeaveRequestSmallTableProps) {
     const [offset, setOffset] = useState(0);
     const [count, setCount] = useState(0);
@@ -74,7 +72,6 @@ export default function LeaveRequestSmallTable({
         <Table
           columns={columns}
           data={leaveRequests}
-          loading={loading}
           onNext={() => setOffset((prev) => prev + limit)}
           onPrevious={() => setOffset((prev) => Math.max(prev - limit, 0))}
           hasNext={offset + limit < count}

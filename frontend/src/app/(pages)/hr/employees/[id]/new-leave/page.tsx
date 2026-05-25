@@ -1,7 +1,7 @@
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
 import NewLeaveForm from "@/components/forms/NewLeaveForm";
-import { getEmployeeFullname } from "@/app/api/employee/me/hr/route";
+import { getLeaveTypes } from "@/services/leaveType.service";
 
 type HrNewLeavePageProps = {
   params: Promise<{
@@ -12,8 +12,11 @@ type HrNewLeavePageProps = {
 export default async function HrNewLeavePage({ params }: HrNewLeavePageProps) {
   const { id } = await params;
 
-  const employeeName = await getEmployeeFullname(id);
-  const employeeFullName = employeeName.firstName + " " + employeeName.surname;
+  const leaveTypes = await getLeaveTypes();
+
+  // const employeeName = await getEmployeeFullname(id);
+  // const employeeFullName = employeeName.firstName + " " + employeeName.surname;
+  const employeeFullName = "A CHANGER";
 
   return (
     <>
@@ -23,6 +26,7 @@ export default async function HrNewLeavePage({ params }: HrNewLeavePageProps) {
         <NewLeaveForm
           employeeId={Number(id)}
           subtitle={`Saisir une absence pour le compte de ${employeeFullName}`}
+          leaveTypes={leaveTypes}
         />
       </section>
     </>

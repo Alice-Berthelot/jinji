@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { createLeaveRequestReview } from "@/app/api/leave-requests/me/route";
+import { createLeaveRequestReview } from "@/services/leaveRequest.service";
 import { LeaveRequest } from "@/types/leave/leaveRequest";
 import { formatDate } from "@/utils/formatDate";
 import { formatLeaveReview } from "@/utils/formatLeaveReview";
@@ -8,27 +8,27 @@ import { formatPeriod } from "@/utils/formatPeriod";
 import { useEffect, useState } from "react";
 import Button from "./ui/Button";
 import { bgStatusColors } from "@/styles/colors";
+import { useRouter } from "next/navigation";
 
 type LeaveRequestDetailProps = {
   leaveRequest: LeaveRequest | null;
-  loading: boolean;
+  loading?: boolean;
   userRole?: Role;
-  onUpdated?: () => void;
 };
 
 export default function LeaveRequestDetail({
   leaveRequest,
   loading,
-  userRole,
-  onUpdated
+  userRole
 }: LeaveRequestDetailProps) {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   if (loading) {
     return <p>Chargement...</p>;
   }
-  
+
   if (!leaveRequest) {
     return (
       <p className="text-sm text-red-500">
@@ -53,20 +53,15 @@ export default function LeaveRequestDetail({
     (r) => r.reviewerRole === "HR"
   )?.comment;
 
-
   const canManagerReview =
-    leaveRequest.workflowStatus === "PENDING_MANAGER" &&
-    userRole === "MANAGER";
+    leaveRequest.workflowStatus === "PENDING_MANAGER" && userRole === "MANAGER";
 
   const canHrReview =
-    leaveRequest.workflowStatus === "PENDING_HR" &&
-    userRole === "HR";
+    leaveRequest.workflowStatus === "PENDING_HR" && userRole === "HR";
 
   const canReview = canManagerReview || canHrReview;
 
-  async function handleDecision(
-    decision: "APPROVED" | "REJECTED"
-  ) {
+  async function handleDecision(decision: "APPROVED" | "REJECTED") {
     try {
       if (!leaveRequest) return;
       setIsSubmitting(true);
@@ -76,7 +71,7 @@ export default function LeaveRequestDetail({
         comment,
       });
 
-      onUpdated?.();
+      router.refresh();
     } catch (err) {
       console.error(err);
     } finally {
@@ -84,69 +79,72 @@ export default function LeaveRequestDetail({
     }
   }
 
-  const colorStatus =  bgStatusColors[leaveRequest?.status ?? ""] ?? "bg-gray-200";
+  const colorStatus =
+    bgStatusColors[leaveRequest?.status ?? ""] ?? "bg-gray-200";
 
   return (
     <>
       <p className="font-md mb-2">
-        <span className="font-semibold">Statut : </span> 
-        <span className={`px-2 py-1 rounded-xs text-xs font-semibold ${colorStatus}`}>{leaveRequest?.statusLabel}</span>
+        <span className="font-semibold">Statut : </span>
+        <span
+          className={`px-2 py-1 rounded-xs text-xs font-semibold ${colorStatus}`}
+        >
+          {leaveRequest?.statusLabel}
+        </span>
       </p>
 
-          <p className="text-xs mb-4">
-            Demande créée le {formatDate(leaveRequest.createdAt)}
-          </p>
+      <p className="text-xs mb-4">
+        Demande créée le {formatDate(leaveRequest.createdAt)}
+      </p>
+      <p>
+        <span className="font-semibold">Type d'absence : </span>
+        {leaveRequest.leaveTypeLabel}
+      </p>
+      <p>
+        <span className="font-semibold">Période : </span>
+        Du {formatDate(leaveRequest.startDate)} (
+        {formatPeriod(leaveRequest.startPeriod)}) au{" "}
+        {formatDate(leaveRequest.endDate)} (
+        {formatPeriod(leaveRequest.endPeriod)})
+      </p>
+
+      <p>
+        <span className="font-semibold">Nombre de jours : </span>
+        {leaveRequest.numberOfDays}
+      </p>
+
+      {leaveRequest.employeeComment &&
+        !(leaveRequest.employeeComment === "") && (
           <p>
-            <span className="font-semibold">Type d'absence : </span>
-            {leaveRequest.leaveTypeLabel}
+            <span className="font-semibold">
+              Commentaire du collaborateur :
+            </span>{" "}
+            {leaveRequest.employeeComment}
           </p>
-          <p>
-          <span className="font-semibold">Période : </span>
-            Du {formatDate(leaveRequest.startDate)} (
-            {formatPeriod(leaveRequest.startPeriod)}) au{" "}
-            {formatDate(leaveRequest.endDate)} (
-            {formatPeriod(leaveRequest.endPeriod)})
-          </p>
+        )}
 
-          <p>
-            <span className="font-semibold">Nombre de jours : </span>
-            {leaveRequest.numberOfDays}
-          </p>
+      {managerDecision && (
+        <p className="my-1 font-semibold">
+          Décision du Manager : {formatLeaveReview(managerDecision)}
+        </p>
+      )}
+      {managerComment && (
+        <p className="my-1 font-semibold">
+          Commentaire du Manager : {formatLeaveReview(managerComment)}
+        </p>
+      )}
+      {hrDecision && (
+        <p className="my-1 font-semibold">
+          Décision des Ressources humaines : {formatLeaveReview(hrDecision)}
+        </p>
+      )}
+      {hrComment && (
+        <p className="my-1 font-semibold">
+          Commentaire des Ressources humaines : {formatLeaveReview(hrComment)}
+        </p>
+      )}
 
-          {leaveRequest.employeeComment &&
-            !(leaveRequest.employeeComment === "") && (
-              <p>
-                <span className="font-semibold">
-                  Commentaire du collaborateur :
-                </span>{" "}
-                {leaveRequest.employeeComment}
-              </p>
-            )}
-
-          {managerDecision && (
-            <p className="my-1 font-semibold">
-              Décision du Manager : {formatLeaveReview(managerDecision)}
-            </p>
-          )}
-          {managerComment && (
-            <p className="my-1 font-semibold">
-              Commentaire du Manager : {formatLeaveReview(managerComment)}
-            </p>
-          )}
-          {hrDecision && (
-            <p className="my-1 font-semibold">
-              Décision des Ressources humaines : {formatLeaveReview(hrDecision)}
-            </p>
-          )}
-          {hrComment && (
-            <p className="my-1 font-semibold">
-              Commentaire des Ressources humaines :{" "}
-              {formatLeaveReview(hrComment)}
-            </p>
-          )}
-
-
-{canReview && (
+      {canReview && (
         <>
           <div className="flex flex-col gap-2 mt-8">
             <label className="font-semibold text-sm">
@@ -178,7 +176,6 @@ export default function LeaveRequestDetail({
           </div>
         </>
       )}
-
     </>
   );
 }
