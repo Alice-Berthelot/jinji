@@ -1,5 +1,6 @@
-package com.jinji.backend.mapper;
+package com.jinji.backend.unit.mapper;
 
+import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.EmployeeMeDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;

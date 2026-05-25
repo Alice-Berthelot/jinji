@@ -1,4 +1,4 @@
-package com.jinji.backend.service;
+package com.jinji.backend.unit.service;
 
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
@@ -153,8 +153,25 @@ class EmployeeServiceTest {
             assertThatThrownBy(() ->
                     employeeService.getCurrentEmployee("unknown")
             )
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("User not found");
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("User not found: unknown");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when employee is not linked to user")
+        void should_throw_when_employee_not_linked() {
+
+            User user = new User();
+            user.setEmployee(null);
+
+            when(userRepository.findByUsername("john"))
+                    .thenReturn(Optional.of(user));
+
+            assertThatThrownBy(() ->
+                    employeeService.getCurrentEmployee("john")
+            )
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("No employee linked to this user");
         }
     }
 }
