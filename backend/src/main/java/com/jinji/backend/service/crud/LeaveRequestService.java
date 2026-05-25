@@ -104,7 +104,7 @@ public class LeaveRequestService {
 
         boolean isOwner = employeeAuth.getId().equals(leaveRequest.getEmployee().getId());
         boolean hasHrRole = currentUser.getRoles().stream()
-                .anyMatch(role -> role.getLabel().equalsIgnoreCase("HR"));
+                .anyMatch(role -> role.getLabel().equalsIgnoreCase("HUMAN RESOURCES"));
         boolean hasTeamManagerRole = currentUser.getRoles().stream()
                 .anyMatch(role -> role.getLabel().equalsIgnoreCase("MANAGER")) && isManagerOf(employeeAuth, leaveRequest.getEmployee());
 
