@@ -1,5 +1,7 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.exception.ForbiddenException;
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveMapper;
 import com.jinji.backend.model.dto.LeaveCreateRequest;
 import com.jinji.backend.model.dto.LeaveDTO;
@@ -45,16 +47,16 @@ public class LeaveService {
         boolean isHr = currentUser.isHr();
         Employee employeeAuth = currentUser.getEmployee();
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
         if ((employeeAuth.getId().equals(employee.getId())) && !isHr) {
-            throw new RuntimeException("User is not authorized to create a leave for employee " + employee.getFullName());
+            throw new ForbiddenException("User is not authorized to create a leave for employee " + employee.getFullName());
         }
 
 
         LeaveType leaveType = leaveTypeRepository
                 .findByCode(request.getLeaveTypeCode())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "Leave type not found with code: " + request.getLeaveTypeCode()
                 ));
 

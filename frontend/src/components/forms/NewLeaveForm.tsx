@@ -9,8 +9,6 @@ import {
   LeaveState,
 } from "@/app/actions/createLeave";
 
-import { getLeaveTypes } from "@/app/api/leaveTypes";
-
 import ButtonPurple from "../ui/Button";
 import { InputField } from "../ui/InputField";
 import { SelectField } from "../ui/SelectField";
@@ -24,19 +22,19 @@ import { toast } from "react-toastify";
 
 type NewLeaveFormProps = {
   employeeId: number,
-  subtitle: string;
+  subtitle: string,
+  leaveTypes: LeaveType[];
 };
 
 export default function NewLeaveForm({
   employeeId,
   subtitle,
+  leaveTypes
 }: NewLeaveFormProps) {
   const [state, formAction] = useActionState<LeaveState, FormData>(
     createLeaveAction,
     { error: null }
   );
-
-  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -55,19 +53,6 @@ export default function NewLeaveForm({
     !startDate || !endDate
       ? true
       : endDate >= startDate;
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getLeaveTypes();
-        setLeaveTypes(data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    load();
-  }, []);
 
   useEffect(() => {
     if (state.success) {

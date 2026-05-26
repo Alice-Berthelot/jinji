@@ -1,5 +1,7 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.exception.BadRequestException;
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.EmployeeCreateRequest;
 import com.jinji.backend.model.dto.EmployeeMeDTO;
@@ -43,12 +45,12 @@ public class EmployeeService {
 
     public Employee getCurrentEmployee(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
         Employee employee = user.getEmployee();
 
         if (employee == null) {
-            throw new RuntimeException("No employee linked to this user");
+            throw new ResourceNotFoundException("No employee linked to this user");
         }
 
         return employee;
@@ -56,12 +58,12 @@ public class EmployeeService {
 
     public EmployeeFullNameDTO getEmployeeFullNameById(Long employeeId) {
         return employeeRepository.findEmployeeNameById(employeeId)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id " + employeeId + " not found"));
     }
 
     public EmployeeFullNameDTO getMyFullName(String username) {
         return employeeRepository.findEmployeeNameByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with username " + username + " not found"));
     }
 
     public EmployeeMeDTO getEmployeeMe(String username) {
@@ -75,7 +77,7 @@ public class EmployeeService {
     public String createEmployee(EmployeeCreateRequest request) {
 
         Department department = departmentRepository.findByCode(request.getDepartmentCode())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "Department not found with code: " + request.getDepartmentCode()
                 ));
 
@@ -93,7 +95,7 @@ public class EmployeeService {
         if (Boolean.TRUE.equals(request.getCreateUser())) {
 
             if (request.getPassword() == null || request.getPassword().isBlank()) {
-                throw new RuntimeException("Password is required to create a user");
+                throw new BadRequestException("Password is required to create a user");
             }
 
             Set<RoleEnum> roles =  mapToRoleEnums(request.getRoles());
@@ -109,12 +111,6 @@ public class EmployeeService {
         leaveBalanceService.createLeaveBalance(savedEmployee);
 
         return "Successful registration for Employee " + savedEmployee.getFirstName() + " " + savedEmployee.getSurname();
-    }
-
-    public EmployeeFullNameDTO getEmployeeFullName(String username) {
-
-        return employeeRepository.findEmployeeNameByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 
     private String normalizeName(String value) {

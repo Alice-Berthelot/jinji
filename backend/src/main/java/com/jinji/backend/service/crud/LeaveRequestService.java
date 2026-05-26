@@ -1,5 +1,8 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.exception.BadRequestException;
+import com.jinji.backend.exception.ForbiddenException;
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.entity.*;
 import com.jinji.backend.model.enums.*;
@@ -48,12 +51,12 @@ public class LeaveRequestService {
         Employee employee = currentUser.getEmployee();
 
         if (employee == null) {
-            throw new RuntimeException("No employee linked to user");
+            throw new ResourceNotFoundException("No employee linked to user");
         }
 
         LeaveType leaveType = leaveTypeRepository
                 .findByCode(request.getLeaveTypeCode())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "Leave type not found with code: " + request.getLeaveTypeCode()
                 ));
 
@@ -94,19 +97,19 @@ public class LeaveRequestService {
 
     public LeaveRequestDTO getLeaveRequestById(Long leaveRequestId) throws RuntimeException {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
-                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Leave request not found with id " + leaveRequestId));
 
         User currentUser = userService.getCurrentUser();
         Employee employeeAuth = currentUser.getEmployee();
 
         boolean isOwner = employeeAuth.getId().equals(leaveRequest.getEmployee().getId());
         boolean hasHrRole = currentUser.getRoles().stream()
-                .anyMatch(role -> role.getLabel().equalsIgnoreCase("HR"));
+                .anyMatch(role -> role.getLabel().equalsIgnoreCase("HUMAN RESOURCES"));
         boolean hasTeamManagerRole = currentUser.getRoles().stream()
                 .anyMatch(role -> role.getLabel().equalsIgnoreCase("MANAGER")) && isManagerOf(employeeAuth, leaveRequest.getEmployee());
 
         if (!isOwner && !hasHrRole && !hasTeamManagerRole) {
-            throw new RuntimeException("User is not authorized to read the leave request");
+            throw new ForbiddenException("User is not authorized to read the leave request");
         }
 
 
@@ -228,7 +231,7 @@ public class LeaveRequestService {
                     .findLeaveRequestSummaryByManagerId(employeeAuth.getId());
         }
         else {
-            throw new RuntimeException(
+            throw new ForbiddenException(
                     "User is not authorized to read leave requests"
             );
         }
@@ -344,52 +347,17 @@ public class LeaveRequestService {
             case PENDING -> "En attente";
         };
     }
-//
-//    private String buildLeaveRequestStatusLabel(
-//            LeaveRequestStatus status,
-//            Boolean hasManagerReview,
-//            Boolean hasHrReview
-//    ) {
-//
-//        if (status == LeaveRequestStatus.APPROVED) {
-//            return "Validée";
-//        }
-//
-//        if (status == LeaveRequestStatus.REJECTED) {
-//            return "Refusée";
-//        }
-//
-//        if (status != LeaveRequestStatus.PENDING) {
-//            return status.name();
-//        }
-//
-//        LeaveValidationProcess validationProcess =
-//                hrPolicyService.getLeaveValidation();
-//
-//        if (Boolean.FALSE.equals(hasManagerReview)) {
-//            return "En attente de validation Manager";
-//        }
-//
-//        if (
-//                validationProcess == LeaveValidationProcess.MANAGER_THEN_HR
-//                        && Boolean.TRUE.equals(hasManagerReview)
-//        ) {
-//            return "Traitée par Manager. En attente de validation RH";
-//        }
-//
-//        return status.name();
-//    }
 
     @Transactional
     public LeaveRequestDTO processLeaveRequest(Long leaveRequestId, LeaveRequestCreateReview reviewRaw) throws RuntimeException {
         // If no leave request matches the provided ID, the request cannot be processed
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
-                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Leave request not found with id " + leaveRequestId));
 
         // If the leave request is already APPROVED or CANCELLED, it cannot be processed further
         LeaveRequestStatus leaveRequestStatus = leaveRequest.getStatus();
         if (leaveRequestStatus == LeaveRequestStatus.APPROVED || leaveRequestStatus == LeaveRequestStatus.CANCELLED) {
-            throw new RuntimeException("Leave request with id " + leaveRequestId
+            throw new BadRequestException("Leave request with id " + leaveRequestId
                     + " has already been reviewed, with status " + leaveRequestStatus);
         }
 
@@ -413,7 +381,7 @@ public class LeaveRequestService {
                         r.getReviewerRole() == LeaveRequestReviewerRole.HR
                 );
         if (hasManagerReview && hasHrReview) {
-            throw new RuntimeException("Leave request with id " + leaveRequest.getId()
+            throw new ForbiddenException("Leave request with id " + leaveRequest.getId()
                     + " has already been reviewed by Manager AND HR");
         }
 
@@ -458,7 +426,7 @@ public class LeaveRequestService {
     ) {
 
         if (!isManager) {
-            throw new RuntimeException(
+            throw new ForbiddenException(
                     "User is not authorized to review this leave request"
             );
         }
@@ -504,7 +472,7 @@ public class LeaveRequestService {
         // MANAGER REVIEW
         if (!hasManagerReview) {
             if (!isManager) {
-                throw new RuntimeException(
+                throw new ForbiddenException(
                         "Manager review is required first"
                 );
             }
@@ -526,7 +494,7 @@ public class LeaveRequestService {
 
         // HR REVIEW
         if (!isHr) {
-            throw new RuntimeException(
+            throw new ForbiddenException(
                     "Reviewer must be HR"
             );
         }

@@ -1,5 +1,6 @@
 package com.jinji.backend.service.business;
 
+import com.jinji.backend.exception.BadRequestException;
 import com.jinji.backend.model.enums.AnnualLeaveDayType;
 import com.jinji.backend.model.enums.PeriodType;
 import com.jinji.backend.service.crud.HrPolicyService;
@@ -69,7 +70,7 @@ public class LeaveCalculationService {
             if (startPeriod == PeriodType.PM
                     && endPeriod == PeriodType.AM) {
 
-                throw new RuntimeException(
+                throw new BadRequestException(
                         "End period cannot be before start period"
                 );
             }

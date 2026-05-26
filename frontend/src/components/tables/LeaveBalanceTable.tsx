@@ -1,19 +1,15 @@
 "use client";
 
 import { LeaveBalance } from "@/types/leave/leaveBalance";
-import { useEffect, useState } from "react";
 import { Column, Table } from "./Table";
 
 interface LeaveBalanceTableProps {
   leaveBalance: LeaveBalance[] | [];
-  loading: boolean;
 }
 
 export default function LeaveBalanceTable({
   leaveBalance,
-  loading
 }: LeaveBalanceTableProps) {
-
   const columns: Column<LeaveBalance>[] = [
     {
       header: "Période",
@@ -34,7 +30,9 @@ export default function LeaveBalanceTable({
         const start = new Date(row.acquisitionStartDate).toLocaleDateString(
           "fr-FR"
         );
-        const end = new Date(row.acquisitionEndDate).toLocaleDateString("fr-FR");
+        const end = new Date(row.acquisitionEndDate).toLocaleDateString(
+          "fr-FR"
+        );
         return `Du ${start} au ${end}`;
       },
       className: "hidden sm:table-cell",
@@ -56,5 +54,5 @@ export default function LeaveBalanceTable({
     },
   ];
 
-  return <Table columns={columns} data={leaveBalance} loading={loading} />;
+  return <Table columns={columns} data={leaveBalance} />;
 }

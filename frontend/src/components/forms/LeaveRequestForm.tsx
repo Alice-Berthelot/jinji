@@ -7,7 +7,6 @@ import {
   createLeaveRequestAction,
   LeaveState,
 } from "@/app/actions/createLeaveRequest";
-import { getLeaveTypes } from "@/app/api/leaveTypes";
 import ButtonPurple from "../ui/Button";
 import { InputField } from "../ui/InputField";
 import { SelectField } from "../ui/SelectField";
@@ -17,7 +16,13 @@ import LinkCustom from "../ui/LinkCustom";
 import { LeaveType } from "@/types/leave/leaveTypes";
 import { RadioField } from "../ui/RadioField";
 
-export default function LeaveRequestForm() {
+type LeaveRequestFormProps = {
+  leaveTypes: LeaveType[];
+};
+
+export default function LeaveRequestForm({
+  leaveTypes,
+}: LeaveRequestFormProps) {
   const [state, formAction] = useActionState<LeaveState, FormData>(
     createLeaveRequestAction,
     { error: null }
@@ -27,8 +32,7 @@ export default function LeaveRequestForm() {
   const [endDate, setEndDate] = useState<string>("");
   const today = new Date().toISOString().split("T")[0];
   const isStartDateValid = startDate >= today;
-  const isEndDateValid =
-  !startDate || !endDate ? true : endDate >= startDate;
+  const isEndDateValid = !startDate || !endDate ? true : endDate >= startDate;
 
   const validateDates = (start: string, end: string) => {
     if (start && start < today) return "start_invalid";
@@ -42,20 +46,6 @@ export default function LeaveRequestForm() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [isValid, setIsValid] = useState(false);
-
-  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getLeaveTypes();
-        setLeaveTypes(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    load();
-  }, []);
 
   const handleChange = () => {
     if (formRef.current) {
@@ -77,7 +67,7 @@ export default function LeaveRequestForm() {
   const handleStartDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setStartDate(e.target.value);
   };
-  
+
   const handleEndDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setEndDate(e.target.value);
   };

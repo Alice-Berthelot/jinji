@@ -9,13 +9,16 @@ import {
   EmployeeState,
 } from "@/app/actions/createEmployee";
 import { Department } from "@/types/departments";
-import { getDepartments } from "@/app/api/departments";
 import { SelectField } from "../ui/SelectField";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Subtitle from "../ui/Subtitle";
 
-export default function NewEmployeeForm() {
+type NewEmployeeFormProps = {
+  departments: Department[];
+};
+
+export default function NewEmployeeForm({ departments }: NewEmployeeFormProps) {
   const [state, formAction] = useActionState<EmployeeState, FormData>(
     createEmployeeAction,
     { error: null }
@@ -24,21 +27,6 @@ export default function NewEmployeeForm() {
   const [createUser, setCreateUser] = useState(true);
   
   const router = useRouter();
-
-  const [departments, setDepartments] = useState<Department[]>([]);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getDepartments();
-        setDepartments(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    load();
-  }, []);
 
   const { pending } = useFormStatus();
   const formRef = useRef<HTMLFormElement>(null);

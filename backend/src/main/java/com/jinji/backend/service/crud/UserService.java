@@ -1,6 +1,7 @@
 package com.jinji.backend.service.crud;
 
 import com.jinji.backend.exception.ResourceAlreadyExistsException;
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.Role;
 import com.jinji.backend.model.entity.User;
@@ -47,7 +48,7 @@ public class UserService {
 
         Set<Role> userRoles = roles.stream()
                 .map(roleEnum -> roleRepository.findByCode(roleEnum)
-                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleEnum)))
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleEnum)))
                 .collect(java.util.stream.Collectors.toSet());
 
         user.setRoles(userRoles);
@@ -69,6 +70,6 @@ public class UserService {
                 .getName();
 
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }

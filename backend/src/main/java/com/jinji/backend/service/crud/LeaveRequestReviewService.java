@@ -1,5 +1,6 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.model.dto.LeaveRequestCreateReview;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.LeaveRequest;
@@ -23,6 +24,10 @@ public class LeaveRequestReviewService {
                                            Employee reviewer,
                                            LeaveRequestReviewerRole reviewerRole,
                                            LeaveRequestCreateReview dto) {
+
+        if (leaveRequest == null) {
+            throw new ResourceNotFoundException("Leave request not found");
+        }
 
         LeaveRequestReview review = new LeaveRequestReview();
 
