@@ -7,7 +7,7 @@ import Filters from "./ui/Filters";
 import { formatDate } from "@/utils/formatDate";
 import LinkCustom from "./ui/LinkCustom";
 
-type Props = {
+type LeaveRequestsListProps = {
   leaveRequests: LeaveRequestsSummary[];
   role: Role;
   detailBasePath: string;
@@ -19,7 +19,7 @@ export default function LeaveRequestsList({
   role,
   detailBasePath,
   hrPolicy,
-}: Props) {
+}: LeaveRequestsListProps) {
   const [filter, setFilter] = useState<"all" | "processed" | "unprocessed">(
     "all"
   );

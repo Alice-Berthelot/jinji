@@ -18,6 +18,8 @@ public class EmployeeCreateRequest {
     private String phoneNumber;
     private LocalDate seniorityDate;
     private String departmentCode;
+    private Set<Long> memberTeamIds;
+    private Set<Long> managerTeamIds;
     private Boolean createUser; // flag
     private String password;
     private Set<String> roles;
@@ -76,6 +78,22 @@ public class EmployeeCreateRequest {
 
     public void setDepartmentCode(String departmentCode) {
         this.departmentCode = departmentCode;
+    }
+
+    public Set<Long> getMemberTeamIds() {
+        return memberTeamIds;
+    }
+
+    public void setMemberTeamIds(Set<Long> memberTeamIds) {
+        this.memberTeamIds = memberTeamIds;
+    }
+
+    public Set<Long> getManagerTeamIds() {
+        return managerTeamIds;
+    }
+
+    public void setManagerTeamIds(Set<Long> managerTeamIds) {
+        this.managerTeamIds = managerTeamIds;
     }
 
     public Boolean getCreateUser() {

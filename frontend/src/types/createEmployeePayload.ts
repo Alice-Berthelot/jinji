@@ -6,6 +6,8 @@ type CreateEmployeePayload = {
     phoneNumber?: string;
     seniorityDate?: string;
     departmentCode: string;
+    memberTeamIds?: number[];
+    managerTeamIds?: number[];
     createUser: boolean;
     password?: string;
     roles?: string[];

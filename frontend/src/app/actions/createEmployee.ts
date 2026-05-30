@@ -16,7 +16,7 @@ export async function createEmployeeAction(
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
 
-  const createUser = formData.get("createUser") === "on";
+  const createUser = formData.get("createUser") === "true";
 
   const payload: CreateEmployeePayload = {
     employeeNumber: getString(formData, "employeeNumber"),
@@ -25,10 +25,12 @@ export async function createEmployeeAction(
     email: getString(formData, "email"),
     phoneNumber: getOptionalString(formData, "phoneNumber"),
     departmentCode: getString(formData, "departmentCode"),
+    memberTeamIds: formData.getAll("memberTeamIds").map(Number),
+    managerTeamIds: formData.getAll("managerTeamIds").map(Number),
     seniorityDate: getString(formData, "seniorityDate"),
     createUser,
   };
-  
+
   if (createUser) {
     payload.password = getString(formData, "password");
     payload.roles = [getString(formData, "role")];
@@ -37,9 +39,9 @@ export async function createEmployeeAction(
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees`, {
     method: "POST",
     headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify(payload),
   });
 

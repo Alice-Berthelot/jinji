@@ -1,6 +1,8 @@
 package com.jinji.backend.model.entity;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,6 +29,18 @@ public class Team {
     )
     private Set<Employee> employees;
 
+    public void addEmployee(Employee employee) {
+        if (employees == null) {
+            employees = new HashSet<>();
+        }
+        employees.add(employee);
+
+        if (employee.getTeams() == null) {
+            employee.setTeams(new HashSet<>());
+        }
+        employee.getTeams().add(this);
+    }
+
     public Long getId() {
         return id;
     }
@@ -51,8 +65,8 @@ public class Team {
         this.label = label;
     }
 
-    public void setManager(Employee manager) {
-        this.manager = manager;
+    public void setManager(Employee employee) {
+        this.manager = employee;
     }
 
     public void setEmployees(Set<Employee> employees) {
