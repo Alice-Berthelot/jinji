@@ -3,25 +3,24 @@ package com.jinji.backend.service.crud;
 import com.jinji.backend.exception.BadRequestException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
-import com.jinji.backend.model.dto.EmployeeCreateRequest;
-import com.jinji.backend.model.dto.EmployeeMeDTO;
-import com.jinji.backend.model.dto.EmployeeFullNameDTO;
+import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.Team;
 import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
+import com.jinji.backend.model.projection.EmployeeTeamProjection;
 import com.jinji.backend.repository.DepartmentRepository;
 import com.jinji.backend.repository.EmployeeRepository;
 import com.jinji.backend.repository.TeamRepository;
 import com.jinji.backend.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -184,6 +183,54 @@ public class EmployeeService {
                     }
                 })
                 .collect(Collectors.toSet());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<EmployeeTableDTO> getEmployeesForTable(
+            String search,
+            Pageable pageable
+    ) {
+        Page<EmployeePageDTO> employeePage =
+                employeeRepository.findEmployeesForTable(search, pageable);
+
+        List<Long> employeeIds = employeePage.getContent()
+                .stream()
+                .map(EmployeePageDTO::id)
+                .toList();
+
+        Map<Long, List<String>> teamsByEmployee = employeeIds.isEmpty()
+                ? Map.of()
+                : employeeRepository.findTeamNamesByEmployeeIds(employeeIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        EmployeeTeamProjection::getEmployeeId,
+                        Collectors.mapping(
+                                EmployeeTeamProjection::getLabel,
+                                Collectors.toList()
+                        )
+                ));
+
+        List<EmployeeTableDTO> content =
+                employeePage.getContent()
+                        .stream()
+                        .map(e -> new EmployeeTableDTO(
+                                e.id(),
+                                e.employeeNumber(),
+                                e.surname(),
+                                e.firstName(),
+                                e.email(),
+                                e.phoneNumber(),
+                                e.seniorityDate(),
+                                e.departmentName(),
+                                teamsByEmployee.getOrDefault(e.id(), List.of())
+                        ))
+                        .toList();
+
+        return new PageImpl<>(
+                content,
+                pageable,
+                employeePage.getTotalElements()
+        );
     }
 }
 

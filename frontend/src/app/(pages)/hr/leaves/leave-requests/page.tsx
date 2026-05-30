@@ -13,7 +13,7 @@ export default async function HrLeaveRequestsPage() {
   return (
     <>
       <BackArrow />
-      <MainTitle title="Demandes d'absence des équipes" />
+      <MainTitle title="Gestion des demandes d'absence" />
       <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] lg:min-h-screen">
         <div className="flex flex-col justify-center items-center gap-4 lg:gap-8 mb-6">
           <LeaveRequestsList
