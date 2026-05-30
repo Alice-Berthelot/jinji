@@ -19,7 +19,7 @@ export const employeeLinks = [
 
 export const managerLinks = [
   {
-    name: "Dashboard Manager",
+    name: "Accueil Manager",
     link: "/manager",
   },
   {
@@ -38,11 +38,11 @@ export const managerLinks = [
 
 export const hrLinks = [
   {
-    name: "Dashboard RH",
+    name: "Accueil RH",
     link: "/hr",
   },
   {
-    name: "Demandes d'absence",
+    name: "Gestion des demandes d'absences",
     link: "/hr/leaves/leave-requests",
   },
   {

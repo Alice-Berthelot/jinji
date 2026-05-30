@@ -8,20 +8,26 @@ import com.jinji.backend.model.dto.EmployeeMeDTO;
 import com.jinji.backend.model.dto.EmployeeFullNameDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
+import com.jinji.backend.model.entity.Team;
 import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.repository.DepartmentRepository;
 import com.jinji.backend.repository.EmployeeRepository;
+import com.jinji.backend.repository.TeamRepository;
 import com.jinji.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
+    private final TeamRepository teamRepository;
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
@@ -29,12 +35,13 @@ public class EmployeeService {
     private final LeaveBalanceService leaveBalanceService;
     private final EmployeeMapper employeeMapper;
 
-    public EmployeeService(EmployeeRepository employeeRepository,
+    public EmployeeService(TeamRepository teamRepository, EmployeeRepository employeeRepository,
                            DepartmentRepository departmentRepository,
                            UserRepository userRepository,
                            UserService userService
                            , LeaveBalanceService leaveBalanceService, EmployeeMapper employeeMapper
     ) {
+        this.teamRepository = teamRepository;
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
@@ -91,6 +98,41 @@ public class EmployeeService {
         employee.setDepartment(department);
 
         Employee savedEmployee = employeeRepository.save(employee);
+
+        Set<Long> memberTeamIds = Optional.ofNullable(request.getMemberTeamIds())
+                .orElse(Set.of());
+
+        Set<Long> managerTeamIds = Optional.ofNullable(request.getManagerTeamIds())
+                .orElse(Set.of());
+
+        // union (on charge toutes les teams en une seule query)
+        Set<Long> allTeamIds = new HashSet<>();
+        allTeamIds.addAll(memberTeamIds);
+        allTeamIds.addAll(managerTeamIds);
+
+        if (!allTeamIds.isEmpty()) {
+
+            List<Team> teams = teamRepository.findAllByIdIn(allTeamIds);
+
+            for (Team team : teams) {
+
+                Long teamId = team.getId();
+
+                // CASE 1 : manager
+                if (managerTeamIds.contains(teamId)) {
+                    team.setManager(savedEmployee);
+                }
+
+                // CASE 2 : member (non manager ou même si manager aussi — dépend de ta règle)
+                if (memberTeamIds.contains(teamId)) {
+                    team.addEmployee(savedEmployee);
+                }
+            }
+        }
+
+
+
+
 
         if (Boolean.TRUE.equals(request.getCreateUser())) {
 

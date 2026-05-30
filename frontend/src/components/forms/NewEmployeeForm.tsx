@@ -13,19 +13,27 @@ import { SelectField } from "../ui/SelectField";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Subtitle from "../ui/Subtitle";
+import { Team } from "@/types/employee/team";
+import { CheckboxField } from "../ui/CheckboxField";
 
 type NewEmployeeFormProps = {
   departments: Department[];
+  teams: Team[];
 };
 
-export default function NewEmployeeForm({ departments }: NewEmployeeFormProps) {
+export default function NewEmployeeForm({
+  departments,
+  teams,
+}: NewEmployeeFormProps) {
   const [state, formAction] = useActionState<EmployeeState, FormData>(
     createEmployeeAction,
     { error: null }
   );
 
   const [createUser, setCreateUser] = useState(true);
-  
+  const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
+  const [managerOfTeams, setManagerOfTeams] = useState<number[]>([]);
+
   const router = useRouter();
 
   const { pending } = useFormStatus();
@@ -41,7 +49,7 @@ export default function NewEmployeeForm({ departments }: NewEmployeeFormProps) {
   useEffect(() => {
     if (state.success) {
       toast.success("Collaborateur créé avec succès");
-      router.push("/");
+      router.push("/hr/employees");
     }
 
     if (state.error) {
@@ -49,14 +57,50 @@ export default function NewEmployeeForm({ departments }: NewEmployeeFormProps) {
     }
   }, [state]);
 
+  const toggleTeam = (checked: boolean, value: number | string) => {
+    const id = Number(value);
+
+    setSelectedTeams((prev) =>
+      checked ? [...prev, id] : prev.filter((t) => t !== id)
+    );
+  };
+
+  const toggleManagerTeam = (checked: boolean, value: number | string) => {
+    const id = Number(value);
+
+    setManagerOfTeams((prev) => {
+      if (checked) {
+        if (!selectedTeams.includes(id)) {
+          setSelectedTeams((prevTeams) => [...prevTeams, id]);
+        }
+
+        return [...prev, id];
+      }
+
+      return prev.filter((t) => t !== id);
+    });
+  };
+
+  const selectedTeamObjects = teams.filter((team) =>
+    selectedTeams.includes(team.id)
+  );
+
+  const toggleCreateUser = (checked: boolean) => {
+    setCreateUser(checked);
+  };
+
   return (
     <form
       ref={formRef}
       onChange={handleChange}
       action={formAction}
-      className="m-auto px-6 py-8 flex flex-col gap-6"
+      className="m-auto pl-2 lg:px-6 py-8 flex flex-col gap-6"
     >
-      <Subtitle subtitle="Formulaire d'ajout de collaborateur" paddingLeft="pl-0 lg:pl-2" className="self-start"/>
+      <Subtitle
+        subtitle="Formulaire d'ajout de collaborateur"
+        paddingLeft="pl-0 lg:pl-2"
+        className="self-start"
+      />
       <InputField
         label="Numéro de matricule"
         type="text"
@@ -89,39 +133,76 @@ export default function NewEmployeeForm({ departments }: NewEmployeeFormProps) {
         }))}
       />
 
-<label className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    name="createUser"
-    checked={createUser}
-    onChange={(e) => setCreateUser(e.target.checked)}
-  />
-  Créer un compte utilisateur ?
-</label>
+      <div className="flex flex-col gap-2 group">
+        <label className="group-focus-within:font-bold">Equipe(s)</label>
 
-{createUser && (
-  <>
-    <InputField
-      label="Mot de passe"
-      type="password"
-      name="password"
-      minLength={12}
-      required
-      disabled={!createUser}
-    />
+        <article className="flex flex-row gap-6">
+          {teams.map((team) => (
+            <CheckboxField
+              key={team.id}
+              name="memberTeamIds"
+              value={team.id}
+              label={team.label}
+              checked={selectedTeams.includes(team.id)}
+              onCheckedChange={toggleTeam}
+            />
+          ))}
+        </article>
+      </div>
 
-    <SelectField
-      label="Rôle"
-      name="role"
-      required
-      options={[
-        { value: "EMPLOYEE", label: "Employé" },
-        { value: "HR", label: "Ressources Humaines" },
-        { value: "MANAGER", label: "Manager" },
-      ]}
-    />
-  </>
-)}
+      {selectedTeamObjects.map((team) => (
+        <div key={team.id} className="flex flex-col gap-2 group">
+          <label className="group-focus-within:font-bold">
+            Equipes managées par le collaborateur
+          </label>
+
+          <CheckboxField
+            name="managerTeamIds"
+            value={team.id}
+            label={team.label}
+            checked={managerOfTeams.includes(team.id)}
+            onCheckedChange={toggleManagerTeam}
+          />
+        </div>
+      ))}
+
+      <input
+        type="hidden"
+        name="createUser"
+        value={createUser ? "true" : "false"}
+      />
+
+      <CheckboxField
+        name="createUser"
+        value="create-user"
+        label="Créer un compte utilisateur ?"
+        checked={createUser}
+        onCheckedChange={(checked) => toggleCreateUser(checked)}
+      />
+
+      {createUser && (
+        <>
+          <InputField
+            label="Mot de passe"
+            type="password"
+            name="password"
+            minLength={12}
+            required
+            disabled={!createUser}
+          />
+
+          <SelectField
+            label="Rôle"
+            name="role"
+            required
+            options={[
+              { value: "EMPLOYEE", label: "Employé" },
+              { value: "HR", label: "Ressources Humaines" },
+              { value: "MANAGER", label: "Manager" },
+            ]}
+          />
+        </>
+      )}
 
       {state.error && (
         <p role="alert" className="text-red-600">

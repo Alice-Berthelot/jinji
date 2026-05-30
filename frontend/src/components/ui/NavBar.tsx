@@ -27,6 +27,17 @@ export default function NavBar({
 }: NavBarProps) {
   const pathname = usePathname();
 
+  const activeItem = links
+    .filter((item) => {
+      const cleanPath = pathname.replace(/\/$/, "");
+      const cleanLink = item.link.replace(/\/$/, "");
+
+      if (cleanLink === "/") return cleanPath === "/";
+
+      return cleanPath === cleanLink || cleanPath.startsWith(cleanLink + "/");
+    })
+    .sort((a, b) => b.link.length - a.link.length)[0];
+
   return (
     <>
       <div className="flex flex-col"></div>
@@ -47,7 +58,7 @@ export default function NavBar({
       <nav className="lg:text-sm">
         <ul className="flex flex-col gap-4">
           {links.map((item) => {
-            const isActive = pathname === item.link;
+            const isActive = activeItem?.link === item.link;
 
             return (
               <li
