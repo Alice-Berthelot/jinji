@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long> {
@@ -101,4 +102,9 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     WHERE t.manager.id = :managerId
 """)
     List<LeaveRequestSummaryRaw> findLeaveRequestSummaryByManagerId(Long managerId);
+
+    Optional<LeaveRequest> findByIdAndEmployee_Id(
+            Long leaveRequestId,
+            Long employeeId
+    );
 }

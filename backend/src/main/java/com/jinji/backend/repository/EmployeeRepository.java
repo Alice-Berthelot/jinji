@@ -1,6 +1,6 @@
 package com.jinji.backend.repository;
 
-import com.jinji.backend.model.dto.EmployeeFullNameDTO;
+import com.jinji.backend.model.dto.response.EmployeeFullNameDTO;
 import com.jinji.backend.model.dto.EmployeeProfileDTO;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.projection.EmployeeTeamProjection;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     @Query("""
-    SELECT new com.jinji.backend.model.dto.EmployeeFullNameDTO(
+    SELECT new com.jinji.backend.model.dto.response.EmployeeFullNameDTO(
         e.firstName,
         e.surname
     )
@@ -27,7 +27,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<EmployeeFullNameDTO> findEmployeeNameByUsername(String username);
 
     @Query("""
-    SELECT new com.jinji.backend.model.dto.EmployeeFullNameDTO(
+    SELECT new com.jinji.backend.model.dto.response.EmployeeFullNameDTO(
         e.firstName,
         e.surname
     )

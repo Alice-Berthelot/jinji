@@ -3,7 +3,11 @@ package com.jinji.backend.service.crud;
 import com.jinji.backend.exception.BadRequestException;
 import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceNotFoundException;
+import com.jinji.backend.mapper.LeaveRequestMapper;
 import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.dto.request.LeaveRequestCreateRequest;
+import com.jinji.backend.model.dto.request.LeaveRequestCreateReview;
+import com.jinji.backend.model.dto.response.LeaveRequestActionResponseDTO;
 import com.jinji.backend.model.entity.*;
 import com.jinji.backend.model.enums.*;
 import com.jinji.backend.repository.LeaveRequestRepository;
@@ -31,9 +35,10 @@ public class LeaveRequestService {
     private final LeaveCalculationService leaveCalculationService;
     private final LeaveRequestReviewService leaveRequestReviewService;
     private final LeaveService leaveService;
+    private final LeaveRequestMapper leaveRequestMapper;
 
     public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
-                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService, LeaveRequestReviewService leaveRequestReviewService, LeaveService leaveService) {
+                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService, LeaveRequestReviewService leaveRequestReviewService, LeaveService leaveService, LeaveRequestMapper leaveRequestMapper) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.leaveRequestReviewRepository = leaveRequestReviewRepository;
@@ -43,6 +48,7 @@ public class LeaveRequestService {
         this.leaveCalculationService = leaveCalculationService;
         this.leaveRequestReviewService = leaveRequestReviewService;
         this.leaveService = leaveService;
+        this.leaveRequestMapper = leaveRequestMapper;
     }
 
     public String createLeaveRequest(LeaveRequestCreateRequest request) {
@@ -527,5 +533,42 @@ public class LeaveRequestService {
 
     }
 
+    @Transactional
+    public LeaveRequestActionResponseDTO cancel(Long leaveRequestId) {
+        User currentUser = userService.getCurrentUser();
+        Employee currentEmployee = currentUser.getEmployee();
+
+        if (currentEmployee == null) {
+            throw new ResourceNotFoundException("No employee linked to user");
+        }
+
+        LeaveRequest leaveRequest =
+                leaveRequestRepository.findByIdAndEmployee_Id(
+                                leaveRequestId,
+                                currentEmployee.getId()
+                        )
+                        .orElseThrow(() -> new ForbiddenException(
+                                "User is not authorized to cancel this leave request"
+                        ));
+
+        if (leaveRequest.getStatus() == LeaveRequestStatus.CANCELLED) {
+            throw new BadRequestException(
+                    "Leave request is already cancelled"
+            );
+        }
+
+        if (leaveRequest.getStatus() == LeaveRequestStatus.APPROVED) {
+            throw new BadRequestException(
+                    "Approved leave request cannot be cancelled"
+            );
+        }
+
+        leaveRequest.setStatus(LeaveRequestStatus.CANCELLED);
+
+        leaveRequestRepository.save(leaveRequest);
+
+        return leaveRequestMapper.toActionResponseDto(leaveRequest);
+//        TODO: add notifications
+    }
 
 }

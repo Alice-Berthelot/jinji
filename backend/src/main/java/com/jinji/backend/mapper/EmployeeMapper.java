@@ -4,6 +4,7 @@ import com.jinji.backend.model.dto.EmployeeDetailsDTO;
 import com.jinji.backend.model.dto.EmployeeHrDTO;
 import com.jinji.backend.model.dto.EmployeeManagerDTO;
 import com.jinji.backend.model.dto.EmployeeMeDTO;
+import com.jinji.backend.model.dto.response.EmployeeCreatedDTO;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.Team;
 import org.mapstruct.Mapper;
@@ -31,4 +32,6 @@ public interface EmployeeMapper {
                 .sorted()
                 .toList();
     }
+
+    EmployeeCreatedDTO toCreatedDto(Employee employee);
 }

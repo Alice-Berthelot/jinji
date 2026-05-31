@@ -24,4 +24,10 @@ public class LeaveTypeController {
     public List<LeaveTypeDTO> getAllLeaveTypes() {
         return leaveTypeService.getAllLeaveTypes();
     }
+
+    @GetMapping("/requestable")
+    @PreAuthorize("isAuthenticated()")
+    public List<LeaveTypeDTO> getRequestableLeaveTypes() {
+        return leaveTypeService.getRequestableLeaveTypes();
+    }
 }

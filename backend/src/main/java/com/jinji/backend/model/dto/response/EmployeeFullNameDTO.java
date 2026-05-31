@@ -1,4 +1,4 @@
-package com.jinji.backend.model.dto;
+package com.jinji.backend.model.dto.response;
 
 public record EmployeeFullNameDTO(
         String firstName,

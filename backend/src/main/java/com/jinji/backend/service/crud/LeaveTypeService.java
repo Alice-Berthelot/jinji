@@ -23,4 +23,10 @@ public class LeaveTypeService {
                 leaveTypeRepository.findAll()
         );
     }
+
+    public List<LeaveTypeDTO> getRequestableLeaveTypes() {
+        return leaveTypeMapper.toDtoList(
+                leaveTypeRepository.findByRequestableTrue()
+        );
+    }
 }

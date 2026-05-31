@@ -1,11 +1,8 @@
-package com.jinji.backend.model.dto;
+package com.jinji.backend.model.dto.request;
 
-import com.jinji.backend.model.enums.LeaveStatus;
 import com.jinji.backend.model.enums.PeriodType;
-import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class LeaveCreateRequest {
 

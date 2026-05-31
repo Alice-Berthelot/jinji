@@ -4,6 +4,7 @@ import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveMapper;
 import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.dto.request.LeaveCreateRequest;
 import com.jinji.backend.model.entity.*;
 import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.model.enums.PeriodType;
@@ -15,7 +16,6 @@ import com.jinji.backend.repository.projection.LeaveRaw;
 import com.jinji.backend.service.business.LeaveCalculationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -62,6 +62,10 @@ public class LeaveService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Leave type not found with code: " + request.getLeaveTypeCode()
                 ));
+
+        if (!leaveType.isRequestable()) {
+            throw new ForbiddenException("This leave type cannot be requested");
+        }
 
         LeaveRaw leaveRaw = new LeaveRaw();
 

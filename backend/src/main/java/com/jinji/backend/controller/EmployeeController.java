@@ -1,6 +1,9 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.dto.request.EmployeeCreateRequest;
+import com.jinji.backend.model.dto.response.EmployeeCreatedDTO;
+import com.jinji.backend.model.dto.response.EmployeeFullNameDTO;
 import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.service.crud.EmployeeService;
 import jakarta.validation.Valid;
@@ -8,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,10 +30,14 @@ public class EmployeeController {
 
     @PostMapping
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<String> createEmployee(
+    public ResponseEntity<EmployeeCreatedDTO> createEmployee(
             @Valid @RequestBody EmployeeCreateRequest request) {
 
-        return ResponseEntity.ok(employeeService.createEmployee(request));
+        EmployeeCreatedDTO created = employeeService.createEmployee(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(created);
     }
 
     @GetMapping("/all")

@@ -1,6 +1,6 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.TeamCreateRequest;
+import com.jinji.backend.model.dto.request.TeamCreateRequest;
 import com.jinji.backend.model.projection.TeamSummary;
 import com.jinji.backend.service.crud.TeamService;
 import jakarta.validation.Valid;

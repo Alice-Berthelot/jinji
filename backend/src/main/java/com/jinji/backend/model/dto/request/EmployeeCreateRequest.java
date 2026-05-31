@@ -1,4 +1,4 @@
-package com.jinji.backend.model.dto;
+package com.jinji.backend.model.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;

@@ -15,6 +15,8 @@ public class LeaveType {
     private String label;
     @Column(name = "balance_managed")
     private boolean balanceManaged;
+    @Column(name = "requestable")
+    private boolean requestable;
 
     public Long getId() {
         return id;
@@ -46,5 +48,13 @@ public class LeaveType {
 
     public void setBalanceManaged(boolean balanceManaged) {
         this.balanceManaged = balanceManaged;
+    }
+
+    public boolean isRequestable() {
+        return requestable;
+    }
+
+    public void setRequestable(boolean requestable) {
+        this.requestable = requestable;
     }
 }

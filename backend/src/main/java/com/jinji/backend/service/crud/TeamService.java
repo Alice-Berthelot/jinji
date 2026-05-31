@@ -2,7 +2,7 @@ package com.jinji.backend.service.crud;
 
 import com.jinji.backend.exception.BadRequestException;
 import com.jinji.backend.exception.ResourceNotFoundException;
-import com.jinji.backend.model.dto.TeamCreateRequest;
+import com.jinji.backend.model.dto.request.TeamCreateRequest;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.Team;
 import com.jinji.backend.repository.EmployeeRepository;

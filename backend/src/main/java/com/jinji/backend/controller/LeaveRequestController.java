@@ -1,6 +1,9 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.dto.request.LeaveRequestCreateRequest;
+import com.jinji.backend.model.dto.request.LeaveRequestCreateReview;
+import com.jinji.backend.model.dto.response.LeaveRequestActionResponseDTO;
 import com.jinji.backend.service.crud.LeaveRequestService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -63,5 +66,14 @@ public class LeaveRequestController {
         LeaveRequestDTO response = leaveRequestService.processLeaveRequest(leaveRequestId, leaveRequestCreateReview);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{leaveRequestId}/cancel")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<LeaveRequestActionResponseDTO> cancelLeaveRequest(
+            @PathVariable Long leaveRequestId
+    ) {
+        LeaveRequestActionResponseDTO updated = leaveRequestService.cancel(leaveRequestId);
+        return ResponseEntity.ok(updated);
     }
 }
