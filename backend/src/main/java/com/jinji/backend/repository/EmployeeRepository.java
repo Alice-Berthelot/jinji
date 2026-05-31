@@ -34,7 +34,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     FROM Employee e
     WHERE e.id = :employeeId
 """)
-    Optional<EmployeeFullNameDTO> findEmployeeNameById(Long employeeId);
+    Optional<EmployeeFullNameDTO> findEmployeeFullNameById(Long employeeId);
 
     @Query("""
     SELECT new com.jinji.backend.model.dto.EmployeePageDTO(

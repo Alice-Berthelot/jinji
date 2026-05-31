@@ -4,10 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 
-import {
-  createLeaveAction,
-  LeaveState,
-} from "@/app/actions/createLeave";
+import { createLeaveAction, LeaveState } from "@/app/actions/createLeave";
 
 import ButtonPurple from "../ui/Button";
 import { InputField } from "../ui/InputField";
@@ -21,15 +18,15 @@ import { LeaveType } from "@/types/leave/leaveTypes";
 import { toast } from "react-toastify";
 
 type NewLeaveFormProps = {
-  employeeId: number,
-  subtitle: string,
+  employeeId: number;
+  subtitle: string;
   leaveTypes: LeaveType[];
 };
 
 export default function NewLeaveForm({
   employeeId,
   subtitle,
-  leaveTypes
+  leaveTypes,
 }: NewLeaveFormProps) {
   const [state, formAction] = useActionState<LeaveState, FormData>(
     createLeaveAction,
@@ -47,17 +44,14 @@ export default function NewLeaveForm({
 
   const today = new Date().toISOString().split("T")[0];
 
-  const isStartDateValid = startDate >= today;
+  const isStartDateValid = !startDate || startDate >= today;
 
-  const isEndDateValid =
-    !startDate || !endDate
-      ? true
-      : endDate >= startDate;
+  const isEndDateValid = !startDate || !endDate ? true : endDate >= startDate;
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Absence ajoutée avec succès");
-      router.push(`/employees/${employeeId}`);
+      toast.success("Absence créée avec succès");
+      router.push(`/hr/employees/${employeeId}`);
     }
 
     if (state.error) {
@@ -84,18 +78,14 @@ export default function NewLeaveForm({
         className="self-start"
       />
 
-      <input
-        type="hidden"
-        name="employeeId"
-        value={employeeId}
-      />
+      <input type="hidden" name="employeeId" value={employeeId} />
 
-      <div className="flex gap-4 items-center">
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
         <InputField
           label="Date de début"
           type="date"
           name="startDate"
-          className="w-96"
+          className="w-80"
           required
           min={today}
           onChange={(e) => setStartDate(e.target.value)}
@@ -117,12 +107,12 @@ export default function NewLeaveForm({
         </p>
       )}
 
-      <div className="flex gap-4 items-center">
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
         <InputField
           label="Date de fin"
           type="date"
           name="endDate"
-          className="w-96"
+          className="w-80"
           required
           min={startDate || today}
           onChange={(e) => setEndDate(e.target.value)}
@@ -144,15 +134,17 @@ export default function NewLeaveForm({
         </p>
       )}
 
-      <SelectField
-        label="Type d'absence"
-        name="leaveTypeCode"
-        required
-        options={leaveTypes.map((type) => ({
-          value: type.code,
-          label: type.label,
-        }))}
-      />
+      <div className="lg:w-96">
+        <SelectField
+          label="Type d'absence"
+          name="leaveTypeCode"
+          required
+          options={leaveTypes.map((type) => ({
+            value: type.code,
+            label: type.label,
+          }))}
+        />
+      </div>
 
       {state.error && (
         <p role="alert" className="text-red-600">
@@ -169,11 +161,7 @@ export default function NewLeaveForm({
           title="Ajouter"
           type="submit"
           isLoading={false}
-          disabled={
-            !isValid ||
-            !isStartDateValid ||
-            !isEndDateValid
-          }
+          disabled={!isValid || !isStartDateValid || !isEndDateValid}
         />
 
         <LinkCustom

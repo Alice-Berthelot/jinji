@@ -153,7 +153,7 @@ export default function NewEmployeeForm({
       {selectedTeamObjects.map((team) => (
         <div key={team.id} className="flex flex-col gap-2 group">
           <label className="group-focus-within:font-bold">
-            Equipe(s) managée(s) par le collaborateur
+            Equipe(s) managées par le collaborateur
           </label>
 
           <CheckboxField

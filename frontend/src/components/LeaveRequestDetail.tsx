@@ -94,7 +94,7 @@ export default function LeaveRequestDetail({
       </p>
 
       <p className="text-xs mb-4">
-        Demande créée le {formatDate(leaveRequest.createdAt)}
+        Demande n°{leaveRequest.leaveRequestId} - Créée le {formatDate(leaveRequest.createdAt)}
       </p>
       <p>
         <span className="font-semibold">Type d'absence : </span>

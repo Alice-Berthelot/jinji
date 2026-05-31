@@ -15,7 +15,7 @@ export default async function HrLeaveRequestDetail({
     <>
       <BackArrow />
       <MainTitle
-        title={`Demande d'absence n°${id} ${
+        title={`Demande d'absence ${
           leaveRequest
             ? `de ${leaveRequest.employeeFirstName} ${leaveRequest.employeeSurname ?? ""}`
             : ""
