@@ -1,4 +1,4 @@
-type CreateEmployeePayload = {
+export type CreateEmployeePayload = {
     employeeNumber: string;
     surname: string;
     firstName: string;

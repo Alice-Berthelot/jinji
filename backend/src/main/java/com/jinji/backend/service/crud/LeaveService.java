@@ -3,10 +3,11 @@ package com.jinji.backend.service.crud;
 import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveMapper;
-import com.jinji.backend.model.dto.LeaveCreateRequest;
-import com.jinji.backend.model.dto.LeaveDTO;
+import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.entity.*;
+import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.model.enums.PeriodType;
+import com.jinji.backend.model.projection.LeaveCalendarProjection;
 import com.jinji.backend.repository.EmployeeRepository;
 import com.jinji.backend.repository.LeaveRepository;
 import com.jinji.backend.repository.LeaveTypeRepository;
@@ -14,9 +15,11 @@ import com.jinji.backend.repository.projection.LeaveRaw;
 import com.jinji.backend.service.business.LeaveCalculationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class LeaveService {
@@ -133,5 +136,70 @@ public class LeaveService {
         }
 
         return leave;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MyLeaveCalendarDTO> getAllMyLeaves() {
+
+        Employee me = userService.getCurrentUser().getEmployee();
+
+        return leaveRepository.findEmployeeCalendar(me.getId())
+                .stream()
+                .map(p -> new MyLeaveCalendarDTO(
+                        new LeaveTypeDTO(p.getLeaveTypeCode(), p.getLeaveTypeLabel()),
+                        p.getStartDate(),
+                        p.getEndDate(),
+                        p.getLeaveId()
+                ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LeaveCalendarDTO> getAllLeaves(EmployeePageView pageType) {
+
+        User currentUser = userService.getCurrentUser();
+        Employee authEmployee = currentUser.getEmployee();
+        if (authEmployee == null) {
+            throw new ResourceNotFoundException("No employee linked to this user");
+        }
+
+        validateAccess(pageType, currentUser);
+
+        List<LeaveCalendarProjection> data =
+                switch (pageType) {
+                    case HR -> leaveRepository.findHrCalendar();
+                    case MANAGER -> leaveRepository.findManagerCalendar(authEmployee.getId());
+                };
+
+        return data.stream()
+                .map(p -> new LeaveCalendarDTO(
+                        p.getEmployeeId(),
+                        p.getFirstName(),
+                        p.getSurname(),
+                        new LeaveTypeDTO(
+                                p.getLeaveTypeCode(),
+                                p.getLeaveTypeLabel()
+                        ),
+                        p.getStartDate(),
+                        p.getEndDate(),
+                        p.getLeaveId()
+                ))
+                .toList();
+    }
+
+    private void validateAccess(EmployeePageView pageType, User user) {
+
+        switch (pageType) {
+            case HR -> {
+                if (!user.isHr()) {
+                    throw new ForbiddenException("User not authorized");
+                }
+            }
+            case MANAGER -> {
+                if (!user.isManager()) {
+                    throw new ForbiddenException("User not authorized");
+                }
+            }
+        }
     }
 }

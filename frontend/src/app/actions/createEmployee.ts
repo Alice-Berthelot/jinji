@@ -1,8 +1,8 @@
 "use server";
 
+import { CreateEmployeePayload } from "@/types/createEmployeePayload";
 import { getOptionalString, getString } from "@/utils/formData";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export type EmployeeState = {
   error: string | null;
@@ -44,8 +44,6 @@ export async function createEmployeeAction(
     },
     body: JSON.stringify(payload),
   });
-
-  console.log(res.status);
 
   if (!res.ok) {
     return { error: "Erreur lors de la création du collaborateur" };

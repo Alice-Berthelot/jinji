@@ -4,17 +4,13 @@ export const employeeLinks = [
     link: "/",
   },
   {
-    name: "Mes congés et absences",
+    name: "Mes absences",
     link: "/leaves",
   },
   {
     name: "Mes informations",
     link: "/profile",
-  },
-  {
-    name: "Mes préférences",
-    link: "/settings",
-  },
+  }
 ];
 
 export const managerLinks = [
