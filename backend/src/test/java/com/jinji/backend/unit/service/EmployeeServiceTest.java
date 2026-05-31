@@ -2,7 +2,7 @@ package com.jinji.backend.unit.service;
 
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
-import com.jinji.backend.model.dto.EmployeeCreateRequest;
+import com.jinji.backend.model.dto.request.EmployeeCreateRequest;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.User;

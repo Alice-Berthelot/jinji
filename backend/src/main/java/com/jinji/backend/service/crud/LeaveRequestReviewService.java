@@ -1,7 +1,7 @@
 package com.jinji.backend.service.crud;
 
 import com.jinji.backend.exception.ResourceNotFoundException;
-import com.jinji.backend.model.dto.LeaveRequestCreateReview;
+import com.jinji.backend.model.dto.request.LeaveRequestCreateReview;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.LeaveRequest;
 import com.jinji.backend.model.entity.LeaveRequestReview;

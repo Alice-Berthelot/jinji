@@ -21,7 +21,7 @@ export default async function LeaveRequestDetailPage({
         <LeaveRequestDetail
           leaveRequest={leaveRequest}
           loading={false}
-          userRole="HR"
+          canCancel={true}
         />
       </section>
     </>

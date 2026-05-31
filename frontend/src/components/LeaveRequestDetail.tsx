@@ -1,25 +1,31 @@
 "use client";
 
-import { createLeaveRequestReview } from "@/services/leaveRequest.service";
+import {
+  createLeaveRequestReview,
+  cancelLeaveRequest,
+} from "@/services/leaveRequest.service";
 import { LeaveRequest } from "@/types/leave/leaveRequest";
 import { formatDate } from "@/utils/formatDate";
 import { formatLeaveReview } from "@/utils/formatLeaveReview";
 import { formatPeriod } from "@/utils/formatPeriod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "./ui/Button";
 import { bgStatusColors } from "@/styles/colors";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 type LeaveRequestDetailProps = {
   leaveRequest: LeaveRequest | null;
   loading?: boolean;
   userRole?: Role;
+  canCancel?: boolean;
 };
 
 export default function LeaveRequestDetail({
   leaveRequest,
   loading,
-  userRole
+  userRole,
+  canCancel,
 }: LeaveRequestDetailProps) {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,6 +85,23 @@ export default function LeaveRequestDetail({
     }
   }
 
+  async function handleCancel() {
+    try {
+      if (!leaveRequest) return;
+
+      setIsSubmitting(true);
+
+      await cancelLeaveRequest(leaveRequest.leaveRequestId);
+      toast.success("Demande d'absence annulée avec succès");
+      router.refresh();
+    } catch (err) {
+      toast.error("Erreur lors de l'annulation de la demande");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   const colorStatus =
     bgStatusColors[leaveRequest?.status ?? ""] ?? "bg-gray-200";
 
@@ -94,7 +117,8 @@ export default function LeaveRequestDetail({
       </p>
 
       <p className="text-xs mb-4">
-        Demande n°{leaveRequest.leaveRequestId} - Créée le {formatDate(leaveRequest.createdAt)}
+        Demande n°{leaveRequest.leaveRequestId} - Créée le{" "}
+        {formatDate(leaveRequest.createdAt)}
       </p>
       <p>
         <span className="font-semibold">Type d'absence : </span>
@@ -144,6 +168,16 @@ export default function LeaveRequestDetail({
         </p>
       )}
 
+      {canCancel && leaveRequest.status == "PENDING" && (
+        <div className="mt-8 flex justify-center">
+          <Button
+            title="Annuler la demande"
+            onClick={handleCancel}
+            isLoading={isSubmitting}
+            className="bg-[var(--color-block-red)] hover:bg-[var(--color-block-red-hover)]"
+          />
+        </div>
+      )}
       {canReview && (
         <>
           <div className="flex flex-col gap-2 mt-8">

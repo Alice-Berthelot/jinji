@@ -5,6 +5,9 @@ import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.dto.request.EmployeeCreateRequest;
+import com.jinji.backend.model.dto.response.EmployeeCreatedDTO;
+import com.jinji.backend.model.dto.response.EmployeeFullNameDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.Team;
@@ -135,7 +138,7 @@ public class EmployeeService {
 
 
     @Transactional
-    public String createEmployee(EmployeeCreateRequest request) {
+    public EmployeeCreatedDTO createEmployee(EmployeeCreateRequest request) {
 
         Department department = departmentRepository.findByCode(request.getDepartmentCode())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -201,8 +204,7 @@ public class EmployeeService {
 
         leaveBalanceService.createLeaveBalance(savedEmployee);
 
-        return "Successful registration for Employee " + savedEmployee.getFirstName() + " " + savedEmployee.getSurname();
-    }
+        return employeeMapper.toCreatedDto(savedEmployee);   }
 
     private String normalizeName(String value) {
         if (value == null) return null;

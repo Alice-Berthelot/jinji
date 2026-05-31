@@ -36,3 +36,14 @@ export async function createLeaveRequestReview(
     }
   );
 }
+
+export async function cancelLeaveRequest(
+  leaveRequestId: number
+): Promise<void> {
+  await apiFetch(
+    `/api/leave-requests/${leaveRequestId}/cancel`,
+    {
+      method: "PATCH",
+    }
+  );
+}

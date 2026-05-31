@@ -1,10 +1,10 @@
 import LeaveRequestForm from "@/components/forms/LeaveRequestForm";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
-import { getLeaveTypes } from "@/services/leaveType.service";
+import { getRequestableLeaveTypes } from "@/services/leaveType.service";
 
 export default async function NewLeaveRequestPage() {
-  const leaveTypes = await getLeaveTypes();
+  const leaveTypes = await getRequestableLeaveTypes();
   return (
     <>
       <BackArrow />

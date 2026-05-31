@@ -1,4 +1,4 @@
-package com.jinji.backend.model.dto;
+package com.jinji.backend.model.dto.request;
 
 import com.jinji.backend.model.enums.PeriodType;
 

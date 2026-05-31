@@ -1,7 +1,7 @@
 package com.jinji.backend.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jinji.backend.model.dto.EmployeeCreateRequest;
+import com.jinji.backend.model.dto.request.EmployeeCreateRequest;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.repository.DepartmentRepository;
 

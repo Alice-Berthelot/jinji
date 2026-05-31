@@ -1,6 +1,7 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.dto.request.LeaveCreateRequest;
 import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.service.crud.LeaveService;
 import jakarta.validation.Valid;
