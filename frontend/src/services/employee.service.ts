@@ -12,6 +12,10 @@ export async function getMe(): Promise<EmployeeProfile> {
   return apiFetch<EmployeeProfile>("/api/employees/me");
 }
 
+export async function getMyFullName(): Promise<EmployeeFullName> {
+  return apiFetch<EmployeeFullName>("/api/employees/me/fullname");
+}
+
 export async function getEmployeeById(
   employeeId: number,
   pageType: EmployeePageView
@@ -21,8 +25,12 @@ export async function getEmployeeById(
   );
 }
 
-export async function getMyFullName(): Promise<EmployeeFullName> {
-  return apiFetch<EmployeeFullName>("/api/employees/me/fullname");
+export async function getEmployeeFullNameById(
+  employeeId: number
+): Promise<EmployeeFullName> {
+  return apiFetch<EmployeeDetails>(
+    `/api/employees/${employeeId}/fullname`
+  );
 }
 
 export async function getEmployees(

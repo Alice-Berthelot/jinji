@@ -76,7 +76,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}/fullname")
-    @PreAuthorize("hasRole('HR') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     public EmployeeFullNameDTO getEmployeeFullNameById(@PathVariable Long id) {
         return employeeService.getEmployeeFullNameById(id);
     }

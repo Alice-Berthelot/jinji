@@ -65,7 +65,7 @@ public class EmployeeService {
     }
 
     public EmployeeFullNameDTO getEmployeeFullNameById(Long employeeId) {
-        return employeeRepository.findEmployeeNameById(employeeId)
+        return employeeRepository.findEmployeeFullNameById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee with id " + employeeId + " not found"));
     }
 

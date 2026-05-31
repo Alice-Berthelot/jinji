@@ -5,7 +5,8 @@ export interface EmployeeProfile {
     email: string;
     phoneNumber?: string;
     seniorityDate: string;
-    departmentCode: string;
+    departmentCode?: string;
+    departmentName?: string;
     teams?: string[];
   };
 

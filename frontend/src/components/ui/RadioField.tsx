@@ -40,6 +40,7 @@ export function RadioField({
               name={name}
               value={opt.value}
               defaultChecked={defaultValue === opt.value}
+              className="accent-[var(--color-block-purple)]"
             />
             {opt.label}
           </label>

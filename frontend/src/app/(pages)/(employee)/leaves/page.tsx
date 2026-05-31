@@ -24,20 +24,20 @@ export default async function LeavePage() {
           className="self-center mb-10 lg:mt-24 lg:mr-16"
         />
       </div>
-      <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-4 lg:gap-8 lg:h-96">
-        <section className="bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[45%] lg:h-full">
-          <Subtitle subtitle="Mon solde de congés payés" />
-          <LeaveBalanceTable leaveBalance={leaveBalance} />
+        <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-4 lg:gap-8 lg:h-96">
+          <section className="bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[45%] lg:h-full">
+            <Subtitle subtitle="Mon solde de congés payés" />
+            <LeaveBalanceTable leaveBalance={leaveBalance} />
+          </section>
+          <section className="bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[45%] lg:h-full">
+            <Subtitle subtitle="Mes demandes d'absence" />
+            <LeaveRequestSmallTable leaveRequests={leaveRequests} />
+          </section>
+        </div>
+        <section className="mx-auto lg:ml-16 mt-4 lg:mt-8 mb-4 bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[92%]">
+          <Subtitle subtitle="Mon planning" />
+          {/* <EmployeePlanning /> */}
         </section>
-        <section className="bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[45%] lg:h-full">
-          <Subtitle subtitle="Mes demandes d'absence" />
-          <LeaveRequestSmallTable leaveRequests={leaveRequests} />
-        </section>
-      </div>
-      <section className="mx-auto lg:ml-10 mt-4 lg:mt-8 mb-4 bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[93%] lg:mx-4">
-        <Subtitle subtitle="Mon planning" />
-        {/* <EmployeePlanning /> */}
-      </section>
     </>
   );
 }
