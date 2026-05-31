@@ -3,6 +3,7 @@ package com.jinji.backend.unit.service;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.request.EmployeeCreateRequest;
+import com.jinji.backend.model.dto.response.EmployeeCreatedDTO;
 import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.User;
@@ -57,7 +58,6 @@ class EmployeeServiceTest {
     private EmployeeService employeeService;
 
     private EmployeeCreateRequest request;
-
     private Department department;
 
     @BeforeEach
@@ -81,20 +81,35 @@ class EmployeeServiceTest {
         @DisplayName("Should create an employee successfully")
         void should_create_employee() {
 
+            Employee savedEmployee = new Employee();
+            savedEmployee.setFirstName("John");
+            savedEmployee.setSurname("Doe");
+            savedEmployee.setEmail("john@mail.com");
+
+            EmployeeCreatedDTO expectedDto =
+                    new EmployeeCreatedDTO(1L, "John", "Doe");
+
             when(departmentRepository.findByCode("IT"))
                     .thenReturn(Optional.of(department));
 
             when(employeeRepository.save(any(Employee.class)))
-                    .thenAnswer(invocation -> invocation.getArgument(0));
+                    .thenReturn(savedEmployee);
 
-            String result =
+            when(employeeMapper.toCreatedDto(any(Employee.class)))
+                    .thenReturn(expectedDto);
+
+            EmployeeCreatedDTO result =
                     employeeService.createEmployee(request);
 
-            assertThat(result)
-                    .contains("John Doe");
+            assertThat(result).isNotNull();
+            assertThat(result.firstName()).isEqualTo("John");
+            assertThat(result.surname()).isEqualTo("Doe");
 
             verify(employeeRepository)
                     .save(any(Employee.class));
+
+            verify(employeeMapper)
+                    .toCreatedDto(any(Employee.class));
 
             verify(leaveBalanceService)
                     .createLeaveBalance(any(Employee.class));
