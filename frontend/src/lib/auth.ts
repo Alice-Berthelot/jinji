@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
+import { redirect } from "next/navigation";
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -47,4 +48,41 @@ export async function deleteTokens() {
     name: "refresh_token",
     path: "/",
   });
+}
+
+export async function refreshTokens() {
+  const cookieStore = await cookies();
+
+  const refreshToken = cookieStore.get("refresh_token")?.value;
+
+  if (!refreshToken) return null;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    }
+  );
+
+  if (!res.ok) return null;
+
+  const data = await res.json();
+
+  cookieStore.set("access_token", data.accessToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  cookieStore.set("refresh_token", data.refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return data.accessToken;
 }
