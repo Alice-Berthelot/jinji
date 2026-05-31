@@ -1,13 +1,11 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.*;
-import com.jinji.backend.service.crud.LeaveRequestService;
+import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.service.crud.LeaveService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,5 +27,18 @@ public class LeaveController {
             @Valid @RequestBody LeaveCreateRequest request) {
 
         return ResponseEntity.ok(leaveService.createLeave(request));
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<MyLeaveCalendarDTO>> getAllMyLeaves() {
+        return ResponseEntity.ok(leaveService.getAllMyLeaves());
+    }
+
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<LeaveCalendarDTO>> getAllLeaves(@RequestParam EmployeePageView pageType) {
+
+        return ResponseEntity.ok(leaveService.getAllLeaves(pageType));
     }
 }

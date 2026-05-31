@@ -5,6 +5,7 @@ type InputFieldProps = {
   error?: string | null;
   errorText?: string;
   id?: string;
+  minHeight?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 export function InputField({
@@ -12,6 +13,7 @@ export function InputField({
   error,
   errorText,
   id,
+  minHeight,
   ...props
 }: InputFieldProps) {
   const inputId = id || props.name;
@@ -30,7 +32,7 @@ export function InputField({
       )}
       </div>
 
-      <Input id={inputId} {...props} />
+      <Input id={inputId} className={minHeight} {...props} />
 
       {error && errorText && (
         <p

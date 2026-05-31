@@ -28,8 +28,8 @@ export default function LeaveRequestSmallTable({
               href={`/leaves/leave-requests/${row.id}`}
               className="text-[var(--color-dark-purple)] underline underline-offset-2"
             >
-              <div className="flex gap-2 items-center">
-                <span>{row.id}</span>
+              <div className="flex gap-2 items-center justify-center">
+                <span>Demande n°{row.id}</span>
                 <IoOpenOutline size={15} />
               </div>
             </Link>

@@ -1,3 +1,5 @@
+import { Color } from "@/types/colors";
+
 export const bgColors: Record<Color, string> = {
   purple:
     "bg-[var(--color-block-purple)] hover:bg-[var(--color-block-purple-hover)]",

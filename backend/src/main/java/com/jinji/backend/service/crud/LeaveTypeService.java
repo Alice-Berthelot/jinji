@@ -1,5 +1,6 @@
 package com.jinji.backend.service.crud;
 
+import com.jinji.backend.mapper.LeaveTypeMapper;
 import com.jinji.backend.model.dto.LeaveTypeDTO;
 import com.jinji.backend.repository.LeaveTypeRepository;
 import org.springframework.stereotype.Service;
@@ -10,18 +11,16 @@ import java.util.List;
 public class LeaveTypeService {
 
     private final LeaveTypeRepository leaveTypeRepository;
+    private final LeaveTypeMapper leaveTypeMapper;
 
-    public LeaveTypeService(LeaveTypeRepository leaveTypeRepository) {
+    public LeaveTypeService(LeaveTypeRepository leaveTypeRepository, LeaveTypeMapper leaveTypeMapper) {
         this.leaveTypeRepository = leaveTypeRepository;
+        this.leaveTypeMapper = leaveTypeMapper;
     }
 
     public List<LeaveTypeDTO> getAllLeaveTypes() {
-        return leaveTypeRepository.findAll()
-                .stream()
-                .map(type -> new LeaveTypeDTO(
-                        type.getCode(),
-                        type.getLabel()
-                ))
-                .toList();
+        return leaveTypeMapper.toDtoList(
+                leaveTypeRepository.findAll()
+        );
     }
 }

@@ -11,7 +11,6 @@ export default function ProfileInfo({
   profile,
   subtitle = "",
 }: ProfileInfoProps) {
-  console.log(profile);
   return (
     <>
       <Subtitle subtitle={subtitle} />

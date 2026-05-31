@@ -85,12 +85,12 @@ export default function LeaveRequestForm({
         className="self-start"
       />
 
-      <div className="flex gap-4 items-center">
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
         <InputField
           label="Date de début"
           type="date"
           name="startDate"
-          className="w-96"
+          className="w-80"
           onBlur={handleStartDateBlur}
           min={today}
           required
@@ -112,12 +112,12 @@ export default function LeaveRequestForm({
         </p>
       )}
 
-      <div className="flex gap-4 items-center">
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
         <InputField
           label="Date de fin"
           type="date"
           name="endDate"
-          className="w-96"
+          className="w-80"
           required
           onBlur={handleEndDateBlur}
           min={startDate || today}
@@ -138,17 +138,26 @@ export default function LeaveRequestForm({
         </p>
       )}
 
-      <SelectField
-        label="Type de congé"
-        name="leaveTypeCode"
-        required
-        options={leaveTypes.map((t) => ({
-          value: t.code,
-          label: t.label,
-        }))}
-      />
+      <div className="lg:w-96">
+        <SelectField
+          label="Type d'absence"
+          name="leaveTypeCode"
+          required
+          options={leaveTypes.map((t) => ({
+            value: t.code,
+            label: t.label,
+          }))}
+        />
+      </div>
 
-      <InputField label="Commentaire" type="text" name="employeeComment" />
+      <div className="lg:w-5/6">
+        <InputField
+          label="Commentaire"
+          type="text"
+          name="employeeComment"
+          minHeight="min-h-24"
+        />
+      </div>
 
       {state.error && (
         <p role="alert" className="text-red-600">

@@ -1,23 +1,27 @@
+import LeaveCalendar from "@/components/calendar/LeaveCalendar";
 import LeaveBalanceTable from "@/components/tables/LeaveBalanceTable";
 import LeaveRequestSmallTable from "@/components/tables/LeaveRequestSmallTable";
 import BackArrow from "@/components/ui/BackArrow";
 import LinkCustom from "@/components/ui/LinkCustom";
 import MainTitle from "@/components/ui/MainTitle";
 import Subtitle from "@/components/ui/Subtitle";
+import { getMyLeaves } from "@/services/leave.service";
 import { getMyLeaveBalance } from "@/services/leaveBalance.service";
 import { getMyLeaveRequestsSummary } from "@/services/leaveRequest.service";
+import { buildLeaveMap } from "@/utils/formatLeaveMap";
 
 export default async function LeavePage() {
-  const [leaveRequests, leaveBalance] = await Promise.all([
+  const [leaveRequests, leaveBalance, leaves] = await Promise.all([
     getMyLeaveRequestsSummary(),
     getMyLeaveBalance(),
+    getMyLeaves()
   ]);
 
   return (
     <>
       <BackArrow />
       <div className="flex flex-col lg:flex-row lg:justify-between">
-        <MainTitle title="Mes congés et absences" />
+        <MainTitle title="Me absences" />
         <LinkCustom
           title="Nouvelle demande"
           href="/leaves/new-leave-request/"
@@ -36,7 +40,7 @@ export default async function LeavePage() {
         </div>
         <section className="mx-auto lg:ml-16 mt-4 lg:mt-8 mb-4 bg-[var(--color-block-white)] px-2 py-6 shadow-sm rounded-sm w-[95%] lg:w-[92%]">
           <Subtitle subtitle="Mon planning" />
-          {/* <EmployeePlanning /> */}
+          <LeaveCalendar leaveMap={buildLeaveMap(leaves)}/>
         </section>
     </>
   );

@@ -74,7 +74,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee with username " + username + " not found"));
     }
 
-    public EmployeeMeDTO getEmployeeMe(String username) {
+    public EmployeeMeDTO getMe(String username) {
 
         Employee currentEmployee = getCurrentEmployee(username);
 
@@ -159,7 +159,6 @@ public class EmployeeService {
         Set<Long> managerTeamIds = Optional.ofNullable(request.getManagerTeamIds())
                 .orElse(Set.of());
 
-        // union (on charge toutes les teams en une seule query)
         Set<Long> allTeamIds = new HashSet<>();
         allTeamIds.addAll(memberTeamIds);
         allTeamIds.addAll(managerTeamIds);
@@ -183,10 +182,6 @@ public class EmployeeService {
                 }
             }
         }
-
-
-
-
 
         if (Boolean.TRUE.equals(request.getCreateUser())) {
 
@@ -245,12 +240,12 @@ public class EmployeeService {
             String search,
             Pageable pageable
     ) {
-        Page<EmployeePageDTO> employeePage =
+        Page<EmployeeProfileDTO> employeePage =
                 employeeRepository.findEmployeesForTable(search, pageable);
 
         List<Long> employeeIds = employeePage.getContent()
                 .stream()
-                .map(EmployeePageDTO::id)
+                .map(EmployeeProfileDTO::id)
                 .toList();
 
         Map<Long, List<String>> teamsByEmployee = employeeIds.isEmpty()

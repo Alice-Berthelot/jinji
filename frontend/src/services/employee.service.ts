@@ -2,10 +2,10 @@ import apiFetch from "@/lib/apiFetch";
 import {
   EmployeeDetails,
   EmployeeFullName,
-  EmployeePageView,
   EmployeeProfile,
   EmployeeTable,
 } from "@/types/employee/employee";
+import { PageView } from "@/types/pageView";
 import { PageResponse } from "@/types/pagination/page";
 
 export async function getMe(): Promise<EmployeeProfile> {
@@ -18,7 +18,7 @@ export async function getMyFullName(): Promise<EmployeeFullName> {
 
 export async function getEmployeeById(
   employeeId: number,
-  pageType: EmployeePageView
+  pageType: PageView
 ): Promise<EmployeeDetails> {
   return apiFetch<EmployeeDetails>(
     `/api/employees/${employeeId}?pageType=${pageType}`

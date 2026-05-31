@@ -27,8 +27,6 @@ export type EmployeeFullName = {
   firstName: string;
 }
 
-export type EmployeePageView = "HR" | "MANAGER";
-
 export interface EmployeeTable {
   id: number;
   employeeNumber: string;

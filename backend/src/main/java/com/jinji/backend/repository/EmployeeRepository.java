@@ -1,7 +1,7 @@
 package com.jinji.backend.repository;
 
 import com.jinji.backend.model.dto.EmployeeFullNameDTO;
-import com.jinji.backend.model.dto.EmployeePageDTO;
+import com.jinji.backend.model.dto.EmployeeProfileDTO;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.projection.EmployeeTeamProjection;
 import org.springframework.data.domain.Page;
@@ -37,7 +37,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<EmployeeFullNameDTO> findEmployeeFullNameById(Long employeeId);
 
     @Query("""
-    SELECT new com.jinji.backend.model.dto.EmployeePageDTO(
+    SELECT new com.jinji.backend.model.dto.EmployeeProfileDTO(
         e.id,
         e.employeeNumber,
         e.surname,
@@ -55,7 +55,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
        OR LOWER(e.email) LIKE LOWER(CONCAT('%', :search, '%'))
     ORDER BY e.surname ASC, e.firstName ASC
 """)
-    Page<EmployeePageDTO> findEmployeesForTable(
+    Page<EmployeeProfileDTO> findEmployeesForTable(
             @Param("search") String search,
             Pageable pageable
     );
