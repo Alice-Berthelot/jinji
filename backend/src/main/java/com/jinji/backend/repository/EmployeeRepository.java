@@ -69,4 +69,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<EmployeeTeamProjection> findTeamNamesByEmployeeIds(
             @Param("employeeIds") List<Long> employeeIds
     );
+
+    @Query("""
+    select distinct e
+    from Employee e
+    left join fetch e.department
+    left join fetch e.teams
+    where e.id = :employeeId
+""")
+    Optional<Employee> findByIdWithDetails(@Param("employeeId") Long employeeId);
 }

@@ -35,7 +35,7 @@ export default function MenuBurger({
     }
     getRoles();
   }, []);
-  
+
   const isManager = roles.includes("MANAGER");
   const isHR = roles.includes("HR");
 
@@ -125,7 +125,10 @@ export default function MenuBurger({
         {isOpen && (
           <>
             <div className="fixed top-16 left-0 h-full w-80 bg-[var(--color-block-white)] shadow-lg z-50 p-6 flex flex-col gap-4 list-none">
-              <p className="mt-10 pl-2 text-md mb-4">{userSpaceTitle}</p>
+              <div>
+                <p className="mt-10 pl-2 text-md">Vous êtes sur votre</p>
+                <p className="pl-2 font-medium mb-4">{userSpaceTitle}</p>
+              </div>
               <div className="flex flex-col">
                 {userSpaceSubtitles?.map((subtitle, i) => (
                   <Link
