@@ -1,6 +1,7 @@
 package com.jinji.backend.service.crud;
 
 import com.jinji.backend.exception.BadRequestException;
+import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.EmployeeMapper;
 import com.jinji.backend.model.dto.*;
@@ -8,6 +9,7 @@ import com.jinji.backend.model.entity.Department;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.Team;
 import com.jinji.backend.model.entity.User;
+import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.model.enums.RoleEnum;
 import com.jinji.backend.model.projection.EmployeeTeamProjection;
 import com.jinji.backend.repository.DepartmentRepository;
@@ -78,6 +80,59 @@ public class EmployeeService {
 
         return employeeMapper.toMeDto(currentEmployee);
     }
+
+    @Transactional(readOnly = true)
+    public EmployeeDetailsDTO getEmployeeById(
+            Long employeeId,
+            EmployeePageView pageType
+    ) {
+        User currentUser = userService.getCurrentUser();
+        Employee authEmployee = currentUser.getEmployee();
+        Employee targetEmployee = employeeRepository.findById(employeeId).orElseThrow(() -> new ResourceNotFoundException(
+                "No employee found with id " + employeeId
+        ));
+
+        if (!canAccess(pageType, currentUser, authEmployee, targetEmployee)) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        Employee employee = employeeRepository.findByIdWithDetails(employeeId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Employee not found with id: " + employeeId
+                        ));
+
+        EmployeeDetailsDTO dto = employeeMapper.toDetailsDto(employee);
+
+        if (pageType == EmployeePageView.MANAGER) {
+            return new EmployeeDetailsDTO(
+                    dto.id(),
+                    null,
+                    dto.surname(),
+                    dto.firstName(),
+                    dto.email(),
+                    null,
+                    dto.seniorityDate(),
+                    dto.departmentName(),
+                    null
+            );
+        }
+
+        return dto;
+    }
+
+    private boolean canAccess(EmployeePageView pageType,
+                              User currentUser,
+                              Employee authEmployee,
+                              Employee target) {
+
+        return switch (pageType) {
+            case HR -> currentUser.isHr();
+            case MANAGER -> currentUser.isManager()
+                    && isManagerOf(authEmployee, target);
+        };
+    }
+
 
     @Transactional
     public String createEmployee(EmployeeCreateRequest request) {
@@ -231,6 +286,12 @@ public class EmployeeService {
                 pageable,
                 employeePage.getTotalElements()
         );
+    }
+
+    private boolean isManagerOf(Employee manager, Employee employee) {
+        return employee.getTeams().stream()
+                .anyMatch(team -> team.getManager() != null
+                        && team.getManager().getId().equals(manager.getId()));
     }
 }
 

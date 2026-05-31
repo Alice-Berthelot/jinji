@@ -1,6 +1,7 @@
 package com.jinji.backend.controller;
 
 import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.service.crud.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -51,6 +52,15 @@ public class EmployeeController {
         return ResponseEntity.ok(
                 employeeService.getEmployeesForTable(search, pageable)
         );
+    }
+
+    @GetMapping("/{employeeId}")
+    @PreAuthorize("hasRole('HR') or hasRole('MANAGER')")
+    public EmployeeDetailsDTO getEmployeeById(
+            @PathVariable Long employeeId,
+            @RequestParam EmployeePageView pageType
+    ) {
+        return employeeService.getEmployeeById(employeeId, pageType);
     }
 
     @GetMapping("/me")

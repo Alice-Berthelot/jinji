@@ -1,9 +1,24 @@
 import apiFetch from "@/lib/apiFetch";
-import { EmployeeFullName, EmployeeProfile, EmployeeTable } from "@/types/employee/employee";
+import {
+  EmployeeDetails,
+  EmployeeFullName,
+  EmployeePageView,
+  EmployeeProfile,
+  EmployeeTable,
+} from "@/types/employee/employee";
 import { PageResponse } from "@/types/pagination/page";
 
 export async function getMe(): Promise<EmployeeProfile> {
   return apiFetch<EmployeeProfile>("/api/employees/me");
+}
+
+export async function getEmployeeById(
+  employeeId: number,
+  pageType: EmployeePageView
+): Promise<EmployeeDetails> {
+  return apiFetch<EmployeeDetails>(
+    `/api/employees/${employeeId}?pageType=${pageType}`
+  );
 }
 
 export async function getMyFullName(): Promise<EmployeeFullName> {
