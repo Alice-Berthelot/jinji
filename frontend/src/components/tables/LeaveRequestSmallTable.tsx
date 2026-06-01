@@ -1,12 +1,12 @@
 "use client"
 
 import { MyLeaveRequestsSummary } from "@/types/leave/leaveRequest";
-import { Column, Table } from "./Table";
-import Link from "next/link";
-import { IoOpenOutline } from "react-icons/io5";
 import { formatDate } from "@/utils/formatDate";
 import { formatLeaveRequestStatus } from "@/utils/formatLeaveRequestStatus";
+import Link from "next/link";
 import { useState } from "react";
+import { IoOpenOutline } from "react-icons/io5";
+import { Column, Table } from "./Table";
 
 type LeaveRequestSmallTableProps = {
   leaveRequests: MyLeaveRequestsSummary[] | [];

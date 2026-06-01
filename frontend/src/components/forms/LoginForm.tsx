@@ -47,6 +47,9 @@ export default function LoginForm() {
         required
         error={state.error}
       />
+      <p className="italic text-xs mt-1">
+        <span className="text-red-600">*</span> Champs obligatoires
+      </p>
       {state.error && (
         <p id="form-error" role="alert" className="text-red-600">
           {state.error}

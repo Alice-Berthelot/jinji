@@ -35,10 +35,11 @@ public class LeaveRequestService {
     private final LeaveCalculationService leaveCalculationService;
     private final LeaveRequestReviewService leaveRequestReviewService;
     private final LeaveService leaveService;
+    private final NotificationService notificationService;
     private final LeaveRequestMapper leaveRequestMapper;
 
     public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
-                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService, LeaveRequestReviewService leaveRequestReviewService, LeaveService leaveService, LeaveRequestMapper leaveRequestMapper) {
+                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService, LeaveRequestReviewService leaveRequestReviewService, LeaveService leaveService, NotificationService notificationService, LeaveRequestMapper leaveRequestMapper) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.leaveRequestReviewRepository = leaveRequestReviewRepository;
@@ -48,6 +49,7 @@ public class LeaveRequestService {
         this.leaveCalculationService = leaveCalculationService;
         this.leaveRequestReviewService = leaveRequestReviewService;
         this.leaveService = leaveService;
+        this.notificationService = notificationService;
         this.leaveRequestMapper = leaveRequestMapper;
     }
 
@@ -567,8 +569,9 @@ public class LeaveRequestService {
 
         leaveRequestRepository.save(leaveRequest);
 
+        notificationService.create(currentUser, "Votre demande d'absence n°" + leaveRequest.getId() + " a été annulée.");
+
         return leaveRequestMapper.toActionResponseDto(leaveRequest);
-//        TODO: add notifications
     }
 
 }

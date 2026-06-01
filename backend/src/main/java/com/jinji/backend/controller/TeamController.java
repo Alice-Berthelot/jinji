@@ -29,6 +29,7 @@ public class TeamController {
     }
 
     @GetMapping("/summary")
+    @PreAuthorize("hasRole('HR')")
     public ResponseEntity<List<TeamSummary>> getAllTeams() {
         return ResponseEntity.ok(teamService.getAllTeams());
     }
