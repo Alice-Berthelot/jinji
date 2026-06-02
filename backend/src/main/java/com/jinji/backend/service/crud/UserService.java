@@ -72,4 +72,9 @@ public class UserService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
+
+    public User getByEmployeeId(Long employeeId) {
+        return userRepository.findByEmployee_Id(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found for employee " + employeeId));
+    }
 }
