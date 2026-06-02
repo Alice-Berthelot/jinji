@@ -24,7 +24,15 @@ async function apiFetch<T>(
 
 
 
-if (res.ok) return res.json();
+  if (res.ok) {
+    const contentType = res.headers.get("content-type");
+  
+    if (contentType?.includes("application/json")) {
+      return res.json();
+    }
+  
+    return undefined as T;
+  }
 
   if (res.status === 401 && !_retry) {
     const newToken = await refreshTokens();

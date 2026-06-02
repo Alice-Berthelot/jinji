@@ -4,7 +4,10 @@ import com.jinji.backend.exception.BadRequestException;
 import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveRequestMapper;
-import com.jinji.backend.model.dto.*;
+import com.jinji.backend.model.dto.LeaveRequestDTO;
+import com.jinji.backend.model.dto.LeaveRequestReviewDTO;
+import com.jinji.backend.model.dto.LeaveRequestSummaryDTO;
+import com.jinji.backend.model.dto.MyLeaveRequestSummaryDTO;
 import com.jinji.backend.model.dto.request.LeaveRequestCreateRequest;
 import com.jinji.backend.model.dto.request.LeaveRequestCreateReview;
 import com.jinji.backend.model.dto.response.LeaveRequestActionResponseDTO;
@@ -35,10 +38,11 @@ public class LeaveRequestService {
     private final LeaveCalculationService leaveCalculationService;
     private final LeaveRequestReviewService leaveRequestReviewService;
     private final LeaveService leaveService;
+    private final NotificationService notificationService;
     private final LeaveRequestMapper leaveRequestMapper;
 
     public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
-                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService, LeaveRequestReviewService leaveRequestReviewService, LeaveService leaveService, LeaveRequestMapper leaveRequestMapper) {
+                               LeaveTypeRepository leaveTypeRepository, LeaveRequestReviewRepository leaveRequestReviewRepository, UserService userService, EmployeeService employeeService, HrPolicyService hrPolicyService, LeaveCalculationService leaveCalculationService, LeaveRequestReviewService leaveRequestReviewService, LeaveService leaveService, NotificationService notificationService, LeaveRequestMapper leaveRequestMapper) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.leaveRequestReviewRepository = leaveRequestReviewRepository;
@@ -48,6 +52,7 @@ public class LeaveRequestService {
         this.leaveCalculationService = leaveCalculationService;
         this.leaveRequestReviewService = leaveRequestReviewService;
         this.leaveService = leaveService;
+        this.notificationService = notificationService;
         this.leaveRequestMapper = leaveRequestMapper;
     }
 
@@ -447,21 +452,25 @@ public class LeaveRequestService {
                 reviewRaw
         );
 
+        User employeeUser = userService.getByEmployeeId(leaveRequest.getEmployee().getId());
+
 // 2. Update leave request status
         switch (decision) {
             case APPROVED -> {
                 leaveRequest.setStatus(LeaveRequestStatus.APPROVED);
                 // 3. Create leave
                 leaveService.createLeaveFromRequest(leaveRequest);
-                // 4. TODO: send notifications (HR & Employee)
             }
             case REJECTED -> {
                 leaveRequest.setStatus(LeaveRequestStatus.REJECTED);
-                // 3.TODO: send notifications (HR & Employee)
             }
         }
 
         leaveRequestRepository.save(leaveRequest);
+
+        // 4. (or 3. if REJECTED) send notifications
+        // TODO: send notifications (HR)
+        notifyFinalDecisionToEmployee(leaveRequest.getId(), employeeUser, decision);
     }
 
     private void processManagerThenHr(
@@ -474,6 +483,8 @@ public class LeaveRequestService {
     ) {
 
         LeaveRequestDecision decision = reviewRaw.getDecision();
+
+        User employeeUser = userService.getByEmployeeId(leaveRequest.getEmployee().getId());
 
         // MANAGER REVIEW
         if (!hasManagerReview) {
@@ -491,9 +502,10 @@ public class LeaveRequestService {
                     reviewRaw
             );
 
-            // 2. TODO: send notifications (HR & employee)
-
             leaveRequestRepository.save(leaveRequest);
+
+            // 2. TODO: send notifications (HR)
+            notifyManagerDecisionToEmployee(leaveRequest.getId(), employeeUser, decision);
 
             return;
         }
@@ -520,17 +532,36 @@ public class LeaveRequestService {
                 leaveRequestRepository.save(leaveRequest);
                 // 3. Create leave
                 leaveService.createLeaveFromRequest(leaveRequest);
-                // 4. TODO: send notifications (Manager & Employee)
+                // 4. TODO: send notifications (Manager)
             }
             case REJECTED -> {
                 leaveRequest.setStatus(LeaveRequestStatus.REJECTED);
                 leaveRequestRepository.save(leaveRequest);
-                // 3.TODO: send notifications (Manager & Employee)
+                // 3.TODO: send notifications (Manager)
             }
         }
+        notifyFinalDecisionToEmployee(leaveRequest.getId(), employeeUser, decision);
+    }
+
+    private void notifyManagerDecisionToEmployee(Long leaveRequestId, User employeeUser, LeaveRequestDecision decision) {
+        String message = switch (decision) {
+            case APPROVED -> "Votre demande d'absence n° " + leaveRequestId + " a été acceptée par votre Manager. " +
+                    "Elle a été transmise au service des Ressources humaines pour validation définitive.";
+            case REJECTED -> "Votre demande d'absence n° " + leaveRequestId + " a été refusée par votre manager. " +
+                    "Le service des Ressources humaines prendra prochainement une décision finale.";
+        };
+
+        notificationService.create(employeeUser, message);
+    }
 
 
+    private void notifyFinalDecisionToEmployee(Long leaveRequestId, User employeeUser, LeaveRequestDecision decision) {
+        String message = switch (decision) {
+            case APPROVED -> "Votre demande d'absence n° " + leaveRequestId + " a été acceptée.";
+            case REJECTED -> "Votre demande d'absence n° " + leaveRequestId + " a été refusée.";
+        };
 
+        notificationService.create(employeeUser, message);
     }
 
     @Transactional
@@ -567,8 +598,9 @@ public class LeaveRequestService {
 
         leaveRequestRepository.save(leaveRequest);
 
+        notificationService.create(currentUser, "Votre demande d'absence n°" + leaveRequest.getId() + " a été annulée.");
+
         return leaveRequestMapper.toActionResponseDto(leaveRequest);
-//        TODO: add notifications
     }
 
 }

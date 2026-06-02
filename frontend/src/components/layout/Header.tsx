@@ -1,12 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import LogoutButton from "../ui/LogoutButton";
-import LogoHeader from "../ui/LogoHeader";
-import MenuBurger from "../ui/MenuBurger";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useEffect, useState } from "react";
-import { EmployeeFullName } from "@/types/employee/employee";
+import { usePathname } from "next/navigation";
+import LogoHeader from "../ui/LogoHeader";
+import LogoutButton from "../ui/LogoutButton";
+import MenuBurger from "../ui/MenuBurger";
+import NotificationIcon from "../ui/NotificationIcon";
 // import AuthenticatedEmployee from "../AuthenticatedEmployee";
 
 export default function Header() {
@@ -38,7 +37,7 @@ export default function Header() {
         <p className="hidden md:block tracking-wide">jinji</p>
       </div>
       <div className="flex flex-row items-center gap-6">
-        {/* <NotificationIcon /> */}
+        <NotificationIcon />
         {/* {!isMobile && <AuthenticatedEmployee employeeFullName={myFullName} />} */}
         <LogoutButton />
       </div>

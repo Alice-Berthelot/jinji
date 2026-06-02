@@ -32,7 +32,6 @@ public class User {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-
     public Long getId() {
         return id;
     }
