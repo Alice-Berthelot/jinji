@@ -289,4 +289,58 @@ public class LeaveBalanceService {
             throw new BadRequestException("Insufficient leave balance");
         }
     }
+
+    public void creditLeaveBalance(Employee employee, LeaveType leaveType, BigDecimal days) {
+
+        List<LeaveBalance> balances =
+                leaveBalanceRepository
+                        .findByEmployeeAndLeaveTypeOrderByAcquisitionStartDateDesc(
+                                employee,
+                                leaveType
+                        );
+
+        if (balances.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "No LeaveBalance found for employee " + employee.getId()
+            );
+        }
+
+        BigDecimal remainingToCredit = days;
+
+        for (LeaveBalance balance : balances) {
+
+            if (remainingToCredit.compareTo(BigDecimal.ZERO) <= 0) {
+                break;
+            }
+
+            BigDecimal taken = balance.getTakenDays();
+
+            // rien à recréditer ici
+            if (taken.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            // cas 1 : on peut tout recréditer dans ce solde
+            if (taken.compareTo(remainingToCredit) >= 0) {
+
+                balance.setTakenDays(
+                        taken.subtract(remainingToCredit)
+                );
+
+                leaveBalanceRepository.save(balance);
+                return;
+            }
+
+            // cas 2 : on vide le solde et on continue
+            balance.setTakenDays(BigDecimal.ZERO);
+            leaveBalanceRepository.save(balance);
+
+            remainingToCredit =
+                    remainingToCredit.subtract(taken);
+        }
+
+        if (remainingToCredit.compareTo(BigDecimal.ZERO) > 0) {
+            throw new BadRequestException("Inconsistent leave balance state");
+        }
+    }
 }
