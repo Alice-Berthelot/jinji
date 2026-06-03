@@ -8,4 +8,5 @@ export type LeaveCalendar = {
   startDate: string;
   endDate: string;
   leaveId: number;
+  status: string;
 };

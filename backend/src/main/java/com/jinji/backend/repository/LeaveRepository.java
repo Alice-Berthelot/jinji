@@ -16,6 +16,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
         l.id AS leaveId,
         l.startDate AS startDate,
         l.endDate AS endDate,
+        l.status AS status,
         lt.code AS leaveTypeCode,
         lt.label AS leaveTypeLabel
     FROM Leave l

@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -73,8 +74,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
-    public User getByEmployeeId(Long employeeId) {
-        return userRepository.findByEmployee_Id(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found for employee " + employeeId));
+    public Optional<User> findByEmployeeId(Long employeeId) {
+        return userRepository.findByEmployee_Id(employeeId);
     }
 }

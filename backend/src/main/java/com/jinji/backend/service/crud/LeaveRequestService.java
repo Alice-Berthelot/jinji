@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LeaveRequestService {
@@ -452,7 +453,8 @@ public class LeaveRequestService {
                 reviewRaw
         );
 
-        User employeeUser = userService.getByEmployeeId(leaveRequest.getEmployee().getId());
+        Optional<User> employeeUser =
+                userService.findByEmployeeId(leaveRequest.getEmployee().getId());
 
 // 2. Update leave request status
         switch (decision) {
@@ -470,7 +472,13 @@ public class LeaveRequestService {
 
         // 4. (or 3. if REJECTED) send notifications
         // TODO: send notifications (HR)
-        notifyFinalDecisionToEmployee(leaveRequest.getId(), employeeUser, decision);
+        employeeUser.ifPresent(user ->
+                notifyFinalDecisionToEmployee(
+                        leaveRequest.getId(),
+                        user,
+                        decision
+                )
+        );
     }
 
     private void processManagerThenHr(
@@ -484,7 +492,8 @@ public class LeaveRequestService {
 
         LeaveRequestDecision decision = reviewRaw.getDecision();
 
-        User employeeUser = userService.getByEmployeeId(leaveRequest.getEmployee().getId());
+        Optional<User> employeeUser =
+                userService.findByEmployeeId(leaveRequest.getEmployee().getId());
 
         // MANAGER REVIEW
         if (!hasManagerReview) {
@@ -505,7 +514,13 @@ public class LeaveRequestService {
             leaveRequestRepository.save(leaveRequest);
 
             // 2. TODO: send notifications (HR)
-            notifyManagerDecisionToEmployee(leaveRequest.getId(), employeeUser, decision);
+            employeeUser.ifPresent(user ->
+                    notifyManagerDecisionToEmployee(
+                            leaveRequest.getId(),
+                            user,
+                            decision
+                    )
+            );
 
             return;
         }
@@ -540,7 +555,13 @@ public class LeaveRequestService {
                 // 3.TODO: send notifications (Manager)
             }
         }
-        notifyFinalDecisionToEmployee(leaveRequest.getId(), employeeUser, decision);
+        employeeUser.ifPresent(user ->
+                notifyFinalDecisionToEmployee(
+                        leaveRequest.getId(),
+                        user,
+                        decision
+                )
+        );
     }
 
     private void notifyManagerDecisionToEmployee(Long leaveRequestId, User employeeUser, LeaveRequestDecision decision) {

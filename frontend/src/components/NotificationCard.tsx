@@ -79,7 +79,7 @@ export default function NotificationCard({
               disabled:opacity-50
             "
           >
-            Marquer comme lu
+            Marquer comme lue
           </button>
         )}
 

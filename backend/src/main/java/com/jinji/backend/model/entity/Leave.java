@@ -4,6 +4,7 @@ import com.jinji.backend.model.enums.LeaveStatus;
 import com.jinji.backend.model.enums.PeriodType;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -32,6 +33,9 @@ public class Leave {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private LeaveStatus status = LeaveStatus.ACTIVE;
+
+    @Column(name = "number_of_days")
+    private BigDecimal numberOfDays;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -98,6 +102,14 @@ public class Leave {
 
     public void setStatus(LeaveStatus status) {
         this.status = status;
+    }
+
+    public BigDecimal getNumberOfDays() {
+        return numberOfDays;
+    }
+
+    public void setNumberOfDays(BigDecimal numberOfDays) {
+        this.numberOfDays = numberOfDays;
     }
 
     public LocalDateTime getCreatedAt() {

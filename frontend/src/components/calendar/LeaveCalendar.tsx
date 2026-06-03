@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import "react-calendar/dist/Calendar.css";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { LeaveCalendar } from "@/types/leave/leave";
+import { cancelLeave } from "@/services/leave.service";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import Button from "../ui/Button";
+import { formatDate } from "@/utils/formatDate";
 
 const Calendar = dynamic(() => import("react-calendar"), { ssr: false });
 
@@ -14,12 +20,58 @@ type Props = {
 
 export default function Planning({ leaveMap }: Props) {
   const [date, setDate] = useState<Date>(new Date());
+  const router = useRouter();
+
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedLeaves, setSelectedLeaves] = useState<LeaveCalendar[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      dialogRef.current?.showModal();
+    } else {
+      dialogRef.current?.close();
+    }
+  }, [isModalOpen]);
+
+  function handleDayClick(date: Date) {
+    const key = format(date, "yyyy-MM-dd");
+    const leaves = leaveMap[key] ?? [];
+
+    setSelectedDate(date);
+    setSelectedLeaves(leaves);
+    setIsModalOpen(true);
+  }
+
+  async function handleCancel(leaveId: number) {
+    try {
+      setIsSubmitting(true);
+
+      await cancelLeave(leaveId);
+
+      toast.success("Absence annulée avec succès");
+
+      setSelectedLeaves((prev) => prev.filter((l) => l.leaveId !== leaveId));
+
+      router.refresh();
+    } catch (err) {
+      toast.error("Erreur lors de l'annulation de la demande");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view !== "month") return null;
 
     const key = format(date, "yyyy-MM-dd");
-    const leaves = leaveMap[key];
+    const leaves = (leaveMap[key] ?? []).filter(
+      (leave) => leave.status !== "CANCELLED"
+    );
 
     if (!leaves?.length) return null;
 
@@ -141,7 +193,67 @@ export default function Planning({ leaveMap }: Props) {
         }}
         value={date}
         tileContent={tileContent}
+        onClickDay={handleDayClick}
       />
+
+      <dialog
+        ref={dialogRef}
+        onClose={() => setIsModalOpen(false)}
+        className="rounded-xl p-0 shadow-lg backdrop:bg-black/40"
+      >
+        <div className="w-full max-w-md p-4 max-h-[80vh] overflow-auto">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="font-semibold">
+              {selectedDate ? format(selectedDate, "dd MMMM yyyy", { locale: fr }) : "Détails"}
+            </h2>
+
+            <button
+              type="button"
+              aria-label="Fermer la fenêtre"
+              onClick={() => setIsModalOpen(false)}
+              className="cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+
+          {selectedLeaves.length === 0 ? (
+            <p className="text-sm text-gray-500">Aucune absence</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {selectedLeaves.map((leave, idx) => (
+                <div
+                  key={idx}
+                  className="p-3 border rounded-lg flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-medium">{leave.leaveType.label}</p>
+
+                    <p className="text-xs text-gray-500">
+                      {leave.firstName} {leave.surname}
+                    </p>
+
+                    <p className="text-xs text-gray-500">
+                      {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
+                    </p>
+                  </div>
+
+                  <Button
+                    title="Annuler"
+                    isLoading={isSubmitting}
+                    disabled={isSubmitting}
+                    marginTop="mt-0"
+                    paddingY="py-1"
+                    width="w-32"
+                    className="text-sm ml-4 bg-[var(--color-block-red)] hover:bg-[var(--color-block-red-hover)]"
+                    onClick={() => handleCancel(leave.leaveId)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </dialog>
     </div>
   );
 }

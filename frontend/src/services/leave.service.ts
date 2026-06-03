@@ -9,3 +9,9 @@ export async function getMyLeaves(): Promise<LeaveCalendar[]> {
 export async function getLeaves(pageType: PageView): Promise<LeaveCalendar[]> {
   return apiFetch<LeaveCalendar[]>(`/api/leaves/?pageType=${pageType}`);
 }
+
+export async function cancelLeave(leaveId: number): Promise<void> {
+  await apiFetch(`/api/leaves/${leaveId}/cancel`, {
+    method: "PATCH",
+  });
+}

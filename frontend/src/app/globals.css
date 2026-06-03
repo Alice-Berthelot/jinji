@@ -34,3 +34,7 @@ h1 {
 header {
   z-index: 100;
 }
+
+dialog {
+  margin: auto;
+}

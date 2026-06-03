@@ -29,4 +29,9 @@ public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance, Long
             Employee employee,
             LeaveType leaveType
     );
+
+    List<LeaveBalance> findByEmployeeAndLeaveTypeOrderByAcquisitionStartDateDesc(
+            Employee employee,
+            LeaveType leaveType
+    );
 }
