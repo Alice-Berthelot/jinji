@@ -25,7 +25,7 @@ export default function LogoutButton({ variant = "icon" }: LogoutButtonProps) {
     <button
       type="button"
       onClick={handleLogout}
-      className="cursor-pointer underline underline-offset-2 flex gap-2 items-center hover:font-bold text-sm mt-10"
+      className="cursor-pointer flex gap-2 items-center hover:font-bold text-sm mt-10"
     >
       <span>Se déconnecter</span>
       <FiLogOut size={15} />

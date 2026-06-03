@@ -144,12 +144,13 @@ export default function MenuBurger({
               {links.map((link, index) => (
                 <li
                   key={index}
-                  className={`${classLi} ${
+                  className={`${classLi} flex items-center gap-2 ${
                     pathname === link.link
                       ? "text-[var(--color-dark-purple)]"
                       : "text-[var(--color-main-font)]"
                   }`}
                 >
+                  {link.icon && <link.icon size={18} aria-hidden="true" />}
                   <Link href={link.link} onClick={handleClose}>
                     {link.name}
                   </Link>
@@ -159,11 +160,19 @@ export default function MenuBurger({
               <button
                 type="button"
                 onClick={handleLogout}
-                className="cursor-pointer underline underline-offset-2 flex gap-2 items-center hover:font-bold text-sm mt-10 ml-6 mb-6"
+                className="cursor-pointer flex gap-2 items-center hover:font-bold text-sm mt-4 ml-6 mb-6"
               >
                 <span>Se déconnecter</span>
                 <FiLogOut size={15} />
               </button>
+              <div className="mx-auto mt-10">
+                <Link
+                  href="/legal"
+                  className="underline underline-offset-2 text-xs cursor-pointer hover:font-bold"
+                >
+                  Mentions légales
+                </Link>
+              </div>
             </div>
           </>
         )}
