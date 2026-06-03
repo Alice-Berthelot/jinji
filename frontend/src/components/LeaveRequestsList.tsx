@@ -95,9 +95,11 @@ export default function LeaveRequestsList({
 
   return (
     <>
+    <div className="my-6">
       {!(role === "HR" && hrPolicy === "MANAGER_ONLY") && (
         <Filters options={filterOptions} value={filter} onChange={setFilter} />
       )}
+      </div>
 
       {visibleLeaveRequests.map((leaveRequest) => {
         const waitingForHr =

@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoutButton from "./LogoutButton";
+import { IconType } from "react-icons";
 
 type NavLink = {
   name: string;
   link: string;
+  icon?: IconType
 };
 
 type UserSpaceSubtitle = {
@@ -59,12 +61,12 @@ export default function NavBar({
         <ul className="flex flex-col gap-4">
           {links.map((item) => {
             const isActive = activeItem?.link === item.link;
-
             return (
+              
               <li
                 key={item.link}
                 className={`
-                hover:text-md hover:font-bold hover:tracking-wide
+                hover:text-md hover:font-bold hover:tracking-wide flex items-center gap-2
                 ${
                   isActive
                     ? "bg-[var(--color-block-purple)] text-[var(--color-main-font)] rounded-md px-3 py-2 w-52 hover:font-normal hover:text-sm hover:tracking-normal m-[-12]"
@@ -72,6 +74,7 @@ export default function NavBar({
                 }
               `}
               >
+                {item.icon && <item.icon size={18}  className="relative top-[-1.5px]" aria-hidden="true" />}
                 <Link href={item.link}>{item.name}</Link>
               </li>
             );
@@ -80,6 +83,8 @@ export default function NavBar({
       </nav>
       <div className="border-t border-gray-300 mt-10 mb-6 w-56"></div>
       <LogoutButton variant="text" />
+      <div className="border-t border-gray-300 mt-10 mb-6 w-56"></div>
+      <Link href="/legal" className="underline text-xs cursor-pointer hover:font-bold">Mentions légales</Link>
     </>
   );
 }
