@@ -4,7 +4,7 @@ import com.jinji.backend.exception.BadRequestException;
 import com.jinji.backend.exception.ResourceAlreadyExistsException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveBalanceMapper;
-import com.jinji.backend.model.dto.LeaveBalanceDTO;
+import com.jinji.backend.model.dto.response.LeaveBalanceDTO;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.entity.LeaveBalance;
 import com.jinji.backend.model.entity.LeaveType;
@@ -29,17 +29,19 @@ public class LeaveBalanceService {
     private final LeaveTypeRepository leaveTypeRepository;
     private final HrPolicyRepository hrPolicyRepository;
     private final HrPolicyService hrPolicyService;
+    private final UserService userService;
     private final LeaveBalanceMapper leaveBalanceMapper;
 
     public LeaveBalanceService(
             LeaveBalanceRepository leaveBalanceRepository,
-            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyRepository hrPolicyRepository, HrPolicyService hrPolicyService, LeaveBalanceMapper leaveBalanceMapper
+            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyRepository hrPolicyRepository, HrPolicyService hrPolicyService, UserService userService, LeaveBalanceMapper leaveBalanceMapper
     ) {
         this.leaveBalanceRepository = leaveBalanceRepository;
         this.userRepository = userRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.hrPolicyRepository = hrPolicyRepository;
         this.hrPolicyService = hrPolicyService;
+        this.userService = userService;
         this.leaveBalanceMapper = leaveBalanceMapper;
     }
 
@@ -343,4 +345,37 @@ public class LeaveBalanceService {
             throw new BadRequestException("Inconsistent leave balance state");
         }
     }
+
+    public LeaveBalanceDTO adjustAcquiredDays(
+            Long leaveBalanceId,
+            BigDecimal newAcquiredDays
+    ) {
+        if (newAcquiredDays == null) {
+            throw new BadRequestException("acquiredDays cannot be null");
+        }
+
+        User user = userService.getCurrentUser();
+
+        if (!user.isHr()) {
+            throw new BadRequestException("Only HR can adjust leave balances");
+        }
+
+        LeaveBalance balance = leaveBalanceRepository.findById(leaveBalanceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Leave balance not found"));
+
+        Employee authEmployee = user.getEmployee();
+
+        if (authEmployee != null &&
+                balance.getEmployee().getId().equals(authEmployee.getId())) {
+            throw new BadRequestException("HR cannot modify their own balance");
+        }
+
+        balance.setAcquiredDays(newAcquiredDays);
+
+        LeaveBalance savedLeaveBalance =leaveBalanceRepository.save(balance);
+
+        return leaveBalanceMapper.toDto(savedLeaveBalance);
+    }
+
+
 }
