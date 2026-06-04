@@ -21,7 +21,7 @@ export async function loginAction(
   });
 
   if (!res.ok) {
-      return { error: "Email ou mot de passe incorrect" };
+      return { error: "Identifiant ou mot de passe incorrect" };
     }
     
     const data = await res.json();
