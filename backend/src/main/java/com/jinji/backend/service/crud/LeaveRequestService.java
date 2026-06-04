@@ -104,6 +104,11 @@ public class LeaveRequestService {
         leave.setStatus(LeaveRequestStatus.PENDING);
         leaveRequestRepository.save(leave);
 
+        notificationService.create(currentUser, "Votre demande de congés n°"
+                + leave.getId() +
+                " a bien été créée.");
+
+//        TODO: add notification to team manager
         return "Leave request submitted successfully";
     }
 
