@@ -1,8 +1,7 @@
 "use server";
 
+import { decodeJwt, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
-import { redirect } from "next/navigation";
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -33,6 +32,25 @@ export async function hasRole(role: Role): Promise<boolean> {
   const roles = await getUserRoles();
 
   return roles.includes(role);
+}
+
+export async function getAccessToken() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+
+  if (!token) return null;
+
+  const payload = decodeJwt(token);
+
+  const isExpired = payload.exp! * 1000 < Date.now();
+
+  if (!isExpired) {
+    return token;
+  }
+
+  const newToken = await refreshTokens();
+
+  return newToken;
 }
 
 

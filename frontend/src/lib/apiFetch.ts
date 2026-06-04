@@ -2,7 +2,7 @@
 
 import { logout } from "@/app/actions/logout";
 import { cookies } from "next/headers";
-import { deleteTokens, refreshTokens } from "./auth";
+import { deleteTokens, getAccessToken, refreshTokens } from "./auth";
 
 async function apiFetch<T>(
   url: string,
@@ -10,7 +10,12 @@ async function apiFetch<T>(
   _retry = false
 ): Promise<T> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+  const token = await getAccessToken();
+
+  if (!token) {
+    await logout();
+    throw new Error("NO_SESSION");
+  }
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
     ...options,
