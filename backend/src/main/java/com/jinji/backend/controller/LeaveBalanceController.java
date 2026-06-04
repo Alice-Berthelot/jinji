@@ -1,10 +1,13 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.LeaveBalanceDTO;
+import com.jinji.backend.model.dto.request.AdjustAcquiredDaysRequest;
+import com.jinji.backend.model.dto.response.LeaveBalanceDTO;
 import com.jinji.backend.service.crud.LeaveBalanceService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -31,5 +34,17 @@ public class LeaveBalanceController {
     ) {
 
         return leaveBalanceService.getLeaveBalancesByEmployeeId(employeeId);
+    }
+
+    @PatchMapping("/{id}/acquired-days")
+    @PreAuthorize("hasRole('HR')")
+    public LeaveBalanceDTO adjustAcquiredDays(
+            @PathVariable Long id,
+            @RequestBody AdjustAcquiredDaysRequest request
+    ) {
+        return leaveBalanceService.adjustAcquiredDays(
+                id,
+                request.newAcquiredDays()
+        );
     }
 }

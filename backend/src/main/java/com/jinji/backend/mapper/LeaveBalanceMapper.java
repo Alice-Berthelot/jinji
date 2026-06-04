@@ -1,6 +1,6 @@
 package com.jinji.backend.mapper;
 
-import com.jinji.backend.model.dto.LeaveBalanceDTO;
+import com.jinji.backend.model.dto.response.LeaveBalanceDTO;
 import com.jinji.backend.model.entity.LeaveBalance;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
