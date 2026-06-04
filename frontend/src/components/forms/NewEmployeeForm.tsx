@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import Subtitle from "../ui/Subtitle";
 import { Team } from "@/types/employee/team";
 import { CheckboxField } from "../ui/CheckboxField";
+import Button from "../ui/Button";
 
 type NewEmployeeFormProps = {
   departments: Department[];
@@ -29,6 +30,10 @@ export default function NewEmployeeForm({
     createEmployeeAction,
     { error: null }
   );
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
+  const [showPassword, setShowPassword] = useState(false);
 
   const [createUser, setCreateUser] = useState(true);
   const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
@@ -89,6 +94,30 @@ export default function NewEmployeeForm({
     setCreateUser(checked);
   };
 
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    setErrors((prev) => ({
+      ...prev,
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+        ? undefined
+        : "Email invalide",
+    }));
+  };
+
+  const handlePasswordBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    setErrors((prev) => ({
+      ...prev,
+      password: value.length >= 12 ? undefined : "12 caractères minimum requis",
+    }));
+  };
+
+  const handleToggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <form
       ref={formRef}
@@ -112,7 +141,16 @@ export default function NewEmployeeForm({
 
       <InputField label="Prénom(s)" type="text" name="firstName" required />
 
-      <InputField label="Adresse e-mail" type="email" name="email" required />
+      <div className="flex flex-col gap-1">
+        <InputField
+          label="Adresse e-mail"
+          type="email"
+          name="email"
+          required
+          onBlur={handleEmailBlur}
+        />
+        {errors.email && <p className="text-red-600 text-xs">{errors.email}</p>}
+      </div>
 
       <InputField label="Numéro de téléphone" type="text" name="phoneNumber" />
 
@@ -182,13 +220,27 @@ export default function NewEmployeeForm({
 
       {createUser && (
         <>
-          <InputField
-            label="Mot de passe"
-            type="password"
-            name="password"
-            minLength={12}
-            required
-            disabled={!createUser}
+          <div className="flex flex-col gap-1">
+            <InputField
+              label="Mot de passe"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              minLength={12}
+              required
+              disabled={!createUser}
+              onBlur={handlePasswordBlur}
+            />
+            {errors.password && (
+              <p className="text-red-600 text-xs">{errors.password}</p>
+            )}
+          </div>
+          <Button
+            title={showPassword ? "Masquer" : "Voir"}
+            type="button"
+            onClick={handleToggleShowPassword}
+            width="w-24"
+            paddingY="py-1"
+            className="text-xs"
           />
 
           <SelectField

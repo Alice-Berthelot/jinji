@@ -21,24 +21,23 @@ public class LeaveBalanceController {
     }
 
     @GetMapping("/me")
-    public List<LeaveBalanceDTO> getMyBalances(Authentication authentication) {
-
+    public List<LeaveBalanceDTO> getMyLeaveBalances(Authentication authentication) {
         return leaveBalanceService.getMyLeaveBalances(
                 authentication.getName()
         );
     }
 
     @GetMapping("/{employeeId}")
+    @PreAuthorize("isAuthenticated()")
     public List<LeaveBalanceDTO> getByEmployeeId(
             @PathVariable Long employeeId
     ) {
-
         return leaveBalanceService.getLeaveBalancesByEmployeeId(employeeId);
     }
 
     @PatchMapping("/{id}/acquired-days")
     @PreAuthorize("hasRole('HR')")
-    public LeaveBalanceDTO adjustAcquiredDays(
+    public LeaveBalanceDTO updateAcquiredDays(
             @PathVariable Long id,
             @RequestBody AdjustAcquiredDaysRequest request
     ) {

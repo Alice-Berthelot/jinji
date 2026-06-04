@@ -1,6 +1,7 @@
 package com.jinji.backend.service.crud;
 
 import com.jinji.backend.exception.BadRequestException;
+import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceAlreadyExistsException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveBalanceMapper;
@@ -10,10 +11,8 @@ import com.jinji.backend.model.entity.LeaveBalance;
 import com.jinji.backend.model.entity.LeaveType;
 import com.jinji.backend.model.entity.User;
 import com.jinji.backend.model.enums.AnnualLeaveAccrualPeriod;
-import com.jinji.backend.repository.HrPolicyRepository;
-import com.jinji.backend.repository.LeaveBalanceRepository;
-import com.jinji.backend.repository.LeaveTypeRepository;
-import com.jinji.backend.repository.UserRepository;
+import com.jinji.backend.repository.*;
+import com.jinji.backend.service.business.PermissionService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,28 +27,25 @@ public class LeaveBalanceService {
     private final UserRepository userRepository;
     private final LeaveTypeRepository leaveTypeRepository;
     private final HrPolicyRepository hrPolicyRepository;
+    private final EmployeeRepository employeeRepository;
     private final HrPolicyService hrPolicyService;
     private final UserService userService;
+    private final PermissionService permissionService;
     private final LeaveBalanceMapper leaveBalanceMapper;
 
     public LeaveBalanceService(
             LeaveBalanceRepository leaveBalanceRepository,
-            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyRepository hrPolicyRepository, HrPolicyService hrPolicyService, UserService userService, LeaveBalanceMapper leaveBalanceMapper
+            UserRepository userRepository, LeaveTypeRepository leaveTypeRepository, HrPolicyRepository hrPolicyRepository, EmployeeRepository employeeRepository, HrPolicyService hrPolicyService, UserService userService, PermissionService permissionService, LeaveBalanceMapper leaveBalanceMapper
     ) {
         this.leaveBalanceRepository = leaveBalanceRepository;
         this.userRepository = userRepository;
         this.leaveTypeRepository = leaveTypeRepository;
         this.hrPolicyRepository = hrPolicyRepository;
+        this.employeeRepository = employeeRepository;
         this.hrPolicyService = hrPolicyService;
         this.userService = userService;
+        this.permissionService = permissionService;
         this.leaveBalanceMapper = leaveBalanceMapper;
-    }
-
-    public List<LeaveBalanceDTO> getLeaveBalancesByEmployeeId(Long employeeId) {
-
-        return leaveBalanceMapper.toDtos(
-                leaveBalanceRepository.findByEmployee_Id(employeeId)
-        );
     }
 
     public List<LeaveBalanceDTO> getMyLeaveBalances(String username) {
@@ -377,5 +373,29 @@ public class LeaveBalanceService {
         return leaveBalanceMapper.toDto(savedLeaveBalance);
     }
 
+    public List<LeaveBalanceDTO> getLeaveBalancesByEmployeeId(Long employeeId) {
+        User currentUser = userService.getCurrentUser();
 
+        Employee targetEmployee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Employee not found with id " + employeeId
+                ));
+
+        if (targetEmployee == null) {
+            throw new ResourceNotFoundException(
+                    "No employee linked to user id " + employeeId
+            );
+        }
+
+        if (!permissionService.canViewLeaveBalances(currentUser, targetEmployee)) {
+            throw new ForbiddenException(
+                    "User is not authorized to access leave balances for this employee"
+            );
+        }
+
+        List<LeaveBalance> balances =
+                leaveBalanceRepository.findByEmployee_Id(targetEmployee.getId());
+
+        return leaveBalanceMapper.toDtos(balances);
+    }
 }

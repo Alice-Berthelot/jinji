@@ -56,7 +56,7 @@ export default function LeaveRequestForm({
   useEffect(() => {
     if (state.success) {
       toast.success("Demande d'absence créée avec succès");
-      router.push("/");
+      router.push("/leaves");
     }
 
     if (state.error) {

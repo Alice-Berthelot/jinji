@@ -6,14 +6,14 @@ import LinkCustom from "@/components/ui/LinkCustom";
 import MainTitle from "@/components/ui/MainTitle";
 import Subtitle from "@/components/ui/Subtitle";
 import { getMyLeaves } from "@/services/leave.service";
-import { getMyLeaveBalance } from "@/services/leaveBalance.service";
+import { getMyLeaveBalances } from "@/services/leaveBalance.service";
 import { getMyLeaveRequestsSummary } from "@/services/leaveRequest.service";
 import { buildLeaveMap } from "@/utils/formatLeaveMap";
 
 export default async function LeavePage() {
   const [leaveRequests, leaveBalance, leaves] = await Promise.all([
     getMyLeaveRequestsSummary(),
-    getMyLeaveBalance(),
+    getMyLeaveBalances(),
     getMyLeaves()
   ]);
 

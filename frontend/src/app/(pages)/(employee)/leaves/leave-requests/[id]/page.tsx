@@ -17,7 +17,7 @@ export default async function LeaveRequestDetailPage({
       <BackArrow />
       <MainTitle title={`Demande d'absence n°${id}`} />
 
-      <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] lg:min-h-screen">
+      <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] min-h-screen">
         <LeaveRequestDetail
           leaveRequest={leaveRequest}
           loading={false}
