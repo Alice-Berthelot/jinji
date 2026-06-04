@@ -1,5 +1,15 @@
-export type LeaveRequestStatus = "APPROVED" | "REJECTED" | "PENDING" | "CANCELLED";
-export type LeaveRequestWorkflowStatus = "APPROVED" | "REJECTED" | "PENDING_MANAGER" | "PENDING_HR" | "PENDING" | "CANCELLED";
+export type LeaveRequestStatus =
+  | "APPROVED"
+  | "REJECTED"
+  | "PENDING"
+  | "CANCELLED";
+export type LeaveRequestWorkflowStatus =
+  | "APPROVED"
+  | "REJECTED"
+  | "PENDING_MANAGER"
+  | "PENDING_HR"
+  | "PENDING"
+  | "CANCELLED";
 export type LeaveRequestReviewDecision = "APPROVED" | "REJECTED";
 export type ReviewerRole = "HR" | "MANAGER";
 
@@ -32,6 +42,7 @@ export interface MyLeaveRequestsSummary {
 
 export interface LeaveRequest {
   leaveRequestId: number;
+  employeeId: number;
   leaveTypeLabel: string;
   employeeFirstName: string;
   employeeSurname: string;
@@ -90,7 +101,6 @@ export interface LeaveRequestReview {
 //     reviews: LeaveRequestReview[];
 //     comment?: string;
 //   }
-
 
 export type CreateLeaveRequestReviewPayload = {
   decision: "APPROVED" | "REJECTED";

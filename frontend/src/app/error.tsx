@@ -2,6 +2,7 @@
 
 import MainTitle from "@/components/ui/MainTitle";
 import LinkPurple from "@/components/ui/LinkCustom";
+import Button from "@/components/ui/Button";
 
 export default function Error({
   reset,
@@ -17,14 +18,7 @@ export default function Error({
       </p>
 
       <div className="flex gap-4">
-        <button
-          onClick={() => reset()}
-          className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
-        >
-          Réessayer
-        </button>
-
-        <LinkPurple href="/" title="Accueil" />
+        <Button onClick={() => reset()}  title="Réessayer" />
       </div>
     </div>
   );

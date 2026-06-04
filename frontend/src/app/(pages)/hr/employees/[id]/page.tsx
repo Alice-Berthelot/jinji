@@ -24,7 +24,7 @@ export default async function HrEmployeeProfilePage({
           className="self-center mb-10 lg:mt-24 lg:mr-16 w-56"
         />
       </div>
-      <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] lg:min-h-screen">
+      <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] min-h-screen">
         {employee && <ProfileInfo profile={employee} subtitle="Informations personnelles"/>}
       </section>
     </>

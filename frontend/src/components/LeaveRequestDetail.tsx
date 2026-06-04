@@ -8,11 +8,15 @@ import { LeaveRequest } from "@/types/leave/leaveRequest";
 import { formatDate } from "@/utils/formatDate";
 import { formatLeaveReview } from "@/utils/formatLeaveReview";
 import { formatPeriod } from "@/utils/formatPeriod";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Button from "./ui/Button";
 import { bgStatusColors } from "@/styles/colors";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { LeaveBalance } from "@/types/leave/leaveBalance";
+import { getEmployeeLeaveBalances } from "@/services/leaveBalance.service";
+import LeaveBalanceTable from "./tables/LeaveBalanceTable";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 
 type LeaveRequestDetailProps = {
   leaveRequest: LeaveRequest | null;
@@ -28,6 +32,11 @@ export default function LeaveRequestDetail({
   canCancel,
 }: LeaveRequestDetailProps) {
   const [comment, setComment] = useState("");
+  const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[] | null>(
+    null
+  );
+  const [isOpenBalance, setIsOpenBalance] = useState(false);
+  const [loadingBalances, setLoadingBalances] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
@@ -102,6 +111,31 @@ export default function LeaveRequestDetail({
     }
   }
 
+  async function handleToggleBalances() {
+    if (isOpenBalance) {
+      setIsOpenBalance(false);
+      return;
+    }
+
+    if (leaveBalances) {
+      setIsOpenBalance(true);
+      return;
+    }
+
+    try {
+      setLoadingBalances(true);
+
+      const balances = await getEmployeeLeaveBalances(
+        String(leaveRequest?.employeeId)
+      );
+
+      setLeaveBalances(balances);
+      setIsOpenBalance(true);
+    } finally {
+      setLoadingBalances(false);
+    }
+  }
+
   const colorStatus =
     bgStatusColors[leaveRequest?.status ?? ""] ?? "bg-gray-200";
 
@@ -166,6 +200,30 @@ export default function LeaveRequestDetail({
         <p className="my-1 font-semibold">
           Commentaire des Ressources humaines : {formatLeaveReview(hrComment)}
         </p>
+      )}
+
+
+      <button
+        type="button"
+        onClick={handleToggleBalances}
+        disabled={loadingBalances}
+        className="flex items-center gap-1 text-[var(--color-block-purple)] mt-1 disabled:opacity-50"
+        aria-label={isOpenBalance ? "Masquer le solde" : "Voir le solde"}
+      >
+        <span className="text-[var(--color-main-font)] text-sm font-medium">
+          Voir le solde
+        </span>
+        {isOpenBalance ? (
+          <TiArrowSortedUp size={25} />
+        ) : (
+          <TiArrowSortedDown size={25} />
+        )}
+      </button>
+
+      {isOpenBalance && leaveBalances && (
+        <div className="mt-6">
+          <LeaveBalanceTable leaveBalance={leaveBalances} />
+        </div>
       )}
 
       {canCancel && leaveRequest.status == "PENDING" && (

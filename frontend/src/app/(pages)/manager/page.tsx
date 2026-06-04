@@ -1,11 +1,11 @@
 import HomeCard from "@/components/ui/HomeCard";
 import MainTitle from "@/components/ui/MainTitle";
 import Subtitle from "@/components/ui/Subtitle";
-import { hrLinks } from "@/config/nav";
+import { managerLinks } from "@/config/nav";
 
 export default async function ManagerHomePage() {
 
-  const links = hrLinks.filter((link) => link.link !== "/manager");
+  const links = managerLinks.filter((link) => link.link !== "/manager");
 
   return (
     <>
