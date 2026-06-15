@@ -1,4 +1,4 @@
-import { bgColors } from "@/styles/colors";
+import { bgColors } from "@/config/colors";
 import { Color } from "@/types/colors";
 import Link from "next/link";
 

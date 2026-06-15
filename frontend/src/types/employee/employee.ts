@@ -1,3 +1,5 @@
+export type EmployeeStatus = "INTERNAL" | "EXTERNAL";
+
 export interface EmployeeProfile {
     employeeNumber: string;
     surname: string;
@@ -6,6 +8,7 @@ export interface EmployeeProfile {
     phoneNumber?: string;
     seniorityDate: string;
     departmentCode?: string;
+    status: EmployeeStatus;
     departmentName?: string;
     teams?: string[];
   };
@@ -18,6 +21,7 @@ export interface EmployeeProfile {
     email: string;
     phoneNumber?: string;
     seniorityDate: string;
+    status: EmployeeStatus;
     departmentName: string;
     teams?: string[];
   };
@@ -35,6 +39,7 @@ export interface EmployeeTable {
   email: string;
   phoneNumber: string;
   seniorityDate: string;
+  status: EmployeeStatus;
   departmentName: string;
   teams: string[];
 }

@@ -1,8 +1,7 @@
 'use client';
 
-import MainTitle from "@/components/ui/MainTitle";
-import LinkPurple from "@/components/ui/LinkCustom";
 import Button from "@/components/ui/Button";
+import MainTitle from "@/components/ui/MainTitle";
 
 export default function Error({
   reset,

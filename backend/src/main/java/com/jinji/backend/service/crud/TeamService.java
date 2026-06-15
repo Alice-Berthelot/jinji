@@ -76,4 +76,12 @@ public class TeamService {
     public List<TeamSummary> getAllTeams() {
         return teamRepository.findAllByOrderByLabelAsc();
     }
+
+    public List<Employee> findManagersByEmployeeId(Long employeeId) {
+
+        return teamRepository.findByEmployees_Id(employeeId).stream()
+                .map(Team::getManager)
+                .distinct()
+                .toList();
+    }
 }

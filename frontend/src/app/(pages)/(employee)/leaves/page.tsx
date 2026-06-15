@@ -10,9 +10,15 @@ import { getMyLeaveBalances } from "@/services/leaveBalance.service";
 import { getMyLeaveRequestsSummary } from "@/services/leaveRequest.service";
 import { buildLeaveMap } from "@/utils/formatLeaveMap";
 
-export default async function LeavePage() {
+export default async function LeavePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Number(params.page ?? 0);
   const [leaveRequests, leaveBalance, leaves] = await Promise.all([
-    getMyLeaveRequestsSummary(),
+    getMyLeaveRequestsSummary(page, 4),
     getMyLeaveBalances(),
     getMyLeaves()
   ]);
@@ -21,7 +27,7 @@ export default async function LeavePage() {
     <>
       <BackArrow />
       <div className="flex flex-col lg:flex-row lg:justify-between">
-        <MainTitle title="Me absences" />
+        <MainTitle title="Mes absences" />
         <LinkCustom
           title="Nouvelle demande"
           href="/leaves/new-leave-request/"

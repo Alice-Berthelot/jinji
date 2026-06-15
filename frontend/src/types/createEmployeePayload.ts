@@ -5,6 +5,7 @@ export type CreateEmployeePayload = {
     email: string;
     phoneNumber?: string;
     seniorityDate?: string;
+    status?: string;
     departmentCode: string;
     memberTeamIds?: number[];
     managerTeamIds?: number[];

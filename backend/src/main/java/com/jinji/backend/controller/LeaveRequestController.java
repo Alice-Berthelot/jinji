@@ -1,18 +1,19 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.dto.request.LeaveRequestCreateRequest;
 import com.jinji.backend.model.dto.request.LeaveRequestCreateReview;
 import com.jinji.backend.model.dto.response.LeaveRequestActionResponseDTO;
+import com.jinji.backend.model.dto.response.LeaveRequestDTO;
+import com.jinji.backend.model.dto.response.LeaveRequestSummaryDTO;
+import com.jinji.backend.model.dto.response.MyLeaveRequestSummaryDTO;
 import com.jinji.backend.service.crud.LeaveRequestService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/leave-requests")
@@ -24,37 +25,42 @@ public class LeaveRequestController {
         this.leaveRequestService = leaveRequestService;
     }
 
-
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> createLeaveRequest(
-            @Valid @RequestBody LeaveRequestCreateRequest request) {
-
-        return ResponseEntity.ok(leaveRequestService.createLeaveRequest(request));
-    }
-
-    @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
-    public List<LeaveRequestDTO> getMyLeaveRequests(@AuthenticationPrincipal UserDetails userDetails) {
-        return leaveRequestService.getMyLeaveRequests(userDetails.getUsername());
-    }
-
-    @GetMapping("/me/summary")
-    @PreAuthorize("isAuthenticated()")
-    public List<MyLeaveRequestSummaryDTO> getMyLeaveRequestsSummary(@AuthenticationPrincipal UserDetails userDetails) {
-        return leaveRequestService.getMyLeaveRequestsSummary(userDetails.getUsername());
-    }
+    // GET
 
     @GetMapping("/{leaveRequestId}")
     @PreAuthorize("isAuthenticated()")
-    public LeaveRequestDTO getLeaveRequestDetail(@PathVariable Long leaveRequestId) {
-        return leaveRequestService.getLeaveRequestById(leaveRequestId);
+    public ResponseEntity<LeaveRequestDTO> getLeaveRequestDetail(@PathVariable Long leaveRequestId) {
+        LeaveRequestDTO response = leaveRequestService.getLeaveRequestById(leaveRequestId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/summary")
     @PreAuthorize("hasRole('HR') or hasRole('MANAGER')")
-    public List<LeaveRequestSummaryDTO> getLeaveRequestsSummary(@AuthenticationPrincipal UserDetails userDetails) {
-        return leaveRequestService.getLeaveRequestsSummary(userDetails.getUsername());
+    public ResponseEntity<Page<LeaveRequestSummaryDTO>> getLeaveRequestsSummary(Pageable pageable) {
+
+        return ResponseEntity.ok(leaveRequestService.getLeaveRequestsSummary(pageable));
+    }
+
+    @GetMapping("/me/summary")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<MyLeaveRequestSummaryDTO>> getMyLeaveRequestsSummary(Pageable pageable) {
+        return ResponseEntity.ok(
+                leaveRequestService.getMyLeaveRequestsSummary(
+                        pageable
+                )
+        );
+    }
+
+    // POST
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<LeaveRequestDTO> createLeaveRequest(
+            @Valid @RequestBody LeaveRequestCreateRequest request) {
+        LeaveRequestDTO response = leaveRequestService.createLeaveRequest(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @PostMapping("/{leaveRequestId}/review")
@@ -62,18 +68,18 @@ public class LeaveRequestController {
     public ResponseEntity<LeaveRequestDTO> processLeaveRequest(@PathVariable Long leaveRequestId,
             @Valid @RequestBody LeaveRequestCreateReview leaveRequestCreateReview
     ) {
-
         LeaveRequestDTO response = leaveRequestService.processLeaveRequest(leaveRequestId, leaveRequestCreateReview);
-
         return ResponseEntity.ok(response);
     }
+
+    // PATCH
 
     @PatchMapping("/{leaveRequestId}/cancel")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LeaveRequestActionResponseDTO> cancelLeaveRequest(
             @PathVariable Long leaveRequestId
     ) {
-        LeaveRequestActionResponseDTO updated = leaveRequestService.cancel(leaveRequestId);
+        LeaveRequestActionResponseDTO updated = leaveRequestService.cancelLeaveRequest(leaveRequestId);
         return ResponseEntity.ok(updated);
     }
 }

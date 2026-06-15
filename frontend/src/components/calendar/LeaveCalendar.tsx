@@ -16,9 +16,10 @@ const Calendar = dynamic(() => import("react-calendar"), { ssr: false });
 
 type Props = {
   leaveMap: Record<string, LeaveCalendar[]>;
+  manager?: boolean;
 };
 
-export default function Planning({ leaveMap }: Props) {
+export default function Planning({ leaveMap, manager = false }: Props) {
   const [date, setDate] = useState<Date>(new Date());
   const router = useRouter();
 
@@ -57,9 +58,8 @@ export default function Planning({ leaveMap }: Props) {
       setSelectedLeaves((prev) => prev.filter((l) => l.leaveId !== leaveId));
 
       router.refresh();
-    } catch (err) {
+    } catch {
       toast.error("Erreur lors de l'annulation de la demande");
-      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -204,7 +204,9 @@ export default function Planning({ leaveMap }: Props) {
         <div className="w-full max-w-md p-4 max-h-[80vh] overflow-auto">
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-semibold">
-              {selectedDate ? format(selectedDate, "dd MMMM yyyy", { locale: fr }) : "Détails"}
+              {selectedDate
+                ? format(selectedDate, "dd MMMM yyyy", { locale: fr })
+                : "Détails"}
             </h2>
 
             <button
@@ -234,20 +236,22 @@ export default function Planning({ leaveMap }: Props) {
                     </p>
 
                     <p className="text-xs text-gray-500">
-                      {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
+                      {formatDate(leave.startDate)} →{" "}
+                      {formatDate(leave.endDate)}
                     </p>
                   </div>
-
-                  <Button
-                    title="Annuler"
-                    isLoading={isSubmitting}
-                    disabled={isSubmitting}
-                    marginTop="mt-0"
-                    paddingY="py-1"
-                    width="w-32"
-                    className="text-sm ml-4 bg-[var(--color-block-red)] hover:bg-[var(--color-block-red-hover)]"
-                    onClick={() => handleCancel(leave.leaveId)}
-                  />
+                  {!manager && (
+                    <Button
+                      title="Annuler"
+                      isLoading={isSubmitting}
+                      disabled={isSubmitting}
+                      marginTop="mt-0"
+                      paddingY="py-1"
+                      width="w-32"
+                      className="text-sm ml-4 bg-[var(--color-block-red)] hover:bg-[var(--color-block-red-hover)]"
+                      onClick={() => handleCancel(leave.leaveId)}
+                    />
+                  )}
                 </div>
               ))}
             </div>

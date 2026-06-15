@@ -6,7 +6,7 @@ import { getLeaveRequestDetail } from "@/services/leaveRequest.service";
 export default async function HrLeaveRequestDetail({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const leaveRequest = await getLeaveRequestDetail(id);

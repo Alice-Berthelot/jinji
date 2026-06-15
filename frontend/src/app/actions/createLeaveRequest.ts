@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import apiFetch from "@/lib/apiFetch";
 
 export type LeaveState = {
   error: string | null;
@@ -11,9 +11,7 @@ export async function createLeaveRequestAction(
   prevState: LeaveState,
   formData: FormData
 ): Promise<LeaveState> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-
+  try {
   const payload = {
     startDate: formData.get("startDate"),
     endDate: formData.get("endDate"),
@@ -23,21 +21,21 @@ export async function createLeaveRequestAction(
     employeeComment: formData.get("employeeComment"),
   };
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/leave-requests`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    }
-  );
+  await apiFetch("/api/leave-requests", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 
-  if (!res.ok) {
-    return { error: "Erreur lors de la création de la demande de congé" };
-  }
-
-  return { error: null, success: true };
+  return {
+    error: null,
+    success: true,
+  };
+} catch (error) {
+  return {
+    error:
+      error instanceof Error
+        ? "Erreur lors de la création de la demande de congé"
+        : "Erreur lors de la création de la demande de congé",
+  };
+}
 }

@@ -1,7 +1,8 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.dto.request.LeaveCreateRequest;
+import com.jinji.backend.model.dto.response.LeaveCalendarDTO;
+import com.jinji.backend.model.dto.response.LeaveDTO;
 import com.jinji.backend.model.dto.response.MyLeaveCalendarDTO;
 import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.service.crud.LeaveService;
@@ -22,7 +23,6 @@ public class LeaveController {
         this.leaveService = leaveService;
     }
 
-
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LeaveDTO> createLeave(
@@ -39,16 +39,13 @@ public class LeaveController {
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<LeaveCalendarDTO>> getAllLeaves(@RequestParam EmployeePageView pageType) {
-
         return ResponseEntity.ok(leaveService.getAllLeaves(pageType));
     }
 
     @PatchMapping("/{leaveId}/cancel")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LeaveDTO> cancelLeave(@PathVariable Long leaveId) {
-
         LeaveDTO response = leaveService.cancelLeave(leaveId);
-
         return ResponseEntity.ok(response);
     }
 }

@@ -1,12 +1,13 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.entity.HrPolicy;
+import com.jinji.backend.model.dto.request.UpdateLeaveValidationRequest;
+import com.jinji.backend.model.dto.response.HrPolicyDTO;
+import com.jinji.backend.model.dto.response.LeaveValidationResponse;
 import com.jinji.backend.model.enums.LeaveValidationProcess;
 import com.jinji.backend.service.crud.HrPolicyService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/hr-policy")
@@ -20,13 +21,21 @@ public class HrPolicyController {
 
     @GetMapping
     @PreAuthorize("hasRole('HR')")
-    public HrPolicy getPolicy() {
-        return service.getHrPolicy();
+    public ResponseEntity<HrPolicyDTO> getHrPolicy() {
+        return ResponseEntity.ok(service.getHrPolicyDto());
     }
 
     @GetMapping("/leave-validation")
     @PreAuthorize("isAuthenticated()")
-    public LeaveValidationProcess getLeaveValidation() {
-        return service.getLeaveValidation();
+    public ResponseEntity<LeaveValidationResponse> getLeaveValidation() {
+        return ResponseEntity.ok(
+                new LeaveValidationResponse(service.getLeaveValidation())
+        );
+    }
+
+    @PatchMapping("/leave-validation")
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<HrPolicyDTO> updateLeaveValidation(@RequestBody UpdateLeaveValidationRequest request) {
+        return ResponseEntity.ok(service.updateLeaveValidation(request.getLeaveValidation()));
     }
 }

@@ -34,7 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // 1. Pas de header → on continue
+        // 1. No header → ship Jwt verification
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -42,13 +42,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         final String token = authHeader.substring(7);
 
-        // 2. On refuse directement les refresh tokens
+        // 2. Refresh tokens are automatically refused on API endpoints
         if (!jwtService.isAccessToken(token)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 3. On récupère username de façon safe
+        // 3. Get user from JWT
         final String username = jwtService.extractUsername(token);
 
         if (username == null || SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -56,10 +56,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 4. Chargement user
+        // 4. Load user
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // 5. Validation complète du token
+        // 5. Token validation
         if (jwtService.isValidAccessToken(token, userDetails)) {
 
             UsernamePasswordAuthenticationToken authToken =

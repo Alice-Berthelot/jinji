@@ -13,7 +13,7 @@ export default async function HrHomePage() {
         marginTop="mt-24"
       />
       <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] min-h-screen">
-        <Subtitle subtitle="Votre espace RH" />
+        <Subtitle subtitle="Mon espace RH" />
         <p className="hidden md:block">
           Accédez directement à la section souhaitée à l'aide des liens
           ci-dessous.

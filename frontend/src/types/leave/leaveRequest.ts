@@ -13,20 +13,6 @@ export type LeaveRequestWorkflowStatus =
 export type LeaveRequestReviewDecision = "APPROVED" | "REJECTED";
 export type ReviewerRole = "HR" | "MANAGER";
 
-// export interface MyLeaveRequests {
-//   id: number;
-//   start_date: string;
-//   start_period: Period;
-//   end_date: string;
-//   end_period: Period;
-//   status_label: string;
-//   employee_comment: string;
-//   created_at: string;
-//   leave_type_label: string;
-//   number_of_days: number;
-//   comment?: string;
-// }
-
 export interface MyLeaveRequestsSummary {
   id: number;
   leaveTypeLabel: string;

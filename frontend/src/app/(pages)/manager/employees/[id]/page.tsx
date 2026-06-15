@@ -6,7 +6,7 @@ import { getEmployeeById } from "@/services/employee.service";
 export default async function ManagerEmployeeProfilePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const employee = await getEmployeeById(Number(id), "MANAGER");

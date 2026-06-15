@@ -19,7 +19,7 @@ export default async function HrNewLeavePage({ params }: HrNewLeavePageProps) {
   return (
     <>
       <BackArrow />
-      <MainTitle title="Saisir une absence" />
+      <MainTitle title="Saisie d'absence" />
       <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] lg:min-h-screen">
         <NewLeaveForm
           employeeId={Number(id)}

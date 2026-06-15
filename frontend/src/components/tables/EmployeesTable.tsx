@@ -5,6 +5,7 @@ import { EmployeeTable as EmployeeTableType } from "@/types/employee/employee";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Subtitle from "../ui/Subtitle";
+import { formatEmployeeStatus } from "@/utils/formatLeaveRequestStatus copy";
 
 interface Props {
   employees: EmployeeTableType[];
@@ -31,6 +32,10 @@ export default function EmployeeTable({
     { header: "Prénom", accessor: "firstName" },
     { header: "Adresse e-mail", accessor: "email" },
     { header: "Téléphone", accessor: "phoneNumber" },
+    {
+      header: "Statut",
+      accessor: (row) => formatEmployeeStatus(row.status),
+    },
     {
       header: "Ancienneté",
       accessor: (row) =>

@@ -1,13 +1,15 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.LoginDTO;
-import com.jinji.backend.model.dto.LoginResponse;
-import com.jinji.backend.model.dto.RefreshTokenRequest;
-import com.jinji.backend.model.dto.RegisterUserDTO;
-import com.jinji.backend.model.entity.User;
+import com.jinji.backend.model.dto.request.LoginRequest;
+import com.jinji.backend.model.dto.response.LoginResponse;
+import com.jinji.backend.model.dto.request.RefreshTokenRequest;
+import com.jinji.backend.model.dto.request.RegisterUserRequest;
+import com.jinji.backend.model.dto.response.UserResponseDTO;
 import com.jinji.backend.security.CustomUserDetailsService;
 import com.jinji.backend.security.JwtService;
 import com.jinji.backend.service.crud.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,16 +39,19 @@ public class AuthController {
 
     @PostMapping("/register")
     @PreAuthorize("hasRole('HR')")
-    public User create(@RequestBody RegisterUserDTO request) {
-        return userService.createUser(
+    public ResponseEntity<UserResponseDTO> create(@RequestBody RegisterUserRequest request) {
+        UserResponseDTO created = userService.createUser(
                 request.getUsername(),
                 request.getPassword(),
                 request.getRoles()
         );
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(created);
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginDTO request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
 
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -60,11 +65,13 @@ public class AuthController {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        return new LoginResponse(accessToken, refreshToken);
+        return ResponseEntity.ok(
+                new LoginResponse(accessToken, refreshToken)
+        );
     }
 
     @PostMapping("/refresh")
-    public LoginResponse refresh(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<LoginResponse> refresh(@RequestBody RefreshTokenRequest request) {
 
         String refreshToken = request.refreshToken();
 
@@ -92,6 +99,8 @@ public class AuthController {
         String newAccessToken = jwtService.generateAccessToken(user);
 
         // 6. V1 simple : on renvoie le même refresh token
-        return new LoginResponse(newAccessToken, refreshToken);
+        return ResponseEntity.ok(
+                new LoginResponse(newAccessToken, refreshToken)
+        );
     }
 }

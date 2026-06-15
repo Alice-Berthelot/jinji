@@ -3,11 +3,11 @@ package com.jinji.backend.controller;
 import com.jinji.backend.model.dto.request.AdjustAcquiredDaysRequest;
 import com.jinji.backend.model.dto.response.LeaveBalanceDTO;
 import com.jinji.backend.service.crud.LeaveBalanceService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -21,29 +21,29 @@ public class LeaveBalanceController {
     }
 
     @GetMapping("/me")
-    public List<LeaveBalanceDTO> getMyLeaveBalances(Authentication authentication) {
-        return leaveBalanceService.getMyLeaveBalances(
-                authentication.getName()
+    public ResponseEntity<List<LeaveBalanceDTO>> getMyLeaveBalances(Authentication authentication) {
+        return ResponseEntity.ok(leaveBalanceService.getMyLeaveBalances(
+                authentication.getName())
         );
     }
 
     @GetMapping("/{employeeId}")
     @PreAuthorize("isAuthenticated()")
-    public List<LeaveBalanceDTO> getByEmployeeId(
+    public ResponseEntity<List<LeaveBalanceDTO>> getByEmployeeId(
             @PathVariable Long employeeId
     ) {
-        return leaveBalanceService.getLeaveBalancesByEmployeeId(employeeId);
+        return ResponseEntity.ok(leaveBalanceService.getLeaveBalancesByEmployeeId(employeeId));
     }
 
     @PatchMapping("/{id}/acquired-days")
     @PreAuthorize("hasRole('HR')")
-    public LeaveBalanceDTO updateAcquiredDays(
+    public ResponseEntity<LeaveBalanceDTO> updateAcquiredDays(
             @PathVariable Long id,
             @RequestBody AdjustAcquiredDaysRequest request
     ) {
-        return leaveBalanceService.adjustAcquiredDays(
+        return ResponseEntity.ok(leaveBalanceService.adjustAcquiredDays(
                 id,
-                request.newAcquiredDays()
+                request.newAcquiredDays())
         );
     }
 }

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { decodeJwt, jwtVerify } from "jose";
-
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
+import { decodeJwt } from "jose";
 
 export default async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -21,7 +19,6 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // ⚠️ IMPORTANT : decode uniquement, pas verify
   const payload = decodeJwt(token);
   const roles = (payload.roles ?? []) as string[];
 

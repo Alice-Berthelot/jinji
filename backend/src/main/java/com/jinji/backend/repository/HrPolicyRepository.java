@@ -8,38 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public interface HrPolicyRepository extends JpaRepository<HrPolicy, Long> {
 
-    @Query("""
-        SELECT h
-        FROM HrPolicy h
-    """)
-    HrPolicy findHrPolicy();
-
-    @Query("""
-        SELECT h.leaveValidation
-        FROM HrPolicy h
-    """)
-    LeaveValidationProcess findLeaveValidation();
-
-    @Query("""
-        SELECT h.annualLeaveDayType
-        FROM HrPolicy h
-    """)
-    AnnualLeaveDayType findAnnualLeaveDayType();
-
-    @Query("""
-        SELECT h.solidarityDay
-        FROM HrPolicy h
-    """)
-    LocalDate findSolidarityDay();
-
-    @Query("""
-        SELECT h.annualLeaveAccrualPeriod
-        FROM HrPolicy h
-    """)
-    AnnualLeaveAccrualPeriod findAnnualLeaveAccrualPeriod();
+    Optional<HrPolicy> findTopByOrderByIdAsc();
 
     @Query("""
         SELECT h.allowAnnualLeaveCarryover

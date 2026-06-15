@@ -21,7 +21,7 @@ export default async function HrEmployeesPage({
     <>
       <BackArrow />
       <div className="flex flex-col lg:flex-row lg:justify-between">
-        <MainTitle title="Gestion des collaborateurs" />
+        <MainTitle title="Collaborateurs" />
         <LinkCustom
           title="Ajouter un collaborateur"
           href="/hr/employees/new-employee/"

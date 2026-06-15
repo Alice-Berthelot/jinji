@@ -16,6 +16,7 @@ import Subtitle from "../ui/Subtitle";
 import { Team } from "@/types/employee/team";
 import { CheckboxField } from "../ui/CheckboxField";
 import Button from "../ui/Button";
+import { EmployeeStatus } from "@/types/employee/employee";
 
 type NewEmployeeFormProps = {
   departments: Department[];
@@ -38,6 +39,7 @@ export default function NewEmployeeForm({
   const [createUser, setCreateUser] = useState(true);
   const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   const [managerOfTeams, setManagerOfTeams] = useState<number[]>([]);
+  const [status, setStatus] = useState<EmployeeStatus>("INTERNAL");
 
   const router = useRouter();
 
@@ -90,8 +92,20 @@ export default function NewEmployeeForm({
     selectedTeams.includes(team.id)
   );
 
+  useEffect(() => {
+    if (status === "EXTERNAL") {
+      setCreateUser(false);
+    } else {
+      setCreateUser(true);
+    }
+  }, [status]);
+
   const toggleCreateUser = (checked: boolean) => {
     setCreateUser(checked);
+  };
+
+  const toggleStatus = (value: "INTERNAL" | "EXTERNAL") => {
+    setStatus(value);
   };
 
   const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -118,6 +132,12 @@ export default function NewEmployeeForm({
     setShowPassword((prev) => !prev);
   };
 
+  useEffect(() => {
+    if (formRef.current) {
+      setIsValid(formRef.current.checkValidity());
+    }
+  }, [state]);
+
   return (
     <form
       ref={formRef}
@@ -126,7 +146,7 @@ export default function NewEmployeeForm({
       className="m-auto pl-2 lg:px-6 py-8 flex flex-col gap-6"
     >
       <Subtitle
-        subtitle="Formulaire d'ajout de collaborateur"
+        subtitle="Ajouter un collaborateur en remplissant le formulaire ci-dessous"
         paddingLeft="pl-0 lg:pl-2"
         className="self-start"
       />
@@ -154,6 +174,28 @@ export default function NewEmployeeForm({
 
       <InputField label="Numéro de téléphone" type="text" name="phoneNumber" />
 
+      <div className="flex flex-col gap-2 group">
+        <label className="group-focus-within:font-bold">Statut</label>
+        <input type="hidden" name="status" value={status} />
+        <div className="flex flex-row gap-6">
+          <CheckboxField
+            name="status"
+            value="INTERNAL"
+            label="Interne"
+            checked={status === "INTERNAL"}
+            onCheckedChange={() => toggleStatus("INTERNAL")}
+          />
+
+          <CheckboxField
+            name="status"
+            value="EXTERNAL"
+            label="Externe"
+            checked={status === "EXTERNAL"}
+            onCheckedChange={() => toggleStatus("EXTERNAL")}
+          />
+        </div>
+      </div>
+
       <InputField
         label="Date d'ancienneté"
         type="date"
@@ -173,8 +215,11 @@ export default function NewEmployeeForm({
 
       <div className="flex flex-col gap-2 group">
         <label className="group-focus-within:font-bold">Equipe(s)</label>
+        {selectedTeams.map((id) => (
+          <input key={id} type="hidden" name="memberTeamIds" value={id} />
+        ))}
 
-        <article className="flex flex-row gap-6">
+        <article className="flex flex-row gap-6 flex-wrap">
           {teams.map((team) => (
             <CheckboxField
               key={team.id}
@@ -188,35 +233,43 @@ export default function NewEmployeeForm({
         </article>
       </div>
 
-      {selectedTeamObjects.map((team) => (
-        <div key={team.id} className="flex flex-col gap-2 group">
-          <label className="group-focus-within:font-bold">
-            Equipe(s) managées par le collaborateur
-          </label>
+      <div className="flex flex-col gap-2 group">
+        <label className="group-focus-within:font-bold">
+          Equipe(s) managées par le collaborateur
+        </label>
 
-          <CheckboxField
-            name="managerTeamIds"
-            value={team.id}
-            label={team.label}
-            checked={managerOfTeams.includes(team.id)}
-            onCheckedChange={toggleManagerTeam}
-          />
-        </div>
-      ))}
+        {managerOfTeams.map((id) => (
+          <input key={id} type="hidden" name="managerTeamIds" value={id} />
+        ))}
+
+        <article className="flex flex-row gap-6">
+          {selectedTeamObjects.map((team) => (
+            <CheckboxField
+              key={team.id}
+              name="managerTeamIds"
+              value={team.id}
+              label={team.label}
+              checked={managerOfTeams.includes(team.id)}
+              onCheckedChange={toggleManagerTeam}
+            />
+          ))}
+        </article>
+      </div>
 
       <input
         type="hidden"
         name="createUser"
         value={createUser ? "true" : "false"}
       />
-
-      <CheckboxField
-        name="createUser"
-        value="create-user"
-        label="Créer un compte utilisateur ?"
-        checked={createUser}
-        onCheckedChange={(checked) => toggleCreateUser(checked)}
-      />
+      {status === "INTERNAL" && (
+        <CheckboxField
+          name="createUser"
+          value="create-user"
+          label="Créer un compte utilisateur ?"
+          checked={createUser}
+          onCheckedChange={(checked) => toggleCreateUser(checked)}
+        />
+      )}
 
       {createUser && (
         <>
@@ -235,23 +288,13 @@ export default function NewEmployeeForm({
             )}
           </div>
           <Button
-            title={showPassword ? "Masquer" : "Voir"}
+            title={showPassword ? "Masquer mot de passe" : "Voir mot de passe"}
             type="button"
             onClick={handleToggleShowPassword}
-            width="w-24"
+            width="w-36"
             paddingY="py-1"
+            marginTop="mt-0"
             className="text-xs"
-          />
-
-          <SelectField
-            label="Rôle"
-            name="role"
-            required
-            options={[
-              { value: "EMPLOYEE", label: "Employé" },
-              { value: "HR", label: "Ressources Humaines" },
-              { value: "MANAGER", label: "Manager" },
-            ]}
           />
         </>
       )}
@@ -266,7 +309,7 @@ export default function NewEmployeeForm({
         <span className="text-red-600">*</span> Champs obligatoires
       </p>
 
-      <ButtonPurple
+      <Button
         title="Ajouter"
         type="submit"
         isLoading={pending}

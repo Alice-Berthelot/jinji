@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import apiFetch from "@/lib/apiFetch";
 
 export type LeaveState = {
   error: string | null;
@@ -11,10 +11,6 @@ export async function createLeaveAction(
   prevState: LeaveState,
   formData: FormData
 ): Promise<LeaveState> {
-  const cookieStore = await cookies();
-
-  const token = cookieStore.get("access_token")?.value;
-
   const payload = {
     employeeId: Number(formData.get("employeeId")),
     startDate: formData.get("startDate"),
@@ -24,26 +20,26 @@ export async function createLeaveAction(
     leaveTypeCode: formData.get("leaveTypeCode"),
   };
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/leaves`,
-    {
+  try {
+    await apiFetch("/api/leaves", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(payload),
-    }
-  );
+    });
 
-  if (!res.ok) {
     return {
-      error: "Erreur lors de la création de l'absence",
+      error: null,
+      success: true,
+    };
+  } catch (e: unknown) {
+    let message = "Erreur lors de la création de l'absence";
+  
+    if (e instanceof Error) {
+      message = e.message;
+    }
+  
+    return {
+      error: message,
+      success: false,
     };
   }
-
-  return {
-    error: null,
-    success: true,
-  };
 }

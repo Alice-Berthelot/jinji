@@ -1,10 +1,13 @@
 package com.jinji.backend.repository;
 
 import com.jinji.backend.model.entity.LeaveRequest;
-import com.jinji.backend.repository.projection.LeaveRequestSummaryRaw;
-import com.jinji.backend.repository.projection.MyLeaveRequestSummaryRaw;
+import com.jinji.backend.model.projection.MyLeaveRequestSummary;
+import com.jinji.backend.model.projection.LeaveRequestSummary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,8 +15,6 @@ import java.util.Optional;
 
 @Repository
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long> {
-
-    List<LeaveRequest> findByEmployee_Id(Long employeeId);
 
     @Query("""
     SELECT lr.id as id,
@@ -27,7 +28,10 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     JOIN lr.leaveType lt
     WHERE lr.employee.id = :employeeId
 """)
-    List<MyLeaveRequestSummaryRaw> findLeaveRequestSummaryByEmployee_Id(Long employeeId);
+    Page<MyLeaveRequestSummary> findLeaveRequestSummaryByEmployee_Id(
+            @Param("employeeId") Long employeeId,
+            Pageable pageable
+    );
 
 
     @Query("""
@@ -63,7 +67,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     JOIN lr.leaveType lt
     JOIN lr.employee e
 """)
-    List<LeaveRequestSummaryRaw> findAllLeaveRequestsSummary();
+    Page<LeaveRequestSummary> findAllLeaveRequestsSummary(Pageable pageable);
 
     @Query("""
     SELECT
@@ -101,7 +105,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
 
     WHERE t.manager.id = :managerId
 """)
-    List<LeaveRequestSummaryRaw> findLeaveRequestSummaryByManagerId(Long managerId);
+    Page<LeaveRequestSummary> findLeaveRequestSummaryByManagerId(Long managerId, Pageable pageable);
 
     Optional<LeaveRequest> findByIdAndEmployee_Id(
             Long leaveRequestId,

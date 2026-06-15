@@ -1,8 +1,8 @@
 "use server";
 
+import apiFetch from "@/lib/apiFetch";
 import { CreateEmployeePayload } from "@/types/createEmployeePayload";
 import { getOptionalString, getString } from "@/utils/formData";
-import { cookies } from "next/headers";
 
 export type EmployeeState = {
   error: string | null;
@@ -13,9 +13,6 @@ export async function createEmployeeAction(
   prevState: EmployeeState,
   formData: FormData
 ): Promise<EmployeeState> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-
   const createUser = formData.get("createUser") === "true";
 
   const payload: CreateEmployeePayload = {
@@ -28,26 +25,31 @@ export async function createEmployeeAction(
     memberTeamIds: formData.getAll("memberTeamIds").map(Number),
     managerTeamIds: formData.getAll("managerTeamIds").map(Number),
     seniorityDate: getString(formData, "seniorityDate"),
+    status: getOptionalString(formData, "status"),
     createUser,
   };
 
   if (createUser) {
     payload.password = getString(formData, "password");
-    payload.roles = [getString(formData, "role")];
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    await apiFetch("/api/employees", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
 
-  if (!res.ok) {
-    return { error: "Erreur lors de la création du collaborateur" };
+    return { error: null, success: true };
+  } catch (e: unknown) {
+    let message = "Erreur lors de la création du collaborateur";
+  
+    if (e instanceof Error) {
+      message = e.message;
+    }
+  
+    return {
+      error: message,
+      success: false,
+    };
   }
-
-  return { error: null, success: true };
 }

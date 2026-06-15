@@ -6,3 +6,14 @@ export async function getLeaveValidation(): Promise<LeaveValidation> {
     "/api/hr-policy/leave-validation"
   );
 }
+
+export async function updateLeaveValidation(
+  leaveValidation: LeaveValidation
+): Promise<void> {
+  await apiFetch("/api/hr-policy/leave-validation", {
+    method: "PATCH",
+    body: JSON.stringify({
+      leaveValidation,
+    }),
+  });
+}

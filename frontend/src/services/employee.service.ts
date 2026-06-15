@@ -42,3 +42,12 @@ export async function getEmployees(
     `/api/employees/all?page=${page}&size=${size}&search=${search}`
   );
 }
+
+export async function getManagerEmployees(
+  page: number,
+  size: number = 10
+): Promise<PageResponse<EmployeeTable>> {
+  return apiFetch<PageResponse<EmployeeTable>>(
+    `/api/employees/team?page=${page}&size=${size}`
+  );
+}
