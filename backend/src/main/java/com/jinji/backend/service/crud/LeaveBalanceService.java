@@ -63,7 +63,7 @@ public class LeaveBalanceService {
     }
 
     public LeaveBalance createLeaveBalance(Employee employee) {
-        // peut-être mettre des années optionnelles pour créer plus tard
+        // for future version: possibility to add previous balances
 
         // 1. determine the accrual start and end dates, depending on the accrual period configured by HR:
         //        - get hr policy accrual period
@@ -313,12 +313,12 @@ public class LeaveBalanceService {
 
             BigDecimal taken = balance.getTakenDays();
 
-            // rien à recréditer ici
+            // nothing to credit
             if (taken.compareTo(BigDecimal.ZERO) <= 0) {
                 continue;
             }
 
-            // cas 1 : on peut tout recréditer dans ce solde
+            // case 1: remaining credit covers the full amount
             if (taken.compareTo(remainingToCredit) >= 0) {
 
                 balance.setTakenDays(
@@ -329,7 +329,7 @@ public class LeaveBalanceService {
                 return;
             }
 
-            // cas 2 : on vide le solde et on continue
+            // case 2: apply credit until balance is fully consumed
             balance.setTakenDays(BigDecimal.ZERO);
             leaveBalanceRepository.save(balance);
 

@@ -25,7 +25,7 @@ public class NotificationController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public Page<NotificationDTO> getMyNotifications(
+    public ResponseEntity<Page<NotificationDTO>> getMyNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -33,13 +33,13 @@ public class NotificationController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return service.getUserNotifications(userId, pageable);
+        return ResponseEntity.ok(service.getUserNotifications(userId, pageable));
     }
 
     @GetMapping("/unread-count")
     @PreAuthorize("isAuthenticated()")
-    public long countUnread() {
-        return service.countUnread();
+    public ResponseEntity<Long> countUnread() {
+        return ResponseEntity.ok(service.countUnread());
     }
 
     @PatchMapping("/{id}/read")

@@ -5,11 +5,6 @@ import { cookies } from "next/headers";
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
-type JwtPayload = {
-  sub: string;
-  roles: Role[];
-};
-
 export async function getUserRoles(): Promise<Role[]> {
   const cookieStore = await cookies();
 
@@ -76,7 +71,7 @@ export async function refreshTokens() {
   if (!refreshToken) return null;
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`,
+    `${process.env.API_URL}/api/auth/refresh`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

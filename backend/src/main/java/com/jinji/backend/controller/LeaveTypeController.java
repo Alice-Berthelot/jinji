@@ -1,7 +1,8 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.LeaveTypeDTO;
+import com.jinji.backend.model.dto.response.LeaveTypeDTO;
 import com.jinji.backend.service.crud.LeaveTypeService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,13 +22,13 @@ public class LeaveTypeController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public List<LeaveTypeDTO> getAllLeaveTypes() {
-        return leaveTypeService.getAllLeaveTypes();
+    public ResponseEntity<List<LeaveTypeDTO>> getAllLeaveTypes() {
+        return ResponseEntity.ok(leaveTypeService.getAllLeaveTypes());
     }
 
     @GetMapping("/requestable")
     @PreAuthorize("isAuthenticated()")
-    public List<LeaveTypeDTO> getRequestableLeaveTypes() {
-        return leaveTypeService.getRequestableLeaveTypes();
+    public ResponseEntity<List<LeaveTypeDTO>> getRequestableLeaveTypes() {
+        return ResponseEntity.ok(leaveTypeService.getRequestableLeaveTypes());
     }
 }

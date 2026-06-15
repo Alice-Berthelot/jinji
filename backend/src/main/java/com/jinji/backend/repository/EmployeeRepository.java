@@ -1,7 +1,8 @@
 package com.jinji.backend.repository;
 
 import com.jinji.backend.model.dto.response.EmployeeFullNameDTO;
-import com.jinji.backend.model.dto.EmployeeProfileDTO;
+import com.jinji.backend.model.dto.response.EmployeeProfileDTO;
+import com.jinji.backend.model.dto.response.ManagerEmployeeTableDTO;
 import com.jinji.backend.model.entity.Employee;
 import com.jinji.backend.model.projection.EmployeeTeamProjection;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<EmployeeFullNameDTO> findEmployeeFullNameById(Long employeeId);
 
     @Query("""
-    SELECT new com.jinji.backend.model.dto.EmployeeProfileDTO(
+    SELECT new com.jinji.backend.model.dto.response.EmployeeProfileDTO(
         e.id,
         e.employeeNumber,
         e.surname,
@@ -45,6 +46,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
         e.email,
         e.phoneNumber,
         e.seniorityDate,
+        e.status,
         d.name
     )
     FROM Employee e
@@ -57,6 +59,27 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 """)
     Page<EmployeeProfileDTO> findEmployeesForTable(
             @Param("search") String search,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT DISTINCT new com.jinji.backend.model.dto.response.ManagerEmployeeTableDTO(
+        e.id,
+        e.surname,
+        e.firstName,
+        e.email,
+        e.seniorityDate,
+        e.status,
+        d.name
+    )
+    FROM Employee e
+    JOIN e.teams t
+    LEFT JOIN e.department d
+    WHERE t.manager.id = :managerId
+    ORDER BY e.surname ASC, e.firstName ASC
+""")
+    Page<ManagerEmployeeTableDTO> findEmployeesManagedBy(
+            @Param("managerId") Long managerId,
             Pageable pageable
     );
 

@@ -1,6 +1,6 @@
 package com.jinji.backend.mapper;
 
-import com.jinji.backend.model.dto.DepartmentDTO;
+import com.jinji.backend.model.dto.response.DepartmentDTO;
 import com.jinji.backend.model.entity.Department;
 import org.mapstruct.Mapper;
 

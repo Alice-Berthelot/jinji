@@ -38,7 +38,9 @@ export default function SearchBar({ search }: { search: string }) {
       <Subtitle subtitle="Rechercher un collaborateur" />
       <div className="flex flex-col lg:flex-row gap-4 lg:items-center w-full lg:w-3/5">
         <div className="flex lg:w-full gap-2">
+          <label htmlFor="search" className="sr-only">Entrer un nom, prénom ou e-mail de collaborateur</label>
         <Input
+        id="search"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Nom, prénom, e-mail..."

@@ -1,4 +1,4 @@
-import LeaveRequestsList from "@/components/LeaveRequestsList";
+import LeaveRequestsListWithLoadMore from "@/components/LeaveRequestsListWithLoadMore";
 import BackArrow from "@/components/ui/BackArrow";
 import MainTitle from "@/components/ui/MainTitle";
 import { getLeaveRequestsSummary } from "@/services/leaveRequest.service";
@@ -6,17 +6,22 @@ import { getLeaveValidation } from "@/services/hrPolicy.service";
 
 export default async function ManagerLeaveRequestsPage() {
   const [leaveRequests, hrPolicy] = await Promise.all([
-    getLeaveRequestsSummary(),
+    getLeaveRequestsSummary(0, 10),
     getLeaveValidation(),
   ]);
+
+console.log(leaveRequests);
+
   return (
     <>
       <BackArrow />
-      <MainTitle title="Demandes d'absence de l'équipe" />
+
+      <MainTitle title="Demandes d'absence" />
+
       <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] lg:min-h-screen">
         <div className="flex flex-col justify-center items-center gap-4 lg:gap-8 mb-6">
-          <LeaveRequestsList
-            leaveRequests={leaveRequests}
+          <LeaveRequestsListWithLoadMore
+            initialPage={leaveRequests}
             role="MANAGER"
             detailBasePath="/manager/leaves/leave-requests"
             hrPolicy={hrPolicy}

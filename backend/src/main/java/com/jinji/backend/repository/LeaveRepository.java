@@ -34,6 +34,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
         lt.label AS leaveTypeLabel,
         l.startDate AS startDate,
         l.endDate AS endDate,
+        l.status AS status,
         l.id AS leaveId
     FROM Team t
     JOIN t.employees e
@@ -52,6 +53,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
         lt.label AS leaveTypeLabel,
         l.startDate AS startDate,
         l.endDate AS endDate,
+        l.status AS status,
         l.id AS leaveId
     FROM Leave l
     JOIN l.employee e

@@ -4,8 +4,10 @@ import com.jinji.backend.exception.BadRequestException;
 import com.jinji.backend.exception.ForbiddenException;
 import com.jinji.backend.exception.ResourceNotFoundException;
 import com.jinji.backend.mapper.LeaveMapper;
-import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.dto.request.LeaveCreateRequest;
+import com.jinji.backend.model.dto.response.LeaveCalendarDTO;
+import com.jinji.backend.model.dto.response.LeaveDTO;
+import com.jinji.backend.model.dto.response.LeaveTypeDTO;
 import com.jinji.backend.model.dto.response.MyLeaveCalendarDTO;
 import com.jinji.backend.model.entity.*;
 import com.jinji.backend.model.enums.EmployeePageView;
@@ -15,14 +17,16 @@ import com.jinji.backend.model.projection.LeaveCalendarProjection;
 import com.jinji.backend.repository.EmployeeRepository;
 import com.jinji.backend.repository.LeaveRepository;
 import com.jinji.backend.repository.LeaveTypeRepository;
-import com.jinji.backend.repository.projection.LeaveRaw;
+import com.jinji.backend.model.projection.LeaveRaw;
 import com.jinji.backend.service.business.LeaveCalculationService;
+import com.jinji.backend.service.business.PermissionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LeaveService {
@@ -34,10 +38,11 @@ public class LeaveService {
     private final LeaveCalculationService leaveCalculationService;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final PermissionService permissionService;
     private final LeaveMapper leaveMapper;
 
     public LeaveService(
-            LeaveRepository leaveRepository, LeaveTypeRepository leaveTypeRepository, EmployeeRepository employeeRepository, LeaveBalanceService leaveBalanceService, LeaveCalculationService leaveCalculationService, UserService userService, NotificationService notificationService, LeaveMapper leaveMapper
+            LeaveRepository leaveRepository, LeaveTypeRepository leaveTypeRepository, EmployeeRepository employeeRepository, LeaveBalanceService leaveBalanceService, LeaveCalculationService leaveCalculationService, UserService userService, NotificationService notificationService, PermissionService permissionService, LeaveMapper leaveMapper
     ) {
         this.leaveRepository = leaveRepository;
         this.leaveTypeRepository = leaveTypeRepository;
@@ -46,6 +51,7 @@ public class LeaveService {
         this.leaveCalculationService = leaveCalculationService;
         this.userService = userService;
         this.notificationService = notificationService;
+        this.permissionService = permissionService;
         this.leaveMapper = leaveMapper;
     }
 
@@ -128,7 +134,7 @@ public class LeaveService {
         leaveRaw.setLeaveType(leaveRequest.getLeaveType());
         leaveRaw.setNumberOfDays(leaveRequest.getNumberOfDays());
 
-        Leave leave = buildLeave(leaveRaw);
+        buildLeave(leaveRaw);
     }
 
     @Transactional
@@ -202,7 +208,8 @@ public class LeaveService {
                         ),
                         p.getStartDate(),
                         p.getEndDate(),
-                        p.getLeaveId()
+                        p.getLeaveId(),
+                        p.getStatus()
                 ))
                 .toList();
     }
@@ -233,7 +240,7 @@ public class LeaveService {
                         new ResourceNotFoundException("Leave not found with id " + leaveId)
                 );
 
-        authorizeLeaveCancellation(currentUser, leave);
+        permissionService.canCancelLeave(currentUser, leave);
 
         if (leave.getStatus() == LeaveStatus.CANCELLED) {
             throw new BadRequestException("Leave has already been cancelled");
@@ -264,21 +271,4 @@ public class LeaveService {
         return leaveMapper.toDto(leave);
     }
 
-    private void authorizeLeaveCancellation(User user, Leave leave) {
-
-        Employee currentEmployee = user.getEmployee();
-
-        if (currentEmployee == null && !user.isHr()) {
-            throw new ForbiddenException("Not authorized");
-        }
-
-        boolean isOwner = currentEmployee != null
-                && leave.getCreatedBy().getId().equals(currentEmployee.getId());
-
-        boolean isHr = user.isHr();
-
-        if (!isOwner && !isHr) {
-            throw new ForbiddenException("User is not authorized to cancel leave n°" + leave.getId());
-        }
-    }
 }

@@ -5,6 +5,7 @@ import {
   MyLeaveRequestsSummary,
   CreateLeaveRequestReviewPayload,
 } from "@/types/leave/leaveRequest";
+import { PageResponse } from "@/types/pagination/page";
 
 export async function getLeaveRequestDetail(
   leaveRequestId: string
@@ -12,16 +13,22 @@ export async function getLeaveRequestDetail(
   return apiFetch<LeaveRequest>(`/api/leave-requests/${leaveRequestId}`);
 }
 
-export async function getMyLeaveRequestsSummary(): Promise<
-  MyLeaveRequestsSummary[]
-> {
-  return apiFetch<MyLeaveRequestsSummary[]>("/api/leave-requests/me/summary");
+export async function getMyLeaveRequestsSummary(
+  page: number,
+  size: number = 5
+): Promise<PageResponse<MyLeaveRequestsSummary>> {
+  return apiFetch(
+    `/api/leave-requests/me/summary?page=${page}&size=${size}`
+  );
 }
 
-export async function getLeaveRequestsSummary(): Promise<
-  LeaveRequestsSummary[]
-> {
-  return apiFetch<LeaveRequestsSummary[]>("/api/leave-requests/summary");
+export async function getLeaveRequestsSummary(
+  page: number,
+  size: number = 10
+): Promise<PageResponse<LeaveRequestsSummary>> {
+  return apiFetch(
+    `/api/leave-requests/summary?page=${page}&size=${size}`
+  );
 }
 
 export async function createLeaveRequestReview(

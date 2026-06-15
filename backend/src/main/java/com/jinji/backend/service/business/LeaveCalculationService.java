@@ -43,10 +43,10 @@ public class LeaveCalculationService {
         ) {
 
             boolean shouldCount = switch (dayType) {
-
+                // FR_JOURS_OUVRES: days actually worked by the company
                 case FR_JOURS_OUVRES ->
                         calendarService.isWorkingDay(current);
-
+                // FR_JOURS_OUVRABLES: all weekdays except Sundays
                 case FR_JOURS_OUVRABLES ->
                         calendarService.isBusinessDay(current);
             };
@@ -76,6 +76,7 @@ public class LeaveCalculationService {
             }
 
             // Day that should not be counted
+            // In France, the Solidarity Day is a public holiday that is usually worked
             boolean isSolidarityDay =
                     calendarService.isSolidarityDay(startDate, solidarityDay);
 

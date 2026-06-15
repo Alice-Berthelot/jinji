@@ -1,30 +1,14 @@
 "use client";
 
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePathname } from "next/navigation";
 import LogoHeader from "../ui/LogoHeader";
 import LogoutButton from "../ui/LogoutButton";
 import MenuBurger from "../ui/MenuBurger";
 import NotificationIcon from "../ui/NotificationIcon";
-// import AuthenticatedEmployee from "../AuthenticatedEmployee";
 
 export default function Header() {
-  const isMobile = useIsMobile();
   const pathname = usePathname();
-  // const [myFullName, setMyFullName] = useState<EmployeeFullName | null>(null);
 
-  // useEffect(() => {
-  //   async function load() {
-  //     try {
-  //       const data = await getMyFullName();
-  //       setMyFullName(data);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   }
-  //   load();
-  // }, []);
-  
   if (pathname === "/login") {
     return null;
   }
@@ -38,7 +22,6 @@ export default function Header() {
       </div>
       <div className="flex flex-row items-center gap-6">
         <NotificationIcon />
-        {/* {!isMobile && <AuthenticatedEmployee employeeFullName={myFullName} />} */}
         <LogoutButton />
       </div>
     </header>

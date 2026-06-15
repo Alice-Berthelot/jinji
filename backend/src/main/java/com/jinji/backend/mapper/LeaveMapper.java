@@ -1,6 +1,6 @@
 package com.jinji.backend.mapper;
 
-import com.jinji.backend.model.dto.LeaveDTO;
+import com.jinji.backend.model.dto.response.LeaveDTO;
 import com.jinji.backend.model.entity.Leave;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,6 +14,5 @@ public interface LeaveMapper {
     @Mapping(source = "leaveRequest.id", target = "leaveRequestId")
     @Mapping(source = "createdBy.id", target = "creatorId")
     @Mapping(source = "createdBy.fullName", target = "creatorFullName")
-
     LeaveDTO toDto(Leave leave);
 }

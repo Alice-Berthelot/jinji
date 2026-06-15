@@ -3,12 +3,11 @@ import BackArrow from "@/components/ui/BackArrow";
 import LinkCustom from "@/components/ui/LinkCustom";
 import MainTitle from "@/components/ui/MainTitle";
 import { getEmployeeById } from "@/services/employee.service";
-// import { getMe } from "@/services/employee.service";
 
 export default async function HrEmployeeProfilePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const employee = await getEmployeeById(Number(id), "HR");

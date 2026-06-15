@@ -1,7 +1,7 @@
 package com.jinji.backend.service.crud;
 
 import com.jinji.backend.mapper.LeaveTypeMapper;
-import com.jinji.backend.model.dto.LeaveTypeDTO;
+import com.jinji.backend.model.dto.response.LeaveTypeDTO;
 import com.jinji.backend.repository.LeaveTypeRepository;
 import org.springframework.stereotype.Service;
 

@@ -12,7 +12,7 @@ export default async function NewEmployeePage() {
   return (
     <>
       <BackArrow />
-      <MainTitle title="Ajouter un collaborateur" />
+      <MainTitle title="Ajout d'un collaborateur" />
 
       <section className="m-auto lg:my-0 lg:mx-8 bg-[var(--color-block-white)] px-6 py-4 shadow-sm rounded-sm w-[95%] lg:min-h-screen">
         <NewEmployeeForm departments={departments} teams={teams} />

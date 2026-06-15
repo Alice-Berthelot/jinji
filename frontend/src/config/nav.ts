@@ -1,4 +1,14 @@
-import { LuBriefcaseBusiness, LuBuilding2, LuCalendarDays, LuClipboardList, LuHouse, LuSettings2, LuUserRound, LuUsers } from "react-icons/lu";
+import {
+  LuBriefcaseBusiness,
+  LuBuilding2,
+  LuCalendarDays,
+  LuCalendarRange,
+  LuClipboardList,
+  LuHouse,
+  LuSettings2,
+  LuUserRound,
+  LuUsers,
+} from "react-icons/lu";
 
 export const employeeLinks = [
   {
@@ -12,7 +22,7 @@ export const employeeLinks = [
     icon: LuCalendarDays,
   },
   {
-    name: "Mes informations",
+    name: "Mon profil",
     link: "/profile",
     icon: LuUserRound,
   },
@@ -30,14 +40,15 @@ export const managerLinks = [
     icon: LuClipboardList,
   },
   {
-    name: "Liste des collaborateurs",
+    name: "Collaborateurs",
     link: "/manager/employees",
     icon: LuUsers,
   },
-  // {
-  //   name: "Planning de l'équipe",
-  //   link: "/manager/planning-equipe",
-  // },
+  {
+    name: "Planning de l'équipe",
+    link: "/manager/calendar",
+    icon: LuCalendarRange,
+  },
 ];
 
 export const hrLinks = [
@@ -47,12 +58,12 @@ export const hrLinks = [
     icon: LuBuilding2,
   },
   {
-    name: "Gestion des demandes d'absences",
-    link: "/hr/leaves/leave-requests",
+    name: "Absences",
+    link: "/hr/leaves",
     icon: LuClipboardList,
   },
   {
-    name: "Gestion des collaborateurs",
+    name: "Collaborateurs",
     link: "/hr/employees",
     icon: LuUsers,
   },

@@ -1,6 +1,6 @@
 package com.jinji.backend.mapper;
 
-import com.jinji.backend.model.dto.LeaveTypeDTO;
+import com.jinji.backend.model.dto.response.LeaveTypeDTO;
 import com.jinji.backend.model.entity.LeaveType;
 import org.mapstruct.Mapper;
 

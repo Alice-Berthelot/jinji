@@ -10,7 +10,7 @@ import { formatLeaveReview } from "@/utils/formatLeaveReview";
 import { formatPeriod } from "@/utils/formatPeriod";
 import { useState, useTransition } from "react";
 import Button from "./ui/Button";
-import { bgStatusColors } from "@/styles/colors";
+import { bgStatusColors } from "@/config/colors";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { LeaveBalance } from "@/types/leave/leaveBalance";
@@ -39,6 +39,9 @@ export default function LeaveRequestDetail({
   const [loadingBalances, setLoadingBalances] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  const isHr = userRole === "HR";
+  const isManager = userRole === "MANAGER";
 
   if (loading) {
     return <p>Chargement...</p>;
@@ -69,10 +72,9 @@ export default function LeaveRequestDetail({
   )?.comment;
 
   const canManagerReview =
-    leaveRequest.workflowStatus === "PENDING_MANAGER" && userRole === "MANAGER";
+    leaveRequest.workflowStatus === "PENDING_MANAGER" && isManager;
 
-  const canHrReview =
-    leaveRequest.workflowStatus === "PENDING_HR" && userRole === "HR";
+  const canHrReview = leaveRequest.workflowStatus === "PENDING_HR" && isHr;
 
   const canReview = canManagerReview || canHrReview;
 
@@ -105,7 +107,6 @@ export default function LeaveRequestDetail({
       router.refresh();
     } catch (err) {
       toast.error("Erreur lors de l'annulation de la demande");
-      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -150,58 +151,70 @@ export default function LeaveRequestDetail({
         </span>
       </p>
 
-      <p className="text-xs mb-4">
+      <p className="text-sm mt-2 mb-4">
         Demande n°{leaveRequest.leaveRequestId} - Créée le{" "}
         {formatDate(leaveRequest.createdAt)}
       </p>
-      <p>
-        <span className="font-semibold">Type d'absence : </span>
-        {leaveRequest.leaveTypeLabel}
-      </p>
-      <p>
-        <span className="font-semibold">Période : </span>
-        Du {formatDate(leaveRequest.startDate)} (
-        {formatPeriod(leaveRequest.startPeriod)}) au{" "}
-        {formatDate(leaveRequest.endDate)} (
-        {formatPeriod(leaveRequest.endPeriod)})
-      </p>
 
-      <p>
-        <span className="font-semibold">Nombre de jours : </span>
-        {leaveRequest.numberOfDays}
-      </p>
-
-      {leaveRequest.employeeComment &&
-        !(leaveRequest.employeeComment === "") && (
+      <section className="flex flex-col gap-2 my-10">
+        {(isHr || isManager) && (
           <p>
-            <span className="font-semibold">
-              Commentaire du collaborateur :
-            </span>{" "}
-            {leaveRequest.employeeComment}
+            <span className="font-semibold">Collaborateur : </span>
+            {leaveRequest.employeeFirstName} {leaveRequest.employeeSurname}
           </p>
         )}
+        <p>
+          <span className="font-semibold">Type d'absence : </span>
+          {leaveRequest.leaveTypeLabel}
+        </p>
+        <p>
+          <span className="font-semibold">Période : </span>
+          Du {formatDate(leaveRequest.startDate)} (
+          {formatPeriod(leaveRequest.startPeriod)}) au{" "}
+          {formatDate(leaveRequest.endDate)} (
+          {formatPeriod(leaveRequest.endPeriod)})
+        </p>
 
-      {managerDecision && (
-        <p className="my-1 font-semibold">
-          Décision du Manager : {formatLeaveReview(managerDecision)}
+        <p>
+          <span className="font-semibold">Nombre de jours : </span>
+          {leaveRequest.numberOfDays}
         </p>
-      )}
-      {managerComment && (
-        <p className="my-1 font-semibold">
-          Commentaire du Manager : {formatLeaveReview(managerComment)}
-        </p>
-      )}
-      {hrDecision && (
-        <p className="my-1 font-semibold">
-          Décision des Ressources humaines : {formatLeaveReview(hrDecision)}
-        </p>
-      )}
-      {hrComment && (
-        <p className="my-1 font-semibold">
-          Commentaire des Ressources humaines : {formatLeaveReview(hrComment)}
-        </p>
-      )}
 
+        {leaveRequest.employeeComment &&
+          !(leaveRequest.employeeComment === "") && (
+            <p>
+              <span className="font-semibold">
+                Commentaire du collaborateur :
+              </span>{" "}
+              {leaveRequest.employeeComment}
+            </p>
+          )}
+
+        {managerDecision && (
+          <p className="my-1">
+            <span className="font-semibold">Décision du Manager : </span> {formatLeaveReview(managerDecision)}
+          </p>
+        )}
+        {managerComment && (
+          <p className="my-1">
+            <span className="font-semibold">Commentaire du Manager : </span>
+            {formatLeaveReview(managerComment)}
+          </p>
+        )}
+        {hrDecision && (
+          <p className="my-1">
+            <span className="font-semibold">
+              Décision des Ressources humaines :{" "}
+            </span>
+            {formatLeaveReview(hrDecision)}
+          </p>
+        )}
+        {hrComment && (
+          <p className="my-1 font-semibold">
+            Commentaire des Ressources humaines : {formatLeaveReview(hrComment)}
+          </p>
+        )}
+      </section>
 
       <button
         type="button"
@@ -210,8 +223,10 @@ export default function LeaveRequestDetail({
         className="flex items-center gap-1 text-[var(--color-block-purple)] mt-1 disabled:opacity-50"
         aria-label={isOpenBalance ? "Masquer le solde" : "Voir le solde"}
       >
-        <span className="text-[var(--color-main-font)] text-sm font-medium">
-          Voir le solde
+        <span className="text-[var(--color-main-font)] font-semibold">
+          {isHr || isManager
+            ? "Solde de congés payés du collaborateur"
+            : "Mon solde de congés payés"}
         </span>
         {isOpenBalance ? (
           <TiArrowSortedUp size={25} />
@@ -229,7 +244,7 @@ export default function LeaveRequestDetail({
       {canCancel && leaveRequest.status == "PENDING" && (
         <div className="mt-8 flex justify-center">
           <Button
-            title="Annuler la demande"
+            title="Annuler ma demande"
             onClick={handleCancel}
             isLoading={isSubmitting}
             className="bg-[var(--color-block-red)] hover:bg-[var(--color-block-red-hover)]"

@@ -1,16 +1,12 @@
 package com.jinji.backend.controller;
 
-import com.jinji.backend.model.dto.*;
 import com.jinji.backend.model.dto.request.EmployeeCreateRequest;
-import com.jinji.backend.model.dto.response.EmployeeCreatedDTO;
-import com.jinji.backend.model.dto.response.EmployeeFullNameDTO;
+import com.jinji.backend.model.dto.response.*;
 import com.jinji.backend.model.enums.EmployeePageView;
 import com.jinji.backend.service.crud.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,50 +38,49 @@ public class EmployeeController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<Page<EmployeeTableDTO>> getEmployees(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+    public ResponseEntity<Page<EmployeeTableDTO>> getAllEmployees(
+            Pageable pageable,
             @RequestParam(required = false) String search
     ) {
-
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by(
-                        Sort.Order.asc("surname"),
-                        Sort.Order.asc("firstName")
-                )
-        );
-
         return ResponseEntity.ok(
                 employeeService.getEmployeesForTable(search, pageable)
         );
     }
 
+    @GetMapping("/team")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<Page<ManagerEmployeeTableDTO>> getEmployeesForManager(
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                employeeService.getEmployeesForManager(pageable)
+        );
+    }
+
     @GetMapping("/{employeeId}")
     @PreAuthorize("hasRole('HR') or hasRole('MANAGER')")
-    public EmployeeDetailsDTO getEmployeeById(
+    public ResponseEntity<EmployeeDetailsDTO> getEmployeeById(
             @PathVariable Long employeeId,
             @RequestParam EmployeePageView pageType
     ) {
-        return employeeService.getEmployeeById(employeeId, pageType);
+        return ResponseEntity.ok(employeeService.getEmployeeById(employeeId, pageType));
     }
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public EmployeeMeDTO getMe(@AuthenticationPrincipal UserDetails userDetails) {
-        return employeeService.getMe(userDetails.getUsername());
+    public ResponseEntity<EmployeeMeDTO> getMe() {
+        return ResponseEntity.ok(employeeService.getMe());
     }
 
     @GetMapping("/me/fullname")
     @PreAuthorize("isAuthenticated()")
-    public EmployeeFullNameDTO getMyFullName(@AuthenticationPrincipal UserDetails userDetails) {
-        return employeeService.getMyFullName(userDetails.getUsername());
+    public ResponseEntity<EmployeeFullNameDTO> getMyFullName(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(employeeService.getMyFullName(userDetails.getUsername()));
     }
 
     @GetMapping("/{id}/fullname")
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
-    public EmployeeFullNameDTO getEmployeeFullNameById(@PathVariable Long id) {
-        return employeeService.getEmployeeFullNameById(id);
+    public ResponseEntity<EmployeeFullNameDTO> getEmployeeFullNameById(@PathVariable Long id) {
+        return ResponseEntity.ok(employeeService.getEmployeeFullNameById(id));
     }
 }

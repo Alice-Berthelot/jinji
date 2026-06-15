@@ -1,5 +1,6 @@
 package com.jinji.backend.model.dto.request;
 
+import com.jinji.backend.model.enums.EmployeeStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 
@@ -17,6 +18,7 @@ public class EmployeeCreateRequest {
     private String email;
     private String phoneNumber;
     private LocalDate seniorityDate;
+    private EmployeeStatus status;
     private String departmentCode;
     private Set<Long> memberTeamIds;
     private Set<Long> managerTeamIds;
@@ -70,6 +72,14 @@ public class EmployeeCreateRequest {
 
     public void setSeniorityDate(LocalDate seniorityDate) {
         this.seniorityDate = seniorityDate;
+    }
+
+    public EmployeeStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EmployeeStatus status) {
+        this.status = status;
     }
 
     public String getDepartmentCode() {

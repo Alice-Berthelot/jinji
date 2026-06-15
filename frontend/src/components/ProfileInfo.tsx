@@ -1,6 +1,7 @@
 import { EmployeeProfile, EmployeeDetails } from "@/types/employee/employee";
 import Subtitle from "./ui/Subtitle";
 import { formatDate } from "@/utils/formatDate";
+import { formatEmployeeStatus } from "@/utils/formatLeaveRequestStatus copy";
 
 type ProfileInfoProps = {
   profile: EmployeeProfile | EmployeeDetails;
@@ -36,6 +37,10 @@ export default function ProfileInfo({
           <strong>Numéro de téléphone :</strong> {profile.phoneNumber}
         </p>
       )}
+
+      <p className="mb-2">
+        <strong>Statut :</strong> {formatEmployeeStatus(profile.status)}
+      </p>
 
       <p className="mb-2">
         <strong>Date d'ancienneté :</strong> {formatDate(profile.seniorityDate)}

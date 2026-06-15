@@ -1,7 +1,7 @@
 "use server";
 
 import { logout } from "@/app/actions/logout";
-import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { deleteTokens, getAccessToken, refreshTokens } from "./auth";
 
 async function apiFetch<T>(
@@ -9,7 +9,6 @@ async function apiFetch<T>(
   options: RequestInit = {},
   _retry = false
 ): Promise<T> {
-  const cookieStore = await cookies();
   const token = await getAccessToken();
 
   if (!token) {
@@ -17,7 +16,7 @@ async function apiFetch<T>(
     throw new Error("NO_SESSION");
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+  const res = await fetch(`${process.env.API_URL}${url}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -26,8 +25,6 @@ async function apiFetch<T>(
     },
     cache: "no-store",
   });
-
-
 
   if (res.ok) {
     const contentType = res.headers.get("content-type");
@@ -39,6 +36,10 @@ async function apiFetch<T>(
     return undefined as T;
   }
 
+  if (res.status === 403) {
+    redirect("/?error=forbidden");
+  }
+
   if (res.status === 401 && !_retry) {
     const newToken = await refreshTokens();
 
@@ -47,7 +48,7 @@ async function apiFetch<T>(
     }
 
     const retryRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      `${process.env.API_URL}${url}`,
       {
         ...options,
         headers: {

@@ -8,13 +8,19 @@ export default function NotificationIcon() {
   const unreadCount = useUnreadNotifications();
 
   return (
-    <Link href="/notifications" className="relative">
+    <Link
+      href="/notifications"
+      className="relative"
+      aria-label={
+        unreadCount > 0
+          ? `Notifications, ${unreadCount} non lues`
+          : "Notifications"
+      }
+    >
       <IoNotificationsSharp
         size={23}
         className={
-          unreadCount > 0
-            ? "text-red-500"
-            : "text-[var(--color-block-purple)]"
+          unreadCount > 0 ? "text-red-500" : "text-[var(--color-block-purple)]"
         }
       />
 

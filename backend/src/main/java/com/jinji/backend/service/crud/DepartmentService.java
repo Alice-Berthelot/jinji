@@ -1,7 +1,7 @@
 package com.jinji.backend.service.crud;
 
 import com.jinji.backend.mapper.DepartmentMapper;
-import com.jinji.backend.model.dto.DepartmentDTO;
+import com.jinji.backend.model.dto.response.DepartmentDTO;
 import com.jinji.backend.repository.DepartmentRepository;
 import org.springframework.stereotype.Service;
 

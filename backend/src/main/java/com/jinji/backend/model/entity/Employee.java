@@ -1,5 +1,7 @@
 package com.jinji.backend.model.entity;
 
+import com.jinji.backend.model.enums.EmployeeStatus;
+import com.jinji.backend.model.enums.PeriodType;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -24,6 +26,9 @@ public class Employee {
     private String phoneNumber;
     @Column(name = "seniority_date")
     private LocalDate seniorityDate;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private EmployeeStatus status;
 
     @ManyToOne
     @JoinColumn(name = "department_id")
@@ -94,6 +99,14 @@ public class Employee {
 
     public void setSeniorityDate(LocalDate seniorityDate) {
         this.seniorityDate = seniorityDate;
+    }
+
+    public EmployeeStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EmployeeStatus status) {
+        this.status = status;
     }
 
     public Department getDepartment() {

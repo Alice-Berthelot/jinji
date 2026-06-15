@@ -4,6 +4,7 @@ import com.jinji.backend.model.dto.request.TeamCreateRequest;
 import com.jinji.backend.model.projection.TeamSummary;
 import com.jinji.backend.service.crud.TeamService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,10 @@ public class TeamController {
     public ResponseEntity<String> createTeam(
             @Valid @RequestBody TeamCreateRequest request) {
 
-        return ResponseEntity.ok(teamService.createTeam(request));
+        String result = teamService.createTeam(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(result);
     }
 
     @GetMapping("/summary")
