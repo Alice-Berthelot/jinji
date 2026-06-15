@@ -25,8 +25,8 @@ describe("createLeaveAction", () => {
   const buildFormData = () => {
     const formData = new FormData();
     formData.set("employeeId", "1");
-    formData.set("startDate", "2026-01-01");
-    formData.set("endDate", "2026-01-02");
+    formData.set("startDate", "2026-07-01");
+    formData.set("endDate", "2026-07-02");
     formData.set("startPeriod", "AM");
     formData.set("endPeriod", "PM");
     formData.set("leaveTypeCode", "CP");
